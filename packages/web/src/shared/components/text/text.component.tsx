@@ -1,4 +1,4 @@
-import styled from 'styled-components'
+import styled, { CSSProperties } from 'styled-components'
 import { FONTS } from '@shared/consts/fonts.enum'
 import { FC } from 'react'
 
@@ -17,6 +17,7 @@ interface TextProps {
   $lineHeight?: string
   color?: string
   fontFamily?: string
+  style?: CSSProperties
 }
 
 export const Text: FC<TextProps> = ({ text, ...styles }) => {

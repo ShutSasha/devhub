@@ -13,6 +13,10 @@ export const StyledAuthForm = styled.div`
   justify-content: center;
   align-items: center;
   padding: 0 123.5px;
+
+  @media (max-width: 1740px) {
+    padding: 0 80px;
+  }
 `
 
 export const FeedBack = styled.div`
