@@ -1,5 +1,10 @@
+import { AuthLayout } from '@shared/layouts/auth/auth.layout'
 import { FC } from 'react'
 
 export const SignUp: FC = () => {
-  return <div>sign-up.page</div>
+  return (
+    <AuthLayout>
+      <p>children here</p>
+    </AuthLayout>
+  )
 }
