@@ -5,6 +5,8 @@ import { Text } from '@shared/components/text/text.component'
 import { colors } from '@shared/consts/colors.const'
 import { FONTS } from '@shared/consts/fonts.enum'
 import { Button } from '@shared/components/button/button.component'
+import googleImage from '@assets/images/auth/devicon_google.svg'
+import githubImage from '@assets/images/auth/mdi_github.svg'
 
 import { BlackText, InputsContainer, OrangeText, SixDigitalCodeSpan, StyledText } from './sign-up.style'
 
@@ -54,7 +56,9 @@ export const SignUp: FC = () => {
           hoverBorder={`1px solid ${colors.accent}`}
           margin="0 0 16px 0"
         />
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+        <div
+          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '16px' }}
+        >
           <Text text="Already have an account?" color="#0D1A26" fontSize="16px" $lineHeight="24px" />
           <Button
             text="Sign in"
@@ -69,6 +73,26 @@ export const SignUp: FC = () => {
             hoverColor="#fff"
             hoverBorder="1px solid transparent"
           />
+        </div>
+        <hr
+          style={{
+            color: 'red',
+            backgroundColor: 'rgba(48, 64, 80, 0.15)',
+            height: '1px',
+            border: 'none',
+            marginBottom: '16px',
+          }}
+        />
+        <Text
+          text="Sign up with"
+          $lineHeight="24px"
+          fontSize="16px"
+          fontFamily={FONTS.INTER}
+          style={{ textAlign: 'center', marginBottom: '16px' }}
+        />
+        <div style={{ display: 'flex', gap: '15px', justifyContent: 'center', alignItems: 'center' }}>
+          <img src={googleImage} alt="GoogleAuth" style={{ height: '36px', width: '36px', cursor: 'pointer' }} />
+          <img src={githubImage} alt="GithubAuth" style={{ height: '36px', width: '36px', cursor: 'pointer' }} />
         </div>
       </div>
     </AuthLayout>
