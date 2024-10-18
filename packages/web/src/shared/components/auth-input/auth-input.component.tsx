@@ -25,8 +25,9 @@ const Input = styled.input`
   font-family: ${FONTS.MANROPE};
   font-size: 16px;
   line-height: 24px;
-  font-weight: 400px;
+  font-weight: 400;
   color: #304050;
+  box-sizing: border-box;
 `
 
 interface AuthInputProps {
