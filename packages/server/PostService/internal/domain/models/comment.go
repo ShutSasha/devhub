@@ -1,10 +1,14 @@
 package models
 
-import "go.mongodb.org/mongo-driver/bson/primitive"
+import (
+	"time"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
+)
 
 type Comment struct {
-	Post        primitive.ObjectID `json:"post" bson:"post"`
 	User        primitive.ObjectID `json:"user" bson:"user"`
-	CommentText string             `json:"commentText" bson:"commentText"`
+	CommentText string             `json:"comment_text" bson:"comment_text"`
 	Likes       int                `json:"likes" bson:"likes"`
+	CreatedAt   time.Time          `json:"created_at" bson:"created_at"`
 }

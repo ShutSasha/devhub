@@ -3,5 +3,5 @@ package storage
 import "errors"
 
 var (
-	ErrPostNotFound = errors.New("user not found")
+	ErrPostNotFound = errors.New("post not found")
 )
