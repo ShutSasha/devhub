@@ -1,14 +1,25 @@
 package app
 
-import "github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/storage/mongodb"
+import (
+	"time"
 
-type App struct{}
+	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/app/httpapp"
+	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/storage/mongodb"
+)
 
-func New(storagePath string) *App {
-	_, err := mongodb.New(storagePath)
+type App struct {
+	HttpServer *httpapp.App
+}
+
+func New(storagePath string, httpPort int, timeout time.Duration) *App {
+	storage, err := mongodb.New(storagePath)
 	if err != nil {
 		panic(err)
 	}
 
-	return &App{}
+	httpApp := httpapp.New(storage, httpPort, timeout)
+
+	return &App{
+		HttpServer: httpApp,
+	}
 }

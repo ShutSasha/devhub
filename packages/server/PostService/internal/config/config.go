@@ -3,12 +3,19 @@ package config
 import (
 	"flag"
 	"os"
+	"time"
 
 	"github.com/ilyakaznacheev/cleanenv"
 )
 
 type Config struct {
-	StoragePath string `yaml:"storage_path" env-required:"true"`
+	StoragePath string     `yaml:"storage_path" env-required:"true"`
+	Http        HttpConfig `yaml:"http"`
+}
+
+type HttpConfig struct {
+	Port    int           `yaml:"port"`
+	Timeout time.Duration `yaml:"timout"`
 }
 
 func MustLoad() *Config {
