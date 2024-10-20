@@ -32,13 +32,14 @@ const Input = styled.input`
 
 interface AuthInputProps {
   label: string
+  type?: string
 }
 
-export const AuthInput: FC<AuthInputProps> = ({ label }) => {
+export const AuthInput: FC<AuthInputProps> = ({ label, type }) => {
   return (
     <InputContainer>
       <Span>{label}</Span>
-      <Input />
+      <Input type={type || 'text'} />
     </InputContainer>
   )
 }

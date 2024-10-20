@@ -37,9 +37,9 @@ export const SignUp: FC = () => {
       <div style={{ width: '100%' }}>
         <InputsContainer>
           <AuthInput label="Username" />
-          <AuthInput label="Password" />
-          <AuthInput label="Repeat password" />
-          <AuthInput label="Email" />
+          <AuthInput label="Password" type="password" />
+          <AuthInput label="Repeat password" type="password" />
+          <AuthInput label="Email" type="email" />
         </InputsContainer>
         <SixDigitalCodeSpan>6-digital code will be send to email</SixDigitalCodeSpan>
         <Button
