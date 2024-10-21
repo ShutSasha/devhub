@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace AuthService.Controllers;
 
 [ApiController]
-[Route("api/user")]
+[Route("api/auth")]
 public class AuthController : ControllerBase
 {
    private readonly Services.AuthService _authService;
@@ -29,10 +29,10 @@ public class AuthController : ControllerBase
    }
    
 
-   [HttpPost("verify-email/{email}")]
-   public async Task<IActionResult> VerifyEmail([FromRoute] string email,[FromBody] VerifyEmailRequest request)
+   [HttpPost("verify-email")]
+   public async Task<IActionResult> VerifyEmail([FromBody] VerifyEmailRequest request)
    {
-      var result = await _authService.VerifyEmail(email, request.ActivationCode);
+      var result = await _authService.VerifyEmail(request.Email, request.ActivationCode);
 
       if (result)
       {

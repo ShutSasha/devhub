@@ -15,9 +15,9 @@ public class MailService
    
    public async Task SendVerificationCode(string recieverEmail, string code)
    {
-     var apiKey = _senderDataSettings.SendGripKey;
+      var apiKey = _senderDataSettings.SendGripKey;
       var client = new SendGridClient(apiKey);
-      var from = new EmailAddress(_senderDataSettings.SenderEmail);
+      var from = new EmailAddress(_senderDataSettings.SenderEmail,"DevHub");
       var subject = "Activation link DevHub";
       var to = new EmailAddress(recieverEmail);
       var plainTextContent = "";

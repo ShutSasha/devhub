@@ -35,23 +35,42 @@ public class AuthService
 
       if (existingUser != null)
       {
-         throw new Exception("User with this email or username already exists");
+         switch (existingUser.IsActivated)
+         {
+            case false:
+            {
+               var code = GenerateActivationCode();
+               existingUser.ActivationCode = code;
+               
+               var update = Builders<User>.Update.Set(u => u.ActivationCode, code);
+               await _userCollection.UpdateOneAsync(
+                  Builders<User>.Filter.Eq(u => u.Email, email), update
+               );
+               
+               await _mailService.SendVerificationCode(email, code);
+               return;
+            }
+            case true:
+            {
+               throw new Exception("User with this email or username already exists.");
+            }
+         }
       }
       
       var passwordHash = _passwordHasher.GenerateHash(password);
-      var code = GenerateActivationCode();
+      var newCode = GenerateActivationCode();
       
       var user = new User()
       {
          UserName = username,
          Password = passwordHash,
          Email = email,
-         ActivationCode = code,
+         ActivationCode = newCode,
          Avatar = "https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/User-avatar.svg/2048px-User-avatar.svg.png",
       };
       
       await _userCollection.InsertOneAsync(user);
-      await _mailService.SendVerificationCode(email,code);
+      await _mailService.SendVerificationCode(email,newCode);
    }
    
    
