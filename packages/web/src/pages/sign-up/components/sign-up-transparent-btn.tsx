@@ -6,16 +6,16 @@ export const SignUpTransparentBtn = () => {
   return (
     <Button
       text="Sign in"
-      padding="3px 10px"
-      bgColor="#fff"
-      color={colors.accent}
-      border={`1px solid ${colors.accent}`}
-      fontFamily={`${FONTS.INTER}`}
-      fontWeight="600"
-      width="none"
-      hoverBgColor={colors.accent}
-      hoverColor="#fff"
-      hoverBorder="1px solid transparent"
+      $padding="3px 10px"
+      $bgColor="#fff"
+      $color={colors.accent}
+      $border={`1px solid ${colors.accent}`}
+      $fontFamily={`${FONTS.INTER}`}
+      $fontWeight="600"
+      $width="none"
+      $hoverBgColor={colors.accent}
+      $hoverColor="#fff"
+      $hoverBorder="1px solid transparent"
     />
   )
 }
