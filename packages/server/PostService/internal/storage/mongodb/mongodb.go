@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -65,4 +66,23 @@ func (s *Storage) SavePost(
 	oid := insertResult.InsertedID.(primitive.ObjectID)
 
 	return oid, nil
+}
+
+func (s *Storage) GetPostById(
+	ctx context.Context,
+	postId primitive.ObjectID,
+) (*models.Post, error) {
+	const op = "storage.mongodb.GetById"
+
+	collection := s.db.Database("DevHubDB").Collection("posts")
+
+	post := &models.Post{}
+	filter := bson.M{"_id": postId}
+
+	err := collection.FindOne(context.TODO(), filter).Decode(post)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", op, err)
+	}
+
+	return post, nil
 }

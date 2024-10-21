@@ -20,11 +20,6 @@ type Request struct {
 	Tags        []string `json:"tags,omitempty"`
 }
 
-type Response struct {
-	resp.Response
-	Alias string `json:"alias,omitempty"`
-}
-
 type PostSaver interface {
 	SavePost(
 		ctx context.Context,
@@ -43,12 +38,12 @@ func New(postSaver PostSaver) http.HandlerFunc {
 
 		err := render.DecodeJSON(r.Body, &req)
 		if errors.Is(err, io.EOF) {
-			render.JSON(w, r, resp.Error("empty request"))
+			render.JSON(w, r, resp.Error(op+" empty request"))
 
 			return
 		}
 		if err != nil {
-			render.JSON(w, r, resp.Error("failed to decode request"))
+			render.JSON(w, r, resp.Error(op+" failed to decode request"))
 
 			return
 		}
@@ -69,7 +64,7 @@ func New(postSaver PostSaver) http.HandlerFunc {
 			req.Tags,
 		)
 		if err != nil {
-			render.JSON(w, r, resp.Error("failed to add post"))
+			render.JSON(w, r, resp.Error(op+" failed to add post"))
 
 			return
 		}
