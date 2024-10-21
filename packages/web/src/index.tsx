@@ -1,10 +1,10 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { RouterProvider } from 'react-router-dom'
-import '@app/styles/index.css'
 import router from '@pages/router'
 import { Provider } from 'react-redux'
 import { store } from '@app/store/store'
+import GlobalStyle from '@app/styles/global.styles'
 
 import reportWebVitals from './reportWebVitals'
 
@@ -13,6 +13,7 @@ const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement)
 root.render(
   <React.StrictMode>
     <Provider store={store}>
+      <GlobalStyle />
       <RouterProvider router={router} />
     </Provider>
   </React.StrictMode>,
