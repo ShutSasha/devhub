@@ -1,6 +1,6 @@
 import { FONTS } from '@shared/consts/fonts.enum'
 import { FC } from 'react'
-import styled from 'styled-components'
+import styled, { CSSProperties } from 'styled-components'
 
 const InputContainer = styled.div`
   display: flex;
@@ -31,15 +31,17 @@ const Input = styled.input`
 `
 
 interface AuthInputProps {
-  label: string
+  label?: string
   type?: string
+  placeholder?: string
+  style?: CSSProperties
 }
 
-export const AuthInput: FC<AuthInputProps> = ({ label, type }) => {
+export const AuthInput: FC<AuthInputProps> = ({ label, type, placeholder, style }) => {
   return (
     <InputContainer>
       <Span>{label}</Span>
-      <Input type={type || 'text'} />
+      <Input type={type || 'text'} placeholder={placeholder} style={{ ...style }} />
     </InputContainer>
   )
 }
