@@ -22,7 +22,7 @@ class MainActivity : AppCompatActivity() {
         val fragmentManager : FragmentManager = supportFragmentManager
         val fragmentTransaction : FragmentTransaction = fragmentManager.beginTransaction()
         val primaryButtonFragment = PrimaryButtonFragment()
-        fragmentTransaction.add(R.id.primarybtn, primaryButtonFragment)
+        fragmentTransaction.add(R.id.primary_button_container, primaryButtonFragment)
         fragmentTransaction.commit()
     }
 

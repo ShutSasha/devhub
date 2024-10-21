@@ -8,12 +8,10 @@
     tools:context=".MainActivity">
 
     <FrameLayout
-        android:id="@+id/primarybtn"
-        android:layout_width="409dp"
-        android:layout_height="729dp"
+        android:id="@+id/primary_button_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-    </FrameLayout>
+        app:layout_constraintTop_toTopOf="parent"/>
 </androidx.constraintlayout.widget.ConstraintLayout>
