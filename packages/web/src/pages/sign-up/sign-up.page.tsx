@@ -7,25 +7,15 @@ import { AuthTitle } from '@shared/components/auth/title/auth-title.component'
 import { AuthBtn } from '@shared/components/auth/btn/btn.component'
 import googleImage from '@assets/images/auth/devicon_google.svg'
 import githubImage from '@assets/images/auth/mdi_github.svg'
+import { AuthDevhubTitle } from '@shared/components/auth/devhub-title/auth-devhub-title.components'
 
-import {
-  AuthIcon,
-  BlackText,
-  ImgContainer,
-  InputsContainer,
-  OrangeText,
-  SixDigitalCodeSpan,
-  StyledText,
-} from './sign-up.style'
+import { AuthIcon, ImgContainer, InputsContainer, SixDigitalCodeSpan } from './sign-up.style'
 import { SignUpTransparentBtn } from './components/sign-up-transparent-btn'
 
 export const SignUp: FC = () => {
   return (
     <AuthLayout>
-      <StyledText>
-        <BlackText>Dev</BlackText>
-        <OrangeText>Hub</OrangeText>
-      </StyledText>
+      <AuthDevhubTitle />
       <AuthTitle title="Welcome!" style={{ marginBottom: '16px' }} />
       <AuthTitle title="Create account" style={{ marginBottom: '16px', textAlign: 'center' }} />
       <div style={{ width: '100%' }}>
@@ -36,7 +26,7 @@ export const SignUp: FC = () => {
           <AuthInput label="Email" type="email" />
         </InputsContainer>
         <SixDigitalCodeSpan>6-digital code will be send to email</SixDigitalCodeSpan>
-        <AuthBtn />
+        <AuthBtn text="Sign up" />
         <div
           style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '16px' }}
         >
