@@ -1,16 +1,23 @@
 import { FC } from 'react'
 import { AuthLayout } from '@shared/layouts/auth/auth.layout'
 import { Text } from '@shared/components/text/text.component'
-import { colors } from '@shared/consts/colors.const'
 import { FONTS } from '@shared/consts/fonts.enum'
-import { Button } from '@shared/components/button/button.component'
 import { AuthInput } from '@shared/components/auth/input/auth-input.component'
 import { AuthTitle } from '@shared/components/auth/title/auth-title.component'
 import { AuthBtn } from '@shared/components/auth/btn/btn.component'
 import googleImage from '@assets/images/auth/devicon_google.svg'
 import githubImage from '@assets/images/auth/mdi_github.svg'
 
-import { BlackText, InputsContainer, OrangeText, SixDigitalCodeSpan, StyledText } from './sign-up.style'
+import {
+  AuthIcon,
+  BlackText,
+  ImgContainer,
+  InputsContainer,
+  OrangeText,
+  SixDigitalCodeSpan,
+  StyledText,
+} from './sign-up.style'
+import { SignUpTransparentBtn } from './components/sign-up-transparent-btn'
 
 export const SignUp: FC = () => {
   return (
@@ -34,19 +41,7 @@ export const SignUp: FC = () => {
           style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '16px' }}
         >
           <Text text="Already have an account?" color="#0D1A26" fontSize="16px" $lineHeight="24px" />
-          <Button
-            text="Sign in"
-            padding="3px 10px"
-            bgColor="#fff"
-            color={colors.accent}
-            border={`1px solid ${colors.accent}`}
-            fontFamily={`${FONTS.INTER}`}
-            fontWeight="600"
-            width="none"
-            hoverBgColor={colors.accent}
-            hoverColor="#fff"
-            hoverBorder="1px solid transparent"
-          />
+          <SignUpTransparentBtn />
         </div>
         <hr
           style={{
@@ -64,10 +59,10 @@ export const SignUp: FC = () => {
           fontFamily={FONTS.INTER}
           style={{ textAlign: 'center', marginBottom: '16px' }}
         />
-        <div style={{ display: 'flex', gap: '15px', justifyContent: 'center', alignItems: 'center' }}>
-          <img src={googleImage} alt="GoogleAuth" style={{ height: '36px', width: '36px', cursor: 'pointer' }} />
-          <img src={githubImage} alt="GithubAuth" style={{ height: '36px', width: '36px', cursor: 'pointer' }} />
-        </div>
+        <ImgContainer>
+          <AuthIcon src={googleImage} alt="GoogleAuth" />
+          <AuthIcon src={githubImage} alt="GithubAuth" />
+        </ImgContainer>
       </div>
     </AuthLayout>
   )
