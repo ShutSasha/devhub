@@ -26,11 +26,9 @@ func New(
 
 	router := chi.NewRouter()
 
-	router.Route("/create-post", func(r chi.Router) {
-		r.Post("/", save.New(postSaver))
-	})
+	router.Route("/api/post", func(r chi.Router) {
+		r.Post("/create", save.New(postSaver))
 
-	router.Route("/post", func(r chi.Router) {
 		r.Get("/{id}", get.New(postProvider))
 	})
 
