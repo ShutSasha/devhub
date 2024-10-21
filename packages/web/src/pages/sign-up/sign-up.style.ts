@@ -36,3 +36,16 @@ export const SixDigitalCodeSpan = styled.span`
   color: rgba(13, 26, 38, 0.5);
   margin-bottom: 16px;
 `
+
+export const ImgContainer = styled.div`
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  align-items: center;
+`
+
+export const AuthIcon = styled.img`
+  height: 36px;
+  width: 36px;
+  cursor: pointer;
+`
