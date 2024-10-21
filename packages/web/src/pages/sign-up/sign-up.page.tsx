@@ -1,10 +1,11 @@
 import { FC } from 'react'
-import { AuthInput } from '@shared/components/auth-input/auth-input.component'
 import { AuthLayout } from '@shared/layouts/auth/auth.layout'
 import { Text } from '@shared/components/text/text.component'
 import { colors } from '@shared/consts/colors.const'
 import { FONTS } from '@shared/consts/fonts.enum'
 import { Button } from '@shared/components/button/button.component'
+import { AuthInput } from '@shared/components/auth/input/auth-input.component'
+import { AuthTitle } from '@shared/components/auth/title/auth-title.component'
 import googleImage from '@assets/images/auth/devicon_google.svg'
 import githubImage from '@assets/images/auth/mdi_github.svg'
 
@@ -17,23 +18,8 @@ export const SignUp: FC = () => {
         <BlackText>Dev</BlackText>
         <OrangeText>Hub</OrangeText>
       </StyledText>
-      <Text
-        text="Welcome!"
-        color={colors.text}
-        fontSize="32px"
-        $lineHeight="48px"
-        fontWeight="700"
-        fontFamily={FONTS.INTER}
-      />
-      <Text
-        style={{ marginBottom: '16px', textAlign: 'center' }}
-        text="Create account"
-        color={colors.text}
-        fontSize="32px"
-        $lineHeight="48px"
-        fontWeight="700"
-        fontFamily={FONTS.INTER}
-      />
+      <AuthTitle title="Welcome!" style={{ marginBottom: '16px' }} />
+      <AuthTitle title="Create account" style={{ marginBottom: '16px', textAlign: 'center' }} />
       <div style={{ width: '100%' }}>
         <InputsContainer>
           <AuthInput label="Username" />
