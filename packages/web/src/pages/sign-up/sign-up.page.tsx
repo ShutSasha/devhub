@@ -6,6 +6,7 @@ import { FONTS } from '@shared/consts/fonts.enum'
 import { Button } from '@shared/components/button/button.component'
 import { AuthInput } from '@shared/components/auth/input/auth-input.component'
 import { AuthTitle } from '@shared/components/auth/title/auth-title.component'
+import { AuthBtn } from '@shared/components/auth/btn/btn.component'
 import googleImage from '@assets/images/auth/devicon_google.svg'
 import githubImage from '@assets/images/auth/mdi_github.svg'
 
@@ -28,20 +29,7 @@ export const SignUp: FC = () => {
           <AuthInput label="Email" type="email" />
         </InputsContainer>
         <SixDigitalCodeSpan>6-digital code will be send to email</SixDigitalCodeSpan>
-        <Button
-          text="Sign up"
-          fontFamily={FONTS.INTER}
-          fontWeight="700"
-          fontSize="16px"
-          bgColor={colors.accent}
-          color="#fff"
-          padding="5px 0"
-          width="100%"
-          hoverBgColor="#fff"
-          hoverColor={colors.accent}
-          hoverBorder={`1px solid ${colors.accent}`}
-          margin="0 0 16px 0"
-        />
+        <AuthBtn />
         <div
           style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '16px' }}
         >
