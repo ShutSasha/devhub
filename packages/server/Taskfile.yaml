@@ -1,0 +1,22 @@
+version: '3'
+
+tasks:
+  run_auth_service:
+    desc: "Run the C# AuthService"
+    cmds:
+      - |
+        cd ./AuthService
+        dotnet run 
+  
+  run_post_service:
+    desc: "Run the Go PostService"
+    cmds:
+      - |
+        cd ./PostService/cmd/app
+        go run main.go --config ../../config/config.yaml
+
+  run_all:
+    desc: "Run both AuthService and PostService"
+    deps:
+      - run_auth_service
+      - run_post_service
