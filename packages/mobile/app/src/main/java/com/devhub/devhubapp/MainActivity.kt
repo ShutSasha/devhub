@@ -43,6 +43,9 @@ class MainActivity : AppCompatActivity() {
         val primaryButtonFragment = PrimaryButtonFragment()
         fragmentTransaction.add(R.id.primary_button_container, primaryButtonFragment)
 
+        val line = LineFragment()
+        fragmentTransaction.add(R.id.line, line)
+
         fragmentTransaction.commit()
     }
 
