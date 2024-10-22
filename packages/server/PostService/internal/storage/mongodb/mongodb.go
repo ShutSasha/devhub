@@ -2,6 +2,7 @@ package mongodb
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -11,6 +12,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 
 	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/domain/models"
+	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/storage"
 )
 
 type Storage struct {
@@ -80,9 +82,35 @@ func (s *Storage) GetPostById(
 	filter := bson.M{"_id": postId}
 
 	err := collection.FindOne(context.TODO(), filter).Decode(post)
+
 	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, storage.ErrPostNotFound
+		}
+
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
 
 	return post, nil
+}
+
+func (s *Storage) Delete(
+	ctx context.Context,
+	postId primitive.ObjectID,
+) error {
+	const op = "storage.mongodb.Delete"
+
+	collection := s.db.Database("DevHubDB").Collection("posts")
+
+	filter := bson.M{"_id": postId}
+
+	deleteResult, err := collection.DeleteOne(context.TODO(), filter)
+	if err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
+	if deleteResult.DeletedCount < 1 {
+		return fmt.Errorf("%s: %w", op, fmt.Errorf("No items deleted"))
+	}
+
+	return nil
 }
