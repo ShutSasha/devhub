@@ -2,6 +2,7 @@ package get
 
 import (
 	"context"
+	"errors"
 	"net/http"
 
 	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/domain/models"
@@ -28,7 +29,7 @@ func New(postProvider PostProvider) http.HandlerFunc {
 
 		postId, err := primitive.ObjectIDFromHex(id)
 		if err != nil {
-			render.JSON(w, r, resp.Error(op+" "+err.Error()))
+			render.JSON(w, r, resp.Error(err.Error(), http.StatusBadRequest))
 
 			return
 		}
@@ -36,8 +37,12 @@ func New(postProvider PostProvider) http.HandlerFunc {
 			context.TODO(),
 			postId,
 		)
+		if errors.Is(err, storage.ErrPostNotFound) {
+			render.JSON(w, r, resp.Error("not found", http.StatusNotFound))
+		}
 		if err != nil {
-			render.JSON(w, r, resp.Error(op+" "+storage.ErrPostNotFound.Error()))
+
+			render.JSON(w, r, resp.Error(storage.ErrPostNotFound.Error(), http.StatusInternalServerError))
 
 			return
 		}

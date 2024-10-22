@@ -8,29 +8,18 @@ import (
 )
 
 type Response struct {
-	Status string `json:"status"`
+	Status int    `json:"status"`
 	Error  string `json:"error,omitempty"`
 }
 
-const (
-	StatusOK    = "OK"
-	StatusError = "Error"
-)
-
-func OK() Response {
+func Error(msg string, statusCode int) Response {
 	return Response{
-		Status: StatusOK,
-	}
-}
-
-func Error(msg string) Response {
-	return Response{
-		Status: StatusError,
+		Status: statusCode,
 		Error:  msg,
 	}
 }
 
-func ValidationError(errs validator.ValidationErrors) Response {
+func ValidationError(errs validator.ValidationErrors, statusCode int) Response {
 	var errMsgs []string
 
 	for _, err := range errs {
@@ -43,7 +32,7 @@ func ValidationError(errs validator.ValidationErrors) Response {
 	}
 
 	return Response{
-		Status: StatusError,
+		Status: statusCode,
 		Error:  strings.Join(errMsgs, ", "),
 	}
 }

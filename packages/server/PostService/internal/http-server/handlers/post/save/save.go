@@ -38,12 +38,12 @@ func New(postSaver PostSaver) http.HandlerFunc {
 
 		err := render.DecodeJSON(r.Body, &req)
 		if errors.Is(err, io.EOF) {
-			render.JSON(w, r, resp.Error(op+" empty request"))
+			render.JSON(w, r, resp.Error("Empty request", http.StatusBadRequest))
 
 			return
 		}
 		if err != nil {
-			render.JSON(w, r, resp.Error(op+" failed to decode request"))
+			render.JSON(w, r, resp.Error("Failed to decode request", http.StatusBadRequest))
 
 			return
 		}
@@ -51,7 +51,7 @@ func New(postSaver PostSaver) http.HandlerFunc {
 		if err := validator.New().Struct(req); err != nil {
 			validateErr := err.(validator.ValidationErrors)
 
-			render.JSON(w, r, resp.ValidationError(validateErr))
+			render.JSON(w, r, resp.ValidationError(validateErr, http.StatusBadRequest))
 
 			return
 		}
@@ -64,7 +64,7 @@ func New(postSaver PostSaver) http.HandlerFunc {
 			req.Tags,
 		)
 		if err != nil {
-			render.JSON(w, r, resp.Error(op+" failed to add post"))
+			render.JSON(w, r, resp.Error("Failed to add post", http.StatusInternalServerError))
 
 			return
 		}
