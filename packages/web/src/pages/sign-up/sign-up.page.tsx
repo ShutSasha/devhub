@@ -5,14 +5,43 @@ import { FONTS } from '@shared/consts/fonts.enum'
 import { AuthInput } from '@shared/components/auth/input/auth-input.component'
 import { AuthTitle } from '@shared/components/auth/title/auth-title.component'
 import { AuthBtn } from '@shared/components/auth/btn/btn.component'
+import { AuthDevhubTitle } from '@shared/components/auth/devhub-title/auth-devhub-title.components'
+import { useAppDispatch, useAppSelector } from '@app/store/store'
+import { setEmail, setPassword, setRepeatPassword, setUsername } from '@features/auth/auth.slice'
 import googleImage from '@assets/images/auth/devicon_google.svg'
 import githubImage from '@assets/images/auth/mdi_github.svg'
-import { AuthDevhubTitle } from '@shared/components/auth/devhub-title/auth-devhub-title.components'
 
 import { AuthIcon, ImgContainer, InputsContainer, SixDigitalCodeSpan } from './sign-up.style'
 import { SignUpTransparentBtn } from './components/sign-up-transparent-btn'
 
 export const SignUp: FC = () => {
+  const dispatch = useAppDispatch()
+
+  const username = useAppSelector(state => state.authSlice.username)
+  const password = useAppSelector(state => state.authSlice.password)
+  const repeatPassword = useAppSelector(state => state.authSlice.repeatPassword)
+  const email = useAppSelector(state => state.authSlice.email)
+
+  const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    dispatch(setUsername(e.target.value))
+  }
+
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    dispatch(setPassword(e.target.value))
+  }
+
+  const handleRepeatPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    dispatch(setRepeatPassword(e.target.value))
+  }
+
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    dispatch(setEmail(e.target.value))
+  }
+
+  const handleSumbit = () => {
+    console.log({ username, password, repeatPassword, email })
+  }
+
   return (
     <AuthLayout>
       <AuthDevhubTitle />
@@ -20,13 +49,13 @@ export const SignUp: FC = () => {
       <AuthTitle title="Create account" style={{ marginBottom: '16px', textAlign: 'center' }} />
       <div style={{ width: '100%' }}>
         <InputsContainer>
-          <AuthInput label="Username" />
-          <AuthInput label="Password" type="password" />
-          <AuthInput label="Repeat password" type="password" />
-          <AuthInput label="Email" type="email" />
+          <AuthInput label="Username" handleInput={handleUsernameChange} />
+          <AuthInput label="Password" type="password" handleInput={handlePasswordChange} />
+          <AuthInput label="Repeat password" type="password" handleInput={handleRepeatPasswordChange} />
+          <AuthInput label="Email" type="email" handleInput={handleEmailChange} />
         </InputsContainer>
         <SixDigitalCodeSpan>6-digital code will be send to email</SixDigitalCodeSpan>
-        <AuthBtn text="Sign up" />
+        <AuthBtn text="Sign up" handleClick={handleSumbit} />
         <div
           style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '16px' }}
         >
