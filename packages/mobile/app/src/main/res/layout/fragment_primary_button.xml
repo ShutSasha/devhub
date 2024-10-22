@@ -4,11 +4,12 @@
     android:id="@+id/primarybtn"
     android:layout_width="match_parent"
     android:layout_height="41dp"
-    android:background="@drawable/primary_button_layout"
+    android:background="@drawable/primary_button_background"
     android:text="Next"
     android:textColor="#FFFFFF"
     android:textSize="14sp"
     android:fontFamily="@font/montserrat_semibold_font"
     android:layout_marginLeft="10dp"
     android:layout_marginRight="10dp"
+    android:layout_marginTop="9dp"
     android:gravity="center"/>
