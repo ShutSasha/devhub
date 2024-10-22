@@ -19,14 +19,20 @@ public class AuthController : ControllerBase
    {
       try
       {
-         await _authService.Register(request.UserName, request.Password, request.Email);
-         return Ok();
+         if (!ModelState.IsValid)
+         {
+            return BadRequest(ModelState); 
+         }
+
+         var userResult = await _authService.Register(request.UserName, request.Password, request.Email);
+         return Ok(userResult);
       }
       catch (Exception e)
       {
-         return BadRequest(new{message = e.Message});
+         return BadRequest(new { message = e.Message });
       }
    }
+
    
 
    [HttpPost("verify-email")]
