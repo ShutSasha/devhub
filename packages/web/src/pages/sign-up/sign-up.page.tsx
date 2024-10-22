@@ -10,11 +10,13 @@ import { useAppDispatch, useAppSelector } from '@app/store/store'
 import { setEmail, setPassword, setRepeatPassword, setUsername } from '@features/auth/auth.slice'
 import googleImage from '@assets/images/auth/devicon_google.svg'
 import githubImage from '@assets/images/auth/mdi_github.svg'
+import { useRegisterMutation } from '@api/auth.api'
 
 import { AuthIcon, ImgContainer, InputsContainer, SixDigitalCodeSpan } from './sign-up.style'
 import { SignUpTransparentBtn } from './components/sign-up-transparent-btn'
 
 export const SignUp: FC = () => {
+  const [register, { isLoading, isSuccess, isError, error }] = useRegisterMutation()
   const dispatch = useAppDispatch()
 
   const username = useAppSelector(state => state.authSlice.username)
@@ -38,8 +40,13 @@ export const SignUp: FC = () => {
     dispatch(setEmail(e.target.value))
   }
 
-  const handleSumbit = () => {
-    console.log({ username, password, repeatPassword, email })
+  const handleSumbit = async () => {
+    try {
+      const res = await register({ userName: username, password, email })
+      console.log({ username, password, email })
+    } catch (error) {
+      console.error(error)
+    }
   }
 
   return (
