@@ -21,7 +21,6 @@
         android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Registration"
         android:textSize="24sp"
         android:textColor="@color/text"
         android:fontFamily="@font/montserrat_semibold_font"
