@@ -25,6 +25,9 @@ class MainActivity : AppCompatActivity() {
         val fragmentManager : FragmentManager = supportFragmentManager
         val fragmentTransaction : FragmentTransaction = fragmentManager.beginTransaction()
 
+        val title = TitleFragment()
+        fragmentTransaction.add(R.id.title, title)
+
         val textInputFragment = InputFragment()
         textInputFragment.setInputType(InputType.TYPE_CLASS_TEXT)
         textInputFragment.setInputHint("Enter your username")
