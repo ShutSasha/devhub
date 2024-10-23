@@ -1,31 +1,28 @@
 package com.devhub.devhubapp
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.text.InputType
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+import androidx.fragment.app.Fragment
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 
-class MainActivity : AppCompatActivity() {
-    @SuppressLint("CommitTransaction")
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContentView(R.layout.activity_main)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
+class RegistrationContainerFragment : Fragment() {
 
-        val fragmentManager : FragmentManager = supportFragmentManager
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+         val view = inflater.inflate(R.layout.fragment_registration_container, container, false)
+
+        val fragmentManager : FragmentManager = childFragmentManager
         val fragmentTransaction : FragmentTransaction = fragmentManager.beginTransaction()
 
         val title = TitleFragment()
+        title.setShowBackArrow(true)
+        title.setTitleText("Registration")
         fragmentTransaction.add(R.id.title, title)
 
         val textInputFragment = InputFragment()
@@ -44,12 +41,22 @@ class MainActivity : AppCompatActivity() {
         fragmentTransaction.add(R.id.password_input_container, passwordInputFragment)
 
         val primaryButtonFragment = PrimaryButtonFragment()
+        primaryButtonFragment.setButtonText("Next")
         fragmentTransaction.add(R.id.primary_button_container, primaryButtonFragment)
 
-        val line = LineFragment()
-        fragmentTransaction.add(R.id.line, line)
+        val lineFragment = LineFragment()
+        fragmentTransaction.add(R.id.line, lineFragment)
+
+        val textAndLinkFragment = TextWithLinkFragment()
+        textAndLinkFragment.setTextAndLinkText(
+            getString(R.string.already_have_an_account),
+            getString(R.string.log_in)
+        )
+        fragmentTransaction.add(R.id.textAndLinkText, textAndLinkFragment)
 
         fragmentTransaction.commit()
+
+        return view
     }
 
 }
