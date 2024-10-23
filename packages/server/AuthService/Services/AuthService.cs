@@ -22,7 +22,7 @@ public class AuthService
       _mailService = mailService;
    }
 
-   public async Task Register(string username, string password, string email)
+   public async Task<User> Register(string username, string password, string email)
    {
       var candidate = await _userCollection.FindAsync(
          Builders<User>.Filter.Or(
@@ -48,7 +48,7 @@ public class AuthService
                );
                
                await _mailService.SendVerificationCode(email, code);
-               return;
+               return existingUser;
             }
             case true:
             {
@@ -71,6 +71,7 @@ public class AuthService
       
       await _userCollection.InsertOneAsync(user);
       await _mailService.SendVerificationCode(email,newCode);
+      return user;
    }
    
    
