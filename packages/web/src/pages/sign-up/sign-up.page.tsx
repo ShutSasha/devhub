@@ -11,12 +11,16 @@ import { setEmail, setPassword, setRepeatPassword, setUsername } from '@features
 import googleImage from '@assets/images/auth/devicon_google.svg'
 import githubImage from '@assets/images/auth/mdi_github.svg'
 import { useRegisterMutation } from '@api/auth.api'
+import { handleServerException } from '@utils/handleServerException.util'
+import { ErrorSpan } from '@shared/components/errors/error-span.component'
 
 import { AuthIcon, ImgContainer, InputsContainer, SixDigitalCodeSpan } from './sign-up.style'
 import { SignUpTransparentBtn } from './components/sign-up-transparent-btn'
 
+import { ErrorException } from '~types/error/error.type'
+
 export const SignUp: FC = () => {
-  const [register, { isLoading, isSuccess, isError, error }] = useRegisterMutation()
+  const [register, { isLoading, isSuccess, isError, error: signUpError }] = useRegisterMutation()
   const dispatch = useAppDispatch()
 
   const username = useAppSelector(state => state.authSlice.username)
@@ -42,12 +46,14 @@ export const SignUp: FC = () => {
 
   const handleSumbit = async () => {
     try {
-      const res = await register({ userName: username, password, email })
-      console.log({ username, password, email })
-    } catch (error) {
-      console.error(error)
-    }
+      console.log('start submit')
+      const res = await register({ userName: username, password, email }).unwrap()
+      console.log(res)
+      console.log('end submit')
+    } catch {}
   }
+
+  const errors: string[] | undefined = handleServerException(signUpError as ErrorException)
 
   return (
     <AuthLayout>
@@ -62,6 +68,7 @@ export const SignUp: FC = () => {
           <AuthInput label="Email" type="email" handleInput={handleEmailChange} />
         </InputsContainer>
         <SixDigitalCodeSpan>6-digital code will be send to email</SixDigitalCodeSpan>
+        <div>{errors && errors.map((error: string, index: number) => <ErrorSpan key={index} value={error} />)}</div>
         <AuthBtn text="Sign up" handleClick={handleSumbit} />
         <div
           style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '16px' }}

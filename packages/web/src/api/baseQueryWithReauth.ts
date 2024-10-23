@@ -12,6 +12,8 @@ const baseUrl = `${process.env.REACT_APP_API_URL}`
 const baseQuery = fetchBaseQuery({
   baseUrl,
   prepareHeaders: (headers, { getState }) => {
+    headers.set('Content-Type', 'application/json')
+
     const token = (getState() as RootState).userSlice.accessToken
     // If we have a token set in state, let's assume that we should be passing it.
     if (token) {
@@ -30,7 +32,9 @@ const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQue
 ) => {
   // wait until the mutex is available without locking it
   await mutex.waitForUnlock()
+
   let result = await baseQuery(args, api, extraOptions)
+
   if (result.error && result.error.status === 401) {
     // checking whether the mutex is locked
     if (!mutex.isLocked()) {
