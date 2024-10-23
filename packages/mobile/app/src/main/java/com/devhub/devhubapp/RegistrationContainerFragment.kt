@@ -21,7 +21,7 @@ class RegistrationContainerFragment : Fragment() {
         val fragmentTransaction : FragmentTransaction = fragmentManager.beginTransaction()
 
         val title = TitleFragment()
-        title.setShowBackArrow(false)
+        title.setShowBackArrow(true)
         title.setTitleText("Registration")
         fragmentTransaction.add(R.id.title, title)
 

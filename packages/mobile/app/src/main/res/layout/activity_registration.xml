@@ -6,12 +6,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity"
-    android:background="@drawable/background_gradient">
+    android:background="@drawable/shape_background_gradient">
 
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/devhub_logo"
+        android:src="@drawable/ic_devhub_logo"
         app:layout_constraintBottom_toTopOf="@+id/registration_container"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

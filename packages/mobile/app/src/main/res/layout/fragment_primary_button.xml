@@ -4,7 +4,7 @@
     android:id="@+id/primarybtn"
     android:layout_width="match_parent"
     android:layout_height="41dp"
-    android:background="@drawable/primary_button_background"
+    android:background="@drawable/shape_primary_button_background"
     android:text="Next"
     android:textColor="#FFFFFF"
     android:textSize="14sp"

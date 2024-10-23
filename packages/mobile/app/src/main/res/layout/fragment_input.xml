@@ -7,7 +7,7 @@
     android:layout_marginLeft="10dp"
     android:layout_marginTop="9dp"
     android:layout_marginRight="10dp"
-    android:background="@drawable/input_background"
+    android:background="@drawable/shape_input_background"
     android:fontFamily="@font/montserrat_semibold_font"
     android:paddingLeft="15dp"
     android:textColor="@color/text"
