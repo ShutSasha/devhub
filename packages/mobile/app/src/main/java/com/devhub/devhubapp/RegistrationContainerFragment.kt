@@ -15,7 +15,6 @@ class RegistrationContainerFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
          val view = inflater.inflate(R.layout.fragment_registration_container, container, false)
 
         val fragmentManager : FragmentManager = childFragmentManager
@@ -42,7 +41,7 @@ class RegistrationContainerFragment : Fragment() {
         fragmentTransaction.add(R.id.password_input_container, passwordInputFragment)
 
         val primaryButtonFragment = PrimaryButtonFragment()
-        primaryButtonFragment.setButtonText("next")
+        primaryButtonFragment.setButtonText("Next")
         fragmentTransaction.add(R.id.primary_button_container, primaryButtonFragment)
 
         val lineFragment = LineFragment()
