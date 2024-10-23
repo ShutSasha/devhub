@@ -15,6 +15,7 @@ public class AuthController : ControllerBase
    }
 
    [HttpPost("register")]
+   // TODO: добавить repeatPassword
    public async Task<IActionResult> Register([FromBody] RegistrationUserRequest request)
    {
       try
@@ -23,8 +24,7 @@ public class AuthController : ControllerBase
          {
             return BadRequest(ModelState); 
          }
-
-         var userResult = await _authService.Register(request.UserName, request.Password, request.Email);
+         var userResult = await _authService.Register(request.Username, request.Password, request.Email);
          return Ok(userResult);
       }
       catch (Exception e)
@@ -33,7 +33,20 @@ public class AuthController : ControllerBase
       }
    }
 
-   
+   [HttpPost("login")]
+   public async Task<IActionResult> Login([FromBody] LoginUserRequest request)
+   {
+      var loginResult = await _authService.Login(request.UserName, request.Password);
+      HttpContext.Response.Cookies.Append("refreshToken",loginResult.RefreshToken, new CookieOptions()
+      {
+         HttpOnly = true,
+         //TODO: На продакшн
+         // Secure = true,
+         SameSite = SameSiteMode.Strict,
+         Expires = DateTime.UtcNow.AddDays(15)
+      });
+      return Ok(new {Token = loginResult.AccessToken, User = loginResult.UserData});
+   }
 
    [HttpPost("verify-email")]
    public async Task<IActionResult> VerifyEmail([FromBody] VerifyEmailRequest request)
@@ -46,5 +59,11 @@ public class AuthController : ControllerBase
       }
 
       return BadRequest(new { message = "Invalid email or activation code" });
+   }
+
+   [HttpPost("refresh")]
+   public async Task<IActionResult> Refresh()
+   {
+      return Ok();
    }
 }

@@ -30,7 +30,7 @@ public static class ApiExtension
             {
                OnMessageReceived = context =>
                {
-                  context.Token = context.Request.Cookies["tasty-cookies"];
+                  context.Token = context.Request.Cookies["refreshToken"];
 
                   return Task.CompletedTask;
                }
