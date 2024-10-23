@@ -1,8 +1,10 @@
+using AuthService.Dtos;
+
 namespace AuthService.Contracts.User;  
   
 public record LoginUserResponse  
 {  
-   public bool IsLoggedIn { get; set; } = false;  
-   public string JwtToken { get; set; }  
-   public string RefreshToken { get; internal set; }  
+   public string AccessToken { get; set; }  
+   public string RefreshToken { get; internal set; }
+   public UserDto UserData { get; set; }
 }
