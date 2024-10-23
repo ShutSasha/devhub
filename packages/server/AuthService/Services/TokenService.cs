@@ -1,5 +1,6 @@
 using System.Security.Cryptography;
 using AuthService.Helpers.Jwt;
+using AuthService.Models;
 
 namespace AuthService.Services;
 
@@ -11,17 +12,13 @@ public class TokenService
    {
       _jwtProvider = jwtProvider;
    }
-   
-   public string GenerateRefreshTokenString()
+
+   public Task<Tuple<string,string>> GenerateTokens(User user)
    {
-      var randomNumbers = new byte[64];
+      var accessToken = _jwtProvider.GenerateAccessToken(user);
+      var refreshToken = _jwtProvider.GenerateRefreshToken(user);
 
-      using (var randomNumberGenerator = RandomNumberGenerator.Create())
-      {
-         randomNumberGenerator.GetBytes(randomNumbers);
-      }
-
-      return Convert.ToBase64String(randomNumbers);
+      return Task.FromResult(Tuple.Create(accessToken, refreshToken));
    }
    
    

@@ -104,10 +104,10 @@ public class AuthService
          throw new Exception("Failed to login. Incorrect password");
       }
 
-      var accessToken = _jwtProvider.Generate(candidate);
+      var (accessToken,refreshToken) = await _tokenService.GenerateTokens(candidate);
       
       loginResponse.AccessToken = accessToken;
-      loginResponse.RefreshToken = _tokenService.GenerateRefreshTokenString();
+      loginResponse.RefreshToken = refreshToken;
       loginResponse.UserData = _mapper.Map<UserDto>(candidate);
       
       return loginResponse;
@@ -123,9 +123,9 @@ public class AuthService
       }
       
       var principal = _jwtProvider.GetPrincipal(refreshToken);
-      if (principal == null || !principal.Claims.Any(c => c.Type == "Id"))
+      if (principal == null || principal.Claims.All(c => c.Type == "Id"))
       {
-         return loginResponse;
+         throw new Exception("Invalid refresh token");
       }
 
       var userId = principal.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
@@ -138,14 +138,14 @@ public class AuthService
       var user = await _userCollection.Find(u => u.Id == userId).FirstOrDefaultAsync();
       if (user == null)
       {
-         return loginResponse;
+         throw new Exception("Unauthorized user");
       }
 
-      var newAccessToken = _jwtProvider.Generate(user);
-      
-      var newRefreshToken = _tokenService.GenerateRefreshTokenString();
+      var (newAccessToken, newRefreshToken) = await _tokenService.GenerateTokens(user);
 
       loginResponse.AccessToken = newAccessToken;
+      loginResponse.RefreshToken = newRefreshToken;
+      loginResponse.UserData = _mapper.Map<UserDto>(user);
       return loginResponse;
    }
 

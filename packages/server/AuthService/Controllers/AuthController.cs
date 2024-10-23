@@ -1,4 +1,5 @@
 using AuthService.Contracts.User;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AuthService.Controllers;
@@ -15,7 +16,6 @@ public class AuthController : ControllerBase
    }
 
    [HttpPost("register")]
-   // TODO: добавить repeatPassword
    public async Task<IActionResult> Register([FromBody] RegistrationUserRequest request)
    {
       try
@@ -36,16 +36,23 @@ public class AuthController : ControllerBase
    [HttpPost("login")]
    public async Task<IActionResult> Login([FromBody] LoginUserRequest request)
    {
-      var loginResult = await _authService.Login(request.UserName, request.Password);
-      HttpContext.Response.Cookies.Append("refreshToken",loginResult.RefreshToken, new CookieOptions()
+      try
       {
-         HttpOnly = true,
-         //TODO: На продакшн
-         // Secure = true,
-         SameSite = SameSiteMode.Strict,
-         Expires = DateTime.UtcNow.AddDays(15)
-      });
-      return Ok(new {Token = loginResult.AccessToken, User = loginResult.UserData});
+         var loginResult = await _authService.Login(request.UserName, request.Password);
+         HttpContext.Response.Cookies.Append("refreshToken", loginResult.RefreshToken, new CookieOptions()
+         {
+            HttpOnly = true,
+            //TODO: На продакшн
+            // Secure = true,
+            SameSite = SameSiteMode.Strict,
+            Expires = DateTime.UtcNow.AddDays(15)
+         });
+         return Ok(new { Token = loginResult.AccessToken, User = loginResult.UserData });
+      }
+      catch (Exception e)
+      {
+         return BadRequest(new { ErrorMessage = e.Message });
+      }
    }
 
    [HttpPost("verify-email")]
@@ -64,6 +71,26 @@ public class AuthController : ControllerBase
    [HttpPost("refresh")]
    public async Task<IActionResult> Refresh()
    {
-      return Ok();
+      try
+      {
+         var token = HttpContext.Request.Cookies["refreshToken"];
+
+         var refreshResult = await _authService.Refresh(token);
+
+         HttpContext.Response.Cookies.Append("refreshToken", refreshResult.RefreshToken, new CookieOptions()
+         {
+            HttpOnly = true,
+            // Secure = true,
+            SameSite = SameSiteMode.Strict,
+            Expires = DateTime.UtcNow.AddDays(15)
+         });
+
+         return Ok(new { Message = "Tokens updated", Token = refreshResult.AccessToken });
+      }
+      catch (Exception e)
+      {
+         return StatusCode(401, e.Message);
+      }
    }
+   
 }

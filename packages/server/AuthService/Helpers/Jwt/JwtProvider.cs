@@ -11,11 +11,17 @@ public class JwtProvider(IOptions<JwtOptions> options)
 {  
    private readonly JwtOptions _options = options.Value;  
   
-   public string Generate(User user)  
-   {  
-      Claim[] claims = [new("id", user.Id)];  
+   public string GenerateAccessToken(User user)
+   {
+      Claim[] claims = new[]
+      {
+         new Claim("Id", user.Id),
+         new Claim("type", "access"),
+         new Claim("Email", user.Email),
+
+      }; 
       var signingCredentials = new SigningCredentials(  
-         new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.SecretKey)),  
+         new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.AccessSecretKey)),  
          SecurityAlgorithms.HmacSha256);  
   
       var token = new JwtSecurityToken(  
@@ -26,11 +32,31 @@ public class JwtProvider(IOptions<JwtOptions> options)
       var tokenValue = new JwtSecurityTokenHandler().WriteToken(token);  
   
       return tokenValue;  
-   }  
+   }
+   public string GenerateRefreshToken(User user)
+   {
+      Claim[] claims = new[]
+      {
+         new Claim("Id", user.Id),
+         new Claim("type", "refresh"),
+         new Claim("Email", user.Email),
+      };
+
+      var signingCredentials = new SigningCredentials(
+         new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.RefreshSecretKey)),
+         SecurityAlgorithms.HmacSha256);
+
+      var refreshToken = new JwtSecurityToken(
+         claims: claims,
+         signingCredentials: signingCredentials,
+         expires: DateTime.UtcNow.AddDays(_options.RefreshExpiresDuration));
+
+      return new JwtSecurityTokenHandler().WriteToken(refreshToken);
+   }
   
-   public ClaimsPrincipal GetPrincipal(string accessToken)  
+   public ClaimsPrincipal GetPrincipal(string refreshToken)  
    {  
-      var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.SecretKey));  
+      var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.RefreshSecretKey));  
         
       var validation = new TokenValidationParameters  
       {  
@@ -41,7 +67,7 @@ public class JwtProvider(IOptions<JwtOptions> options)
          ValidateIssuerSigningKey = true  
       };  
   
-      return new JwtSecurityTokenHandler().ValidateToken(accessToken, validation, out _);  
+      return new JwtSecurityTokenHandler().ValidateToken(refreshToken, validation, out _);  
    }  
   
 }
