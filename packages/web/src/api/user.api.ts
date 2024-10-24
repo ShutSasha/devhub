@@ -7,7 +7,6 @@ export const api = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: 'https://jsonplaceholder.typicode.com',
   }),
-  tagTypes: ['User'],
   endpoints: builder => ({
     getUsers: builder.query<IUser[], void>({
       query: () => 'users',
