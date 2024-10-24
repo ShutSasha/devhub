@@ -2,37 +2,39 @@ package response
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/go-playground/validator/v10"
 )
 
 type Response struct {
-	Status int    `json:"status"`
-	Error  string `json:"error,omitempty"`
+	Status int                 `json:"status"`
+	Errors map[string][]string `json:"errors"`
 }
 
-func Error(msg string, statusCode int) Response {
+func Error(msgs map[string][]string, statusCode int) Response {
 	return Response{
 		Status: statusCode,
-		Error:  msg,
+		Errors: msgs,
 	}
 }
 
 func ValidationError(errs validator.ValidationErrors, statusCode int) Response {
-	var errMsgs []string
+	errMsgs := make(map[string][]string)
 
 	for _, err := range errs {
-		switch err.ActualTag() {
+		var message string
+		switch err.Tag() {
 		case "required":
-			errMsgs = append(errMsgs, fmt.Sprintf("field %s is a required field", err.Field()))
+			message = fmt.Sprintf("The %s field is required", err.Field())
 		default:
-			errMsgs = append(errMsgs, fmt.Sprintf("field %s is not valid", err.Field()))
+			message = fmt.Sprintf("The %s field is not valid", err.Field())
 		}
+
+		errMsgs[err.Field()] = append(errMsgs[err.Field()], message)
 	}
 
 	return Response{
 		Status: statusCode,
-		Error:  strings.Join(errMsgs, ", "),
+		Errors: errMsgs,
 	}
 }

@@ -38,12 +38,17 @@ func New(postSaver PostSaver) http.HandlerFunc {
 
 		err := render.DecodeJSON(r.Body, &req)
 		if errors.Is(err, io.EOF) {
-			render.JSON(w, r, resp.Error("Empty request", http.StatusBadRequest))
-
+			render.JSON(w, r, resp.Error(
+				map[string][]string{"body": {"Empty request"}},
+				http.StatusBadRequest,
+			))
 			return
 		}
 		if err != nil {
-			render.JSON(w, r, resp.Error("Failed to decode request", http.StatusBadRequest))
+			render.JSON(w, r, resp.Error(
+				map[string][]string{"body": {"Failed to decode request"}},
+				http.StatusBadRequest,
+			))
 
 			return
 		}
@@ -51,20 +56,35 @@ func New(postSaver PostSaver) http.HandlerFunc {
 		if err := validator.New().Struct(req); err != nil {
 			validateErr := err.(validator.ValidationErrors)
 
-			render.JSON(w, r, resp.ValidationError(validateErr, http.StatusBadRequest))
+			render.JSON(w, r, resp.ValidationError(
+				validateErr,
+				http.StatusBadRequest,
+			))
 
+			return
+		}
+
+		userId, err := primitive.ObjectIDFromHex(req.UserId)
+		if err != nil {
+			render.JSON(w, r, resp.Error(
+				map[string][]string{"userId": {"Invalid userId format"}},
+				http.StatusBadRequest,
+			))
 			return
 		}
 
 		id, err := postSaver.SavePost(
 			context.TODO(),
-			primitive.ObjectID([]byte(req.UserId)),
+			userId,
 			req.Title,
 			req.Description,
 			req.Tags,
 		)
 		if err != nil {
-			render.JSON(w, r, resp.Error("Failed to add post", http.StatusInternalServerError))
+			render.JSON(w, r, resp.Error(
+				map[string][]string{"userId": {"Invalid userId format"}},
+				http.StatusBadRequest,
+			))
 
 			return
 		}

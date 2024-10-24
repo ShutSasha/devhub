@@ -29,7 +29,10 @@ func New(postProvider PostProvider) http.HandlerFunc {
 
 		postId, err := primitive.ObjectIDFromHex(id)
 		if err != nil {
-			render.JSON(w, r, resp.Error(err.Error(), http.StatusBadRequest))
+			render.JSON(w, r, resp.Error(
+				map[string][]string{"postId": {"Invalid postId format"}},
+				http.StatusBadRequest,
+			))
 
 			return
 		}
@@ -38,12 +41,15 @@ func New(postProvider PostProvider) http.HandlerFunc {
 			postId,
 		)
 		if errors.Is(err, storage.ErrPostNotFound) {
-			render.JSON(w, r, resp.Error("not found", http.StatusNotFound))
+			render.JSON(w, r, resp.Error(map[string][]string{
+				"post": {"Post not found"},
+			}, http.StatusNotFound))
+			return
 		}
 		if err != nil {
-
-			render.JSON(w, r, resp.Error(storage.ErrPostNotFound.Error(), http.StatusInternalServerError))
-
+			render.JSON(w, r, resp.Error(map[string][]string{
+				"post": {err.Error()},
+			}, http.StatusInternalServerError))
 			return
 		}
 

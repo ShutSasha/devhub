@@ -25,7 +25,10 @@ func New(postRemover PostRemover) http.HandlerFunc {
 
 		postId, err := primitive.ObjectIDFromHex(id)
 		if err != nil {
-			render.JSON(w, r, resp.Error(err.Error(), http.StatusBadRequest))
+			render.JSON(w, r, resp.Error(
+				map[string][]string{"postId": {"Invalid postId format"}},
+				http.StatusBadRequest,
+			))
 
 			return
 		}
@@ -34,14 +37,16 @@ func New(postRemover PostRemover) http.HandlerFunc {
 			postId,
 		)
 		if err != nil {
-			render.JSON(w, r, resp.Error(err.Error(), http.StatusInternalServerError))
+			render.JSON(w, r, resp.Error(map[string][]string{
+				"post": {err.Error()},
+			}, http.StatusInternalServerError))
 
 			return
 		}
 
 		render.JSON(w, r, map[string]interface{}{
 			"Status":  http.StatusOK,
-			"Message": "successfully deleted",
+			"Message": "Successfully deleted",
 		})
 	}
 }
