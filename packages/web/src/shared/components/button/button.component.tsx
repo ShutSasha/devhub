@@ -43,8 +43,13 @@ interface StyledButtonProps {
 
 interface ButtonProps extends StyledButtonProps {
   text: ReactNode
+  handleClick?: () => void
 }
 
-export const Button: FC<ButtonProps> = ({ text, ...styles }) => {
-  return <StyledButton {...styles}>{text}</StyledButton>
+export const Button: FC<ButtonProps> = ({ text, handleClick, ...styles }) => {
+  return (
+    <StyledButton onClick={handleClick} {...styles}>
+      {text}
+    </StyledButton>
+  )
 }
