@@ -1,48 +1,38 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
-import { User } from '~types/user.type'
+import { IUser } from '~types/user/user.type'
 
-interface Filters {
-  email?: string
-  name?: string
-  phone?: string
-  username?: string
+export interface IUserState {
+  user: IUser | null
+  accessToken: string
 }
 
-export interface UsersState {
-  users: User[]
-  filteredUsers: User[]
-  filters: Filters
+const initialState: IUserState = {
+  user: null,
+  accessToken: '',
 }
 
-const initialState: UsersState = {
-  users: [],
-  filteredUsers: [],
-  filters: {},
-}
-
-const usersSlice = createSlice({
-  name: 'users',
+const userSlice = createSlice({
   initialState,
+  name: 'userSlice',
   reducers: {
-    setUsers: (state, action: PayloadAction<User[]>) => {
-      state.users = action.payload
-      state.filteredUsers = action.payload
+    login: (state, action: PayloadAction<string>) => {
+      state.accessToken = action.payload
     },
-    setFilters: (state, action: PayloadAction<Filters>) => {
-      state.filters = action.payload
-      state.filteredUsers = state.users.filter(user => {
-        return Object.entries(state.filters).every(([key, value]) =>
-          user[key as keyof Filters]?.toLowerCase().includes((value as string).toLowerCase()),
-        )
-      })
+    logout: () => initialState,
+    setUser: (state, action: PayloadAction<IUser>) => {
+      state.user = action.payload
     },
-    clearFilters: state => {
-      state.filters = {}
-      state.filteredUsers = state.users
+    setAccessToken: (state, action: PayloadAction<string>) => {
+      state.accessToken = action.payload
     },
+  },
+  selectors: {
+    getUserToken: state => state.accessToken,
   },
 })
 
-export const { setUsers, setFilters, clearFilters } = usersSlice.actions
-export default usersSlice.reducer
+export default userSlice
+
+export const { login, logout, setUser, setAccessToken } = userSlice.actions
+export const { getUserToken } = userSlice.selectors

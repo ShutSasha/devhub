@@ -5,9 +5,10 @@ import { FC } from 'react'
 
 interface AuthBtnProps {
   text: string
+  handleClick?: () => void
 }
 
-export const AuthBtn: FC<AuthBtnProps> = ({ text }) => {
+export const AuthBtn: FC<AuthBtnProps> = ({ text, handleClick }) => {
   return (
     <Button
       text={text}
@@ -22,6 +23,7 @@ export const AuthBtn: FC<AuthBtnProps> = ({ text }) => {
       $hoverColor={colors.accent}
       $hoverBorder={`1px solid ${colors.accent}`}
       $margin="0 0 16px 0"
+      handleClick={handleClick}
     />
   )
 }

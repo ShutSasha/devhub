@@ -1,4 +1,5 @@
 using AuthService.Contracts.User;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AuthService.Controllers;
@@ -19,15 +20,53 @@ public class AuthController : ControllerBase
    {
       try
       {
-         await _authService.Register(request.UserName, request.Password, request.Email);
-         return Ok();
+         if (!ModelState.IsValid)
+         {
+            return BadRequest(ModelState); 
+         }
+         var userResult = await _authService.Register(request.Username, request.Password, request.Email);
+         return Ok(userResult);
       }
       catch (Exception e)
       {
-         return BadRequest(new{message = e.Message});
+         return BadRequest(new {
+            status = 400,
+            errors = new Dictionary<string, List<string>>
+            {
+               { "Registration error", new List<string> { e.Message } }
+            }
+         });
       }
    }
-   
+
+   [HttpPost("login")]
+   public async Task<IActionResult> Login([FromBody] LoginUserRequest request)
+   {
+      try
+      {
+         var loginResult = await _authService.Login(request.UserName, request.Password);
+         HttpContext.Response.Cookies.Append("refreshToken", loginResult.RefreshToken, new CookieOptions()
+         {
+            HttpOnly = true,
+            //TODO: На продакшн
+            // Secure = true,
+            SameSite = SameSiteMode.Strict,
+            Expires = DateTime.UtcNow.AddDays(15)
+         });
+         return Ok(new { Token = loginResult.AccessToken, User = loginResult.UserData });
+      }
+      catch (Exception e)
+      {
+         return BadRequest(new
+         {
+            status = 400,
+            errors = new Dictionary<string, List<string>>
+            {
+               { "Login error", new List<string> { e.Message } }
+            }
+         });
+      }
+   }
 
    [HttpPost("verify-email")]
    public async Task<IActionResult> VerifyEmail([FromBody] VerifyEmailRequest request)
@@ -39,6 +78,46 @@ public class AuthController : ControllerBase
          return Ok(new { message = "Email successfully verified" });
       }
 
-      return BadRequest(new { message = "Invalid email or activation code" });
+      return BadRequest(new
+      {
+         status = 400,
+         errors = new Dictionary<string, List<string>>
+         {
+            { "ActivationCode", new List<string> { "Invalid email or activation code" } }
+         }
+      });
    }
+
+   [HttpPost("refresh")]
+   public async Task<IActionResult> Refresh()
+   {
+      try
+      {
+         var token = HttpContext.Request.Cookies["refreshToken"];
+
+         var refreshResult = await _authService.Refresh(token);
+
+         HttpContext.Response.Cookies.Append("refreshToken", refreshResult.RefreshToken, new CookieOptions()
+         {
+            HttpOnly = true,
+            // Secure = true,
+            SameSite = SameSiteMode.Strict,
+            Expires = DateTime.UtcNow.AddDays(15)
+         });
+
+         return Ok(new { Message = "Tokens updated", Token = refreshResult.AccessToken });
+      }
+      catch (Exception e)
+      {
+         return Unauthorized(new
+         {
+            status = 401,
+            errors = new Dictionary<string, List<string>>
+            {
+               { "Refresh error", new List<string> { e.Message } }
+            }
+         });
+      }
+   }
+   
 }

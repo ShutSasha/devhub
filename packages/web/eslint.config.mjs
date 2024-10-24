@@ -52,7 +52,7 @@ export default [
 			// General
 			'no-var': 'error',
 			'prefer-const': 'warn',
-			'no-console': 'warn',
+      'no-console': ['warn', { allow: ['error'] }],
 			'no-debugger': 'error',
 			'no-unused-vars': 'off',
 		},
