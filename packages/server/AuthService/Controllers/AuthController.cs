@@ -29,7 +29,13 @@ public class AuthController : ControllerBase
       }
       catch (Exception e)
       {
-         return BadRequest(new { message = e.Message });
+         return BadRequest(new {
+            status = 400,
+            errors = new Dictionary<string, List<string>>
+            {
+               { "Registration error", new List<string> { e.Message } }
+            }
+         });
       }
    }
 
