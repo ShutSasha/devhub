@@ -13,7 +13,7 @@ Before running the services, ensure that you have:
 
 1. **Paste configuration files into services**
 
-   For AuthService paste this appsettings.Development.json file into **core** directory (Ask Developer for SendGripKey)
+   For AuthService paste this appsettings.Development.json file into **root** directory of a service (Ask Developer for SendGripKey)
    
    ```json
    {  
@@ -43,17 +43,17 @@ Before running the services, ensure that you have:
       "ExpiresDuration": "1"  
    }  
 }
-   ```
+	```
    
-   For PostService add a **config** folder into **core** directory and paste this config.yaml file into this config folder.
+   For PostService add a **config** folder into **root** directory of a service and paste this config.yaml file into this config folder.
    
-   ```yaml
-   storage_path: "mongodb+srv://root:e8vGcbKC5vm5spFw@devhubdb.jsttz.mongodb.net/?retryWrites=true&w=majority&appName=DevHubDB"
-http:
-  port: 8080
-  timeout: 10s
-
-   ```
+  ```yaml
+	env: "local"
+	storage_path: "mongodb+srv://root:e8vGcbKC5vm5spFw@devhubdb.jsttz.mongodb.net/?retryWrites=true&w=majority&appName=DevHubDB"
+	http:
+  	  port: 8080
+  	  timeout: 10s
+  ```
 
 
 2. **Navigate to the project folder:**
