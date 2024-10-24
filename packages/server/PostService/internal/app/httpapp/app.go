@@ -12,6 +12,7 @@ import (
 	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/http-server/handlers/post/delete"
 	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/http-server/handlers/post/get"
 	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/http-server/handlers/post/save"
+	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/http-server/handlers/post/update"
 )
 
 type App struct {
@@ -22,6 +23,7 @@ func New(
 	postSaver save.PostSaver,
 	postProvider get.PostProvider,
 	postRemover delete.PostRemover,
+	postUpdater update.PostUpdater,
 	port int,
 	timout time.Duration,
 ) *App {
@@ -34,6 +36,8 @@ func New(
 		r.Get("/{id}", get.New(postProvider))
 
 		r.Delete("/{id}", delete.New(postRemover))
+
+		r.Patch("/{id}", update.New(postUpdater))
 	})
 
 	httpServer := &http.Server{

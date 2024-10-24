@@ -1,4 +1,4 @@
-package save
+package update
 
 import (
 	"context"
@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	"github.com/go-playground/validator/v10"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -14,26 +15,28 @@ import (
 )
 
 type Request struct {
-	UserId      string   `json:"userId" validate:"required"`
-	Title       string   `json:"title" validate:"required"`
-	Description string   `json:"description" validate:"required"`
+	Title       string   `json:"title,omitempty"`
+	Description string   `json:"description,omitempty"`
+	HeaderImage string   `json:"header_image,omitempty"`
 	Tags        []string `json:"tags,omitempty"`
 }
 
-type PostSaver interface {
-	SavePost(
+type PostUpdater interface {
+	Update(
 		ctx context.Context,
-		userId primitive.ObjectID,
+		postId primitive.ObjectID,
 		title string,
 		description string,
+		headerImage string,
 		tags []string,
-	) (primitive.ObjectID, error)
+	) error
 }
 
-func New(postSaver PostSaver) http.HandlerFunc {
+func New(postUpdater PostUpdater) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		const op = "handlers.post.save.New"
+		const op = "handlers.post.update.New"
 
+		id := chi.URLParam(r, "id")
 		var req Request
 
 		err := render.DecodeJSON(r.Body, &req)
@@ -64,25 +67,26 @@ func New(postSaver PostSaver) http.HandlerFunc {
 			return
 		}
 
-		userId, err := primitive.ObjectIDFromHex(req.UserId)
+		postId, err := primitive.ObjectIDFromHex(id)
 		if err != nil {
 			render.JSON(w, r, resp.Error(
-				map[string][]string{"userId": {"Invalid userId format"}},
+				map[string][]string{"postId": {"Invalid postId format"}},
 				http.StatusBadRequest,
 			))
 			return
 		}
 
-		id, err := postSaver.SavePost(
+		err = postUpdater.Update(
 			context.TODO(),
-			userId,
+			postId,
 			req.Title,
 			req.Description,
+			req.HeaderImage,
 			req.Tags,
 		)
 		if err != nil {
 			render.JSON(w, r, resp.Error(
-				map[string][]string{"userId": {err.Error()}},
+				map[string][]string{"post": {err.Error()}},
 				http.StatusBadRequest,
 			))
 
@@ -90,7 +94,8 @@ func New(postSaver PostSaver) http.HandlerFunc {
 		}
 
 		render.JSON(w, r, map[string]interface{}{
-			"_id": id,
+			"Status":  http.StatusOK,
+			"Message": "Successfully updated",
 		})
 	}
 }

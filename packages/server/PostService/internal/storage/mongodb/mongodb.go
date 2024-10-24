@@ -114,3 +114,34 @@ func (s *Storage) Delete(
 
 	return nil
 }
+
+func (s *Storage) Update(
+	ctx context.Context,
+	postId primitive.ObjectID,
+	title string,
+	description string,
+	headerImage string,
+	tags []string,
+) error {
+	const op = "storage.mongodb.Update"
+
+	// TODO: add validation
+
+	collection := s.db.Database("DevHubDB").Collection("posts")
+
+	filter := bson.M{"_id": postId}
+
+	update := bson.M{"$set": bson.M{
+		"title":        title,
+		"description":  description,
+		"header_image": headerImage,
+		"tags":         tags,
+	}}
+
+	_, err := collection.UpdateOne(ctx, filter, update)
+	if err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	return nil
+}

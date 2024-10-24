@@ -17,7 +17,14 @@ func New(storagePath string, httpPort int, timeout time.Duration) *App {
 		panic(err)
 	}
 
-	httpApp := httpapp.New(storage, storage, storage, httpPort, timeout)
+	httpApp := httpapp.New(
+		storage,
+		storage,
+		storage,
+		storage,
+		httpPort,
+		timeout,
+	)
 
 	return &App{
 		HttpServer: httpApp,
