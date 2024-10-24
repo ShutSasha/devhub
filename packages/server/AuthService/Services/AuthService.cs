@@ -119,7 +119,7 @@ public class AuthService
 
       if (string.IsNullOrEmpty(refreshToken))
       {
-         return loginResponse; 
+         throw new Exception("Empty token");
       }
       
       var principal = _jwtProvider.GetPrincipal(refreshToken);
@@ -132,7 +132,7 @@ public class AuthService
 
       if (string.IsNullOrEmpty(userId))
       {
-         return loginResponse; 
+         throw new Exception("Invalid user id");
       }
       
       var user = await _userCollection.Find(u => u.Id == userId).FirstOrDefaultAsync();
