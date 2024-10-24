@@ -35,14 +35,21 @@ interface AuthInputProps {
   type?: string
   placeholder?: string
   style?: CSSProperties
+  value?: string | undefined
   handleInput?: (e: React.ChangeEvent<HTMLInputElement>) => void
 }
 
-export const AuthInput: FC<AuthInputProps> = ({ label, type, placeholder, style, handleInput }) => {
+export const AuthInput: FC<AuthInputProps> = ({ label, type, placeholder, style, value, handleInput }) => {
   return (
     <InputContainer>
       <Span>{label}</Span>
-      <Input type={type || 'text'} placeholder={placeholder} style={{ ...style }} onChange={handleInput} />
+      <Input
+        type={type || 'text'}
+        placeholder={placeholder}
+        style={{ ...style }}
+        value={value}
+        onChange={handleInput}
+      />
     </InputContainer>
   )
 }
