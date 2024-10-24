@@ -51,7 +51,14 @@ public class AuthController : ControllerBase
       }
       catch (Exception e)
       {
-         return BadRequest(new { ErrorMessage = e.Message });
+         return BadRequest(new
+         {
+            status = 400,
+            errors = new Dictionary<string, List<string>>
+            {
+               { "Login error", new List<string> { e.Message } }
+            }
+         });
       }
    }
 
@@ -65,7 +72,14 @@ public class AuthController : ControllerBase
          return Ok(new { message = "Email successfully verified" });
       }
 
-      return BadRequest(new { message = "Invalid email or activation code" });
+      return BadRequest(new
+      {
+         status = 400,
+         errors = new Dictionary<string, List<string>>
+         {
+            { "ActivationCode", new List<string> { "Invalid email or activation code" } }
+         }
+      });
    }
 
    [HttpPost("refresh")]
@@ -89,7 +103,14 @@ public class AuthController : ControllerBase
       }
       catch (Exception e)
       {
-         return StatusCode(401, e.Message);
+         return Unauthorized(new
+         {
+            status = 401,
+            errors = new Dictionary<string, List<string>>
+            {
+               { "Refresh error", new List<string> { e.Message } }
+            }
+         });
       }
    }
    
