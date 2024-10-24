@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"log"
+	"log/slog"
 	"os"
 	"os/signal"
 	"syscall"
@@ -10,27 +10,75 @@ import (
 
 	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/app"
 	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/config"
+	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/lib/logger/handlers/slogpretty"
+	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/lib/logger/sl"
+)
+
+const (
+	envLocal = "local"
+	envDev   = "dev"
+	envProd  = "prod"
 )
 
 func main() {
 	cfg := config.MustLoad()
 
-	application := app.New(cfg.StoragePath, cfg.Http.Port, cfg.Http.Timeout)
+	log := setupLogger(cfg.Env)
+
+	application := app.New(log, cfg.StoragePath, cfg.Http.Port, cfg.Http.Timeout)
+	done := make(chan os.Signal, 1)
+	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 
 	go func() {
-		sigChan := make(chan os.Signal, 1)
-		signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
-		<-sigChan
-
-		shutdownCtx, shutdownRelease := context.WithTimeout(context.Background(), 10*time.Second)
-		defer shutdownRelease()
-
-		if err := application.HttpServer.Server.Shutdown(shutdownCtx); err != nil {
-			log.Fatalf("HTTP shutdown error: %v", err)
+		if err := application.HttpServer.Run(); err != nil {
+			log.Error("failed to start server")
 		}
 	}()
 
-	if err := application.HttpServer.Run(); err != nil {
-		log.Fatalf("HTTP server error: %v", err)
+	log.Info("server started")
+
+	<-done
+	log.Info("stopping server")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	if err := application.HttpServer.Server.Shutdown(ctx); err != nil {
+		log.Error("failed to stop server", sl.Err(err))
+
+		return
 	}
+
+	log.Info("server stopped")
+}
+
+func setupLogger(env string) *slog.Logger {
+	var log *slog.Logger
+
+	switch env {
+	case envLocal:
+		log = setupPrettySlog()
+	case envDev:
+		log = slog.New(
+			slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}),
+		)
+	case envProd:
+		log = slog.New(
+			slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelInfo}),
+		)
+	}
+
+	return log
+}
+
+func setupPrettySlog() *slog.Logger {
+	opts := slogpretty.PrettyHandlerOptions{
+		SlogOpts: &slog.HandlerOptions{
+			Level: slog.LevelDebug,
+		},
+	}
+
+	handler := opts.NewPrettyHandler(os.Stdout)
+
+	return slog.New(handler)
 }
