@@ -1,5 +1,6 @@
 export interface IUser {
-  _id: string
+  id: string
+  userName: string
   name: string | null
   avatar: string
   email: string
@@ -8,4 +9,5 @@ export interface IUser {
   activationCode: string
   isActivated: false
   roles: string[]
+  userRole: number[]
 }
