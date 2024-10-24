@@ -125,8 +125,6 @@ func (s *Storage) Update(
 ) error {
 	const op = "storage.mongodb.Update"
 
-	// TODO: add validation
-
 	collection := s.db.Database("DevHubDB").Collection("posts")
 
 	filter := bson.M{"_id": postId}

@@ -15,8 +15,8 @@ import (
 
 type Request struct {
 	UserId      string   `json:"userId" validate:"required"`
-	Title       string   `json:"title" validate:"required"`
-	Description string   `json:"description" validate:"required"`
+	Title       string   `json:"title" validate:"required,max=128,min=1"`
+	Description string   `json:"description" validate:"required,max=62792"`
 	Tags        []string `json:"tags,omitempty"`
 }
 

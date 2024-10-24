@@ -15,8 +15,8 @@ import (
 )
 
 type Request struct {
-	Title       string   `json:"title,omitempty"`
-	Description string   `json:"description,omitempty"`
+	Title       string   `json:"title,omitempty" validate:"max=128,min=1"`
+	Description string   `json:"description,omitempty" validate:"max=62792"`
 	HeaderImage string   `json:"header_image,omitempty"`
 	Tags        []string `json:"tags,omitempty"`
 }
