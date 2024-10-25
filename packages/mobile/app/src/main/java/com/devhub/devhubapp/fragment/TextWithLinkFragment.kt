@@ -1,15 +1,14 @@
-package com.devhub.devhubapp
+package com.devhub.devhubapp.fragment
 
 import android.annotation.SuppressLint
 import android.graphics.Paint
 import android.os.Bundle
-import android.text.Html
-import android.text.Spanned
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import com.devhub.devhubapp.R
 
 
 class TextWithLinkFragment : Fragment() {
