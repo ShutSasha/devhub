@@ -14,4 +14,6 @@
     <string name="we_will_send_you_6_digital_code">We will send you 6-digital code</string>
     <string name="next">Next</string>
     <string name="back_arrow">Back arrow</string>
+    <string name="welcome">Welcome!</string>
+    <string name="code_collaborate_create">Code, Collaborate, Create</string>
 </resources>
