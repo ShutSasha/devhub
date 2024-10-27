@@ -7,6 +7,7 @@
     <string name="confirming_email">Confirming email</string>
     <string name="enter_code_from_email">Enter code from email</string>
     <string name="code_has_been_sent_to_your_email">Code has been sent to your email</string>
+    <string name="we_will_send_you_6_digital_code">We will send you 6-digital code</string>
     <string name="next">Next</string>
     <string name="back_arrow">Back arrow</string>
 </resources>
