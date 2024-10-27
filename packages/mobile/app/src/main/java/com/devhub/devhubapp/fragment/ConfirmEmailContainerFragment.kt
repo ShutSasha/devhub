@@ -32,7 +32,6 @@ class ConfirmEmailContainerFragment : Fragment() {
         emailInputFragment.setInputHint("Enter your email")
         fragmentTransaction.add(R.id.email_input_container, emailInputFragment)
 
-
         val primaryButtonFragment = PrimaryButtonFragment()
         primaryButtonFragment.setButtonText("Next")
         fragmentTransaction.add(R.id.primary_button_container, primaryButtonFragment)
