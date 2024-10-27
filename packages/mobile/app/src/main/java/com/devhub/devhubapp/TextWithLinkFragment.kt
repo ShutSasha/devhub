@@ -3,14 +3,11 @@ package com.devhub.devhubapp
 import android.annotation.SuppressLint
 import android.graphics.Paint
 import android.os.Bundle
-import android.text.Html
-import android.text.Spanned
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-
 
 class TextWithLinkFragment : Fragment() {
 
@@ -24,21 +21,30 @@ class TextWithLinkFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_text_with_link, container, false)
 
         textView = view.findViewById(R.id.text)
         linkTextView = view.findViewById(R.id.linkText)
 
-        textView.text = text
+        if (!text.isNullOrEmpty()) {
+            textView.text = text
+            textView.visibility = View.VISIBLE
+        } else {
+            textView.visibility = View.GONE
+        }
 
-        linkTextView.text = linkText
-        linkTextView.paintFlags = linkTextView.paintFlags or Paint.UNDERLINE_TEXT_FLAG
+        if (!linkText.isNullOrEmpty()) {
+            linkTextView.text = linkText
+            linkTextView.paintFlags = linkTextView.paintFlags or Paint.UNDERLINE_TEXT_FLAG
+            linkTextView.visibility = View.VISIBLE
+        } else {
+            linkTextView.visibility = View.GONE
+        }
 
         return view
     }
 
-    fun setTextAndLinkText(text: String, linkText: String) {
+    fun setTextAndLinkText(text: String?, linkText: String?) {
         this.text = text
         this.linkText = linkText
     }
