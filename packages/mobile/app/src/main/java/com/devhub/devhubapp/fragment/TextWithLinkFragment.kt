@@ -10,7 +10,6 @@ import android.view.ViewGroup
 import android.widget.TextView
 import com.devhub.devhubapp.R
 
-
 class TextWithLinkFragment : Fragment() {
 
     private lateinit var textView: TextView
@@ -28,15 +27,25 @@ class TextWithLinkFragment : Fragment() {
         textView = view.findViewById(R.id.text)
         linkTextView = view.findViewById(R.id.linkText)
 
-        textView.text = text
+        if (!text.isNullOrEmpty()) {
+            textView.text = text
+            textView.visibility = View.VISIBLE
+        } else {
+            textView.visibility = View.GONE
+        }
 
-        linkTextView.text = linkText
-        linkTextView.paintFlags = linkTextView.paintFlags or Paint.UNDERLINE_TEXT_FLAG
+        if (!linkText.isNullOrEmpty()) {
+            linkTextView.text = linkText
+            linkTextView.paintFlags = linkTextView.paintFlags or Paint.UNDERLINE_TEXT_FLAG
+            linkTextView.visibility = View.VISIBLE
+        } else {
+            linkTextView.visibility = View.GONE
+        }
 
         return view
     }
 
-    fun setTextAndLinkText(text: String, linkText: String) {
+    fun setTextAndLinkText(text: String?, linkText: String?) {
         this.text = text
         this.linkText = linkText
     }

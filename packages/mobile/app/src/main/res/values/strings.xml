@@ -3,6 +3,10 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="already_have_an_account">Already have an account?</string>
     <string name="log_in">Log In</string>
+    <string name="dont_have_an_account">Don’t have an account?</string>
+    <string name="sign_in"> Sign in</string>
+    <string name="forgot_password">Forgot password?</string>
+    <string name="or_sign_in_with">Or sign in with</string>
     <string name="devhub_logo">DevHub logo</string>
     <string name="confirming_email">Confirming email</string>
     <string name="enter_code_from_email">Enter code from email</string>
