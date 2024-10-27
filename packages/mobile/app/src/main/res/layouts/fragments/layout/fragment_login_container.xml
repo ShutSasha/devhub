@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="440dp"
     tools:context=".LoginContainerFragment"
-    android:background="@drawable/auth_container_background"
+    android:background="@drawable/shape_auth_container_background"
     android:elevation="8dp"
     android:translationZ="4dp"
     android:orientation="vertical"

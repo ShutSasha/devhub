@@ -1,4 +1,4 @@
-package com.devhub.devhubapp
+package com.devhub.devhubapp.activity
 
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
@@ -7,6 +7,8 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
+import com.devhub.devhubapp.fragment.LoginContainerFragment
+import com.devhub.devhubapp.R
 
 class LogInActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
