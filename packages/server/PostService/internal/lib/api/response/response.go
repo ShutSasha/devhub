@@ -2,48 +2,43 @@ package response
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/go-playground/validator/v10"
 )
 
 type Response struct {
-	Status string `json:"status"`
-	Error  string `json:"error,omitempty"`
+	Status int                 `json:"status"`
+	Errors map[string][]string `json:"errors"`
 }
 
-const (
-	StatusOK    = "OK"
-	StatusError = "Error"
-)
-
-func OK() Response {
+func Error(msgs map[string][]string, statusCode int) Response {
 	return Response{
-		Status: StatusOK,
+		Status: statusCode,
+		Errors: msgs,
 	}
 }
 
-func Error(msg string) Response {
-	return Response{
-		Status: StatusError,
-		Error:  msg,
-	}
-}
-
-func ValidationError(errs validator.ValidationErrors) Response {
-	var errMsgs []string
+func ValidationError(errs validator.ValidationErrors, statusCode int) Response {
+	errMsgs := make(map[string][]string)
 
 	for _, err := range errs {
-		switch err.ActualTag() {
+		var message string
+		switch err.Tag() {
 		case "required":
-			errMsgs = append(errMsgs, fmt.Sprintf("field %s is a required field", err.Field()))
+			message = fmt.Sprintf("The %s field is required", err.Field())
+		case "max":
+			message = fmt.Sprintf("The %s field is too long", err.Field())
+		case "min":
+			message = fmt.Sprintf("The %s field is too short", err.Field())
 		default:
-			errMsgs = append(errMsgs, fmt.Sprintf("field %s is not valid", err.Field()))
+			message = fmt.Sprintf("The %s field is not valid", err.Field())
 		}
+
+		errMsgs[err.Field()] = append(errMsgs[err.Field()], message)
 	}
 
 	return Response{
-		Status: StatusError,
-		Error:  strings.Join(errMsgs, ", "),
+		Status: statusCode,
+		Errors: errMsgs,
 	}
 }

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -12,13 +13,16 @@
         android:theme="@style/Theme.DevHubApp"
         tools:targetApi="31">
         <activity
-            android:name=".LogInActivity"
+            android:name=".activity.RegistrationActivity"
             android:exported="true" />
         <activity
-            android:name=".RegistrationActivity"
+            android:name=".activity.ConfirmEmailActivity"
             android:exported="true" />
         <activity
-            android:name=".MainActivity"
+            android:name=".activity.ForgotPasswordActivity"
+            android:exported="true" />
+        <activity
+            android:name=".activity.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -27,4 +31,5 @@
             </intent-filter>
         </activity>
     </application>
+
 </manifest>

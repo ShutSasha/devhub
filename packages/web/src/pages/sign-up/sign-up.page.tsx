@@ -1,18 +1,66 @@
 import { FC } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { AuthLayout } from '@shared/layouts/auth/auth.layout'
 import { Text } from '@shared/components/text/text.component'
 import { FONTS } from '@shared/consts/fonts.enum'
 import { AuthInput } from '@shared/components/auth/input/auth-input.component'
 import { AuthTitle } from '@shared/components/auth/title/auth-title.component'
 import { AuthBtn } from '@shared/components/auth/btn/btn.component'
+import { AuthDevhubTitle } from '@shared/components/auth/devhub-title/auth-devhub-title.components'
+import { useAppDispatch, useAppSelector } from '@app/store/store'
+import { setEmail, setPassword, setRepeatPassword, setUsername } from '@features/auth/auth.slice'
 import googleImage from '@assets/images/auth/devicon_google.svg'
 import githubImage from '@assets/images/auth/mdi_github.svg'
-import { AuthDevhubTitle } from '@shared/components/auth/devhub-title/auth-devhub-title.components'
+import { useRegisterMutation } from '@api/auth.api'
+import { handleServerException } from '@utils/handleServerException.util'
+import { ErrorSpan } from '@shared/components/errors/error-span.component'
+import loaderGif from '@assets/gif/loading.gif'
+import { ROUTES } from '@pages/router/routes.enum'
 
 import { AuthIcon, ImgContainer, InputsContainer, SixDigitalCodeSpan } from './sign-up.style'
 import { SignUpTransparentBtn } from './components/sign-up-transparent-btn'
+import { EmphasizeLine } from './components/emphasize-line.component'
+
+import { ErrorException } from '~types/error/error.type'
 
 export const SignUp: FC = () => {
+  const [register, { isLoading, error: signUpError }] = useRegisterMutation()
+  const dispatch = useAppDispatch()
+  const navigate = useNavigate()
+
+  const username = useAppSelector(state => state.authSlice.username)
+  const password = useAppSelector(state => state.authSlice.password)
+  const repeatPassword = useAppSelector(state => state.authSlice.repeatPassword)
+  const email = useAppSelector(state => state.authSlice.email)
+
+  const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    dispatch(setUsername(e.target.value))
+  }
+
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    dispatch(setPassword(e.target.value))
+  }
+
+  const handleRepeatPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    dispatch(setRepeatPassword(e.target.value))
+  }
+
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    dispatch(setEmail(e.target.value))
+  }
+
+  const handleSumbit = async () => {
+    try {
+      await register({ username, password, repeatPassword, email }).unwrap()
+
+      navigate(`${ROUTES.SIGN_UP}${ROUTES.CONFIRM_EMAIL}`)
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
+  const errors: string[] | undefined = handleServerException(signUpError as ErrorException)
+
   return (
     <AuthLayout>
       <AuthDevhubTitle />
@@ -20,28 +68,32 @@ export const SignUp: FC = () => {
       <AuthTitle title="Create account" style={{ marginBottom: '16px', textAlign: 'center' }} />
       <div style={{ width: '100%' }}>
         <InputsContainer>
-          <AuthInput label="Username" />
-          <AuthInput label="Password" type="password" />
-          <AuthInput label="Repeat password" type="password" />
-          <AuthInput label="Email" type="email" />
+          {isLoading ? (
+            <img src={loaderGif} />
+          ) : (
+            <>
+              <AuthInput label="Username" value={username || ''} handleInput={handleUsernameChange} />
+              <AuthInput label="Password" type="password" value={password || ''} handleInput={handlePasswordChange} />
+              <AuthInput
+                label="Repeat password"
+                type="password"
+                value={repeatPassword || ''}
+                handleInput={handleRepeatPasswordChange}
+              />
+              <AuthInput label="Email" type="email" value={email || ''} handleInput={handleEmailChange} />
+            </>
+          )}
         </InputsContainer>
         <SixDigitalCodeSpan>6-digital code will be send to email</SixDigitalCodeSpan>
-        <AuthBtn text="Sign up" />
+        <div>{errors && errors.map((error: string, index: number) => <ErrorSpan key={index} value={error} />)}</div>
+        <AuthBtn text="Sign up" handleClick={handleSumbit} />
         <div
           style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '16px' }}
         >
           <Text text="Already have an account?" color="#0D1A26" fontSize="16px" $lineHeight="24px" />
           <SignUpTransparentBtn />
         </div>
-        <hr
-          style={{
-            color: 'red',
-            backgroundColor: 'rgba(48, 64, 80, 0.15)',
-            height: '1px',
-            border: 'none',
-            marginBottom: '16px',
-          }}
-        />
+        <EmphasizeLine />
         <Text
           text="Sign up with"
           $lineHeight="24px"
