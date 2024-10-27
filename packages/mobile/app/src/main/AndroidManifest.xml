@@ -19,6 +19,9 @@
             android:name=".activity.ConfirmEmailActivity"
             android:exported="true" />
         <activity
+            android:name=".activity.ForgotPasswordActivity"
+            android:exported="true" />
+        <activity
             android:name=".activity.MainActivity"
             android:exported="true">
             <intent-filter>
