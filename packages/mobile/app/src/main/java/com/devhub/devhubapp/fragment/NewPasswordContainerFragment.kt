@@ -11,29 +11,29 @@ import androidx.fragment.app.FragmentTransaction
 import com.devhub.devhubapp.R
 
 
-class ConfirmEmailContainerFragment : Fragment() {
+class NewPasswordContainerFragment : Fragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-         val view = inflater.inflate(R.layout.fragment_confirm_email_container, container, false)
+        val view = inflater.inflate(R.layout.fragment_new_password_container, container, false)
 
         val fragmentManager : FragmentManager = childFragmentManager
         val fragmentTransaction : FragmentTransaction = fragmentManager.beginTransaction()
 
         val title = TitleFragment()
         title.setShowBackArrow(true)
-        title.setTitleText("Confirming email")
+        title.setTitleText("Enter new password")
         fragmentTransaction.add(R.id.title, title)
 
-        val codeInputFragment = InputFragment()
-        codeInputFragment.setInputType(InputType.TYPE_CLASS_NUMBER)
-        codeInputFragment.setInputHint("Enter 6-digit code from email")
-        fragmentTransaction.add(R.id.code_input_container, codeInputFragment)
+        val passwordInputFragment = InputFragment()
+        passwordInputFragment.setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD)
+        passwordInputFragment.setInputHint("Your new password")
+        fragmentTransaction.add(R.id.password_input_container, passwordInputFragment)
 
         val primaryButtonFragment = PrimaryButtonFragment()
-        primaryButtonFragment.setButtonText("Next")
+        primaryButtonFragment.setButtonText("Confirm")
         fragmentTransaction.add(R.id.primary_button_container, primaryButtonFragment)
 
         fragmentTransaction.commit()

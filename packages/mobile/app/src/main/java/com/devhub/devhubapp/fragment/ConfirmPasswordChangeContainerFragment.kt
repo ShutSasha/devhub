@@ -11,20 +11,20 @@ import androidx.fragment.app.FragmentTransaction
 import com.devhub.devhubapp.R
 
 
-class ConfirmEmailContainerFragment : Fragment() {
+class ConfirmPasswordChangeContainerFragment : Fragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-         val view = inflater.inflate(R.layout.fragment_confirm_email_container, container, false)
+        val view = inflater.inflate(R.layout.fragment_confirm_password_change_container, container, false)
 
         val fragmentManager : FragmentManager = childFragmentManager
         val fragmentTransaction : FragmentTransaction = fragmentManager.beginTransaction()
 
         val title = TitleFragment()
         title.setShowBackArrow(true)
-        title.setTitleText("Confirming email")
+        title.setTitleText("Forgot password")
         fragmentTransaction.add(R.id.title, title)
 
         val codeInputFragment = InputFragment()

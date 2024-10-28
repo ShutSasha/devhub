@@ -31,6 +31,12 @@
             android:name=".activity.ForgotPasswordActivity"
             android:exported="true" />
         <activity
+            android:name=".activity.ConfirmPasswordChangeActivity"
+            android:exported="true" />
+        <activity
+            android:name=".activity.NewPasswordActivity"
+            android:exported="true" />
+        <activity
             android:name=".activity.MainActivity"
             android:exported="true">
             <intent-filter>
