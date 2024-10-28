@@ -50,7 +50,7 @@
       },
       
       {
-         "DownstreamPathTemplate": "/api/post/create",
+         "DownstreamPathTemplate": "/api/posts",
          "DownstreamScheme": "http",
          "DownstreamHostAndPorts": [
             {
@@ -58,7 +58,7 @@
                "Port": 8080
             }
          ],
-         "UpstreamPathTemplate": "/api/posts/create",
+         "UpstreamPathTemplate": "/api/posts",
          "UpstreamHttpMethod": ["POST"]
       },
       {
