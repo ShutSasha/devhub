@@ -4,6 +4,7 @@ import { About } from '@pages/about/about.page'
 import { SignUp } from '@pages/auth/sign-up/sign-up.page'
 import { ConfirmEmail } from '@pages/auth/confirm-email/confirm-email.page'
 import { Login } from '@pages/auth/login/login.page'
+import { ForgotPassword } from '@pages/auth/forgot-password/forgot-password.page'
 
 import { ROUTES } from './routes.enum'
 
@@ -27,6 +28,10 @@ const router = createBrowserRouter([
   {
     path: `${ROUTES.LOGIN}`,
     element: <Login />,
+  },
+  {
+    path: `${ROUTES.FORGOT_PASSWORD}`,
+    element: <ForgotPassword />,
   },
 ])
 
