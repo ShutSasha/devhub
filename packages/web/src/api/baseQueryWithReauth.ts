@@ -35,7 +35,7 @@ const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQue
 
   let result = await baseQuery(args, api, extraOptions)
 
-  if (result.error && result.error.status === 401) {
+  if (result.error?.status === 401) {
     // checking whether the mutex is locked
     if (!mutex.isLocked()) {
       const release = await mutex.acquire()
@@ -44,10 +44,10 @@ const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQue
           { credentials: 'include', url: '/auth/refresh', method: 'POST' },
           api,
           extraOptions,
-        )) as { data: { token: { accessToken: string } } }
+        )) as { data: { token: string } }
 
-        api.dispatch(setAccessToken(refreshResult.data.token.accessToken))
-        if (refreshResult.data) {
+        api.dispatch(setAccessToken(refreshResult.data.token))
+        if (refreshResult.data.token) {
           // retry the initial query
           result = await baseQuery(args, api, extraOptions)
         } else {
