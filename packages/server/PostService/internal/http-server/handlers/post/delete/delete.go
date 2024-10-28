@@ -63,7 +63,7 @@ func New(log *slog.Logger, postRemover PostRemover) http.HandlerFunc {
 			postId,
 		)
 		if err != nil {
-			log.Info("can not delete post", sl.Err(err))
+			log.Error("can not delete post", sl.Err(err))
 
 			render.JSON(w, r, resp.Error(map[string][]string{
 				"post": {err.Error()},

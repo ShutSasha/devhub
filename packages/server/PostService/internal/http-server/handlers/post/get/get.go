@@ -20,7 +20,7 @@ import (
 // PostProvider is an interface that defines the method for retrieving a post by its ID.
 // GetPostById takes a context and postId, and returns the post model or an error.
 type PostProvider interface {
-	GetPostById(
+	GetById(
 		ctx context.Context,
 		postId primitive.ObjectID,
 	) (*models.Post, error)
@@ -62,19 +62,20 @@ func New(log *slog.Logger, postProvider PostProvider) http.HandlerFunc {
 			return
 		}
 
-		post, err := postProvider.GetPostById(
+		post, err := postProvider.GetById(
 			context.TODO(),
 			postId,
 		)
 		if errors.Is(err, storage.ErrPostNotFound) {
-			log.Info("post not found", slog.Any("post", postId))
+			log.Error(storage.ErrPostNotFound.Error(), slog.Any("post", postId))
+
 			render.JSON(w, r, resp.Error(map[string][]string{
-				"post": {"Post not found"},
+				"post": {storage.ErrPostNotFound.Error()},
 			}, http.StatusNotFound))
 			return
 		}
 		if err != nil {
-			log.Info("can not get post", sl.Err(err))
+			log.Error("can not get post", sl.Err(err))
 
 			render.JSON(w, r, resp.Error(map[string][]string{
 				"post": {err.Error()},

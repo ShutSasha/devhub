@@ -32,7 +32,7 @@ type Request struct {
 // SavePost takes a context, user ID, title, content, and tags,
 // and returns the ID of the saved post or an error.
 type PostSaver interface {
-	SavePost(
+	Save(
 		ctx context.Context,
 		userId primitive.ObjectID,
 		title string,
@@ -111,7 +111,7 @@ func New(log *slog.Logger, postSaver PostSaver) http.HandlerFunc {
 			return
 		}
 
-		id, err := postSaver.SavePost(
+		id, err := postSaver.Save(
 			context.TODO(),
 			userId,
 			req.Title,
