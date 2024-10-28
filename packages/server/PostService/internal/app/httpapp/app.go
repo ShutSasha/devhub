@@ -19,6 +19,7 @@ import (
 	mwLogger "github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/http-server/middleware/logger"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/rs/cors"
 	httpSwagger "github.com/swaggo/http-swagger/v2"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -87,8 +88,16 @@ func New(
 	port int,
 	timout time.Duration,
 ) *App {
+	corsHandler := cors.New(cors.Options{
+		AllowedOrigins:   []string{"http://localhost:5295"},
+		AllowedMethods:   []string{"GET", "POST", "PATCH", "DELETE"},
+		AllowedHeaders:   []string{"Authorization", "Content-Type"},
+		AllowCredentials: true,
+	})
+
 	router := chi.NewRouter()
 
+	router.Use(corsHandler.Handler)
 	router.Use(middleware.RequestID)
 	router.Use(mwLogger.New(log))
 	router.Use(middleware.Recoverer)
