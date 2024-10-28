@@ -72,6 +72,18 @@
          ],
          "UpstreamPathTemplate": "/api/posts/{id}",
          "UpstreamHttpMethod": ["PATCH","DELETE","GET"]
+      },
+      {
+         "DownstreamPathTemplate": "/api/posts/search",
+         "DownstreamScheme": "http",
+         "DownstreamHostAndPorts": [
+            {
+               "Host": "localhost",
+               "Port": 8080
+            }
+         ],
+         "UpstreamPathTemplate": "/api/posts/search",
+         "UpstreamHttpMethod": ["GET"]
       }
    ],
    "GlobalConfiguration": {

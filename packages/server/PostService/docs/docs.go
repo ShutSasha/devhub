@@ -17,7 +17,7 @@ const docTemplate = `{
     "paths": {
         "/posts": {
             "post": {
-                "description": "This endpoint allows a user to save a new post with a title, description, and optional tags.",
+                "description": "This endpoint allows a user to save a new post with a title, content, and optional tags.",
                 "consumes": [
                     "application/json"
                 ],
@@ -49,6 +49,46 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Validation errors or request decoding failures",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/posts/search": {
+            "get": {
+                "description": "This endpoint retrieves posts by query.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "posts"
+                ],
+                "summary": "Get posts by query",
+                "responses": {
+                    "200": {
+                        "description": "The requested posts",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Post"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Posts not found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -155,7 +195,7 @@ const docTemplate = `{
                 }
             },
             "patch": {
-                "description": "This endpoint allows a user to update an existing post with a new title, description, header image, and tags.",
+                "description": "This endpoint allows a user to update an existing post with a new title, content, header image, and tags.",
                 "consumes": [
                     "application/json"
                 ],
@@ -224,16 +264,19 @@ const docTemplate = `{
         "models.Post": {
             "type": "object",
             "properties": {
+                "_id": {
+                    "type": "string"
+                },
                 "comments": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/models.Comment"
                     }
                 },
-                "created_at": {
+                "content": {
                     "type": "string"
                 },
-                "description": {
+                "created_at": {
                     "type": "string"
                 },
                 "dislikes": {
@@ -262,12 +305,12 @@ const docTemplate = `{
         "save.Request": {
             "type": "object",
             "required": [
-                "description",
+                "content",
                 "title",
                 "userId"
             ],
             "properties": {
-                "description": {
+                "content": {
                     "type": "string",
                     "maxLength": 62792
                 },
@@ -290,7 +333,7 @@ const docTemplate = `{
         "update.Request": {
             "type": "object",
             "properties": {
-                "description": {
+                "content": {
                     "type": "string",
                     "maxLength": 62792
                 },
