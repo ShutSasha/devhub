@@ -62,7 +62,7 @@
          "UpstreamHttpMethod": ["POST"]
       },
       {
-         "DownstreamPathTemplate": "/api/post/{id}",
+         "DownstreamPathTemplate": "/api/posts/{id}",
          "DownstreamScheme": "http",
          "DownstreamHostAndPorts": [
             {
