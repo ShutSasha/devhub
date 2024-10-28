@@ -41,7 +41,7 @@ func (s *Storage) SavePost(
 	ctx context.Context,
 	userId primitive.ObjectID,
 	title string,
-	description string,
+	content string,
 	tags []string,
 ) (primitive.ObjectID, error) {
 	const op = "storage.mongodb.SavePost"
@@ -51,7 +51,7 @@ func (s *Storage) SavePost(
 	post := &models.Post{
 		User:        userId,
 		Title:       title,
-		Description: description,
+		Content:     content,
 		CreatedAt:   time.Now(),
 		Likes:       0,
 		Dislikes:    0,
@@ -119,7 +119,7 @@ func (s *Storage) Update(
 	ctx context.Context,
 	postId primitive.ObjectID,
 	title string,
-	description string,
+	content string,
 	headerImage string,
 	tags []string,
 ) error {
@@ -131,7 +131,7 @@ func (s *Storage) Update(
 
 	update := bson.M{"$set": bson.M{
 		"title":        title,
-		"description":  description,
+		"content":      content,
 		"header_image": headerImage,
 		"tags":         tags,
 	}}

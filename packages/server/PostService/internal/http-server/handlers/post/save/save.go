@@ -19,24 +19,24 @@ import (
 // Request struct defines the JSON request body for the handler.
 // - UserId: The ID of the user creating the post (required).
 // - Title: The title of the post (required, between 1 and 128 characters).
-// - Description: The description of the post (required, max 62792 characters).
+// - Content: The content of the post (required, max 62792 characters).
 // - Tags: Optional tags associated with the post.
 type Request struct {
-	UserId      string   `json:"userId" validate:"required"`
-	Title       string   `json:"title" validate:"required,max=128,min=1"`
-	Description string   `json:"description" validate:"required,max=62792"`
-	Tags        []string `json:"tags,omitempty"`
+	UserId  string   `json:"userId" validate:"required"`
+	Title   string   `json:"title" validate:"required,max=128,min=1"`
+	Content string   `json:"content" validate:"required,max=62792"`
+	Tags    []string `json:"tags,omitempty"`
 }
 
 // PostSaver is an interface defining the method to save a post.
-// SavePost takes a context, user ID, title, description, and tags,
+// SavePost takes a context, user ID, title, content, and tags,
 // and returns the ID of the saved post or an error.
 type PostSaver interface {
 	SavePost(
 		ctx context.Context,
 		userId primitive.ObjectID,
 		title string,
-		description string,
+		content string,
 		tags []string,
 	) (primitive.ObjectID, error)
 }
@@ -45,7 +45,7 @@ type PostSaver interface {
 // It validates the incoming request body, checks for errors, and if valid,
 // calls the SavePost method of the PostSaver interface to persist the post.
 // @Summary Save a new post
-// @Description This endpoint allows a user to save a new post with a title, description, and optional tags.
+// @Description This endpoint allows a user to save a new post with a title, content, and optional tags.
 // @Tags posts
 // @Accept json
 // @Produce json
@@ -115,7 +115,7 @@ func New(log *slog.Logger, postSaver PostSaver) http.HandlerFunc {
 			context.TODO(),
 			userId,
 			req.Title,
-			req.Description,
+			req.Content,
 			req.Tags,
 		)
 		if err != nil {
