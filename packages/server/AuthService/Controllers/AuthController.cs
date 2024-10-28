@@ -44,7 +44,7 @@ public class AuthController : ControllerBase
    {
       try
       {
-         var loginResult = await _authService.Login(request.UserName, request.Password);
+         var loginResult = await _authService.Login(request.Username, request.Password);
          HttpContext.Response.Cookies.Append("refreshToken", loginResult.RefreshToken, new CookieOptions()
          {
             HttpOnly = true,
