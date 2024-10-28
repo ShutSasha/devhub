@@ -27,10 +27,10 @@ class ConfirmEmailContainerFragment : Fragment() {
         title.setTitleText("Confirming email")
         fragmentTransaction.add(R.id.title, title)
 
-        val emailInputFragment = InputFragment()
-        emailInputFragment.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS)
-        emailInputFragment.setInputHint("Enter your email")
-        fragmentTransaction.add(R.id.email_input_container, emailInputFragment)
+        val codeInputFragment = InputFragment()
+        codeInputFragment.setInputType(InputType.TYPE_CLASS_NUMBER)
+        codeInputFragment.setInputHint("Enter 6-digit code from email")
+        fragmentTransaction.add(R.id.code_input_container, codeInputFragment)
 
         val primaryButtonFragment = PrimaryButtonFragment()
         primaryButtonFragment.setButtonText("Next")
