@@ -37,6 +37,7 @@ type PostRemover interface {
 func New(log *slog.Logger, postRemover PostRemover) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		const op = "handlers.post.delete.New"
+		defer r.Body.Close()
 
 		log := log.With(
 			slog.String("op", op),
