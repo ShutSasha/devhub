@@ -1,11 +1,16 @@
 import { Button } from '@shared/components/button/button.component'
 import { colors } from '@shared/consts/colors.const'
 import { FONTS } from '@shared/consts/fonts.enum'
+import { FC } from 'react'
 
-export const SignUpTransparentBtn = () => {
+interface AuthTransparentBtnProps {
+  text: string
+}
+
+export const AuthTransparentBtn: FC<AuthTransparentBtnProps> = ({ text }) => {
   return (
     <Button
-      text="Sign in"
+      text={text}
       $padding="3px 10px"
       $bgColor="#fff"
       $color={colors.accent}
