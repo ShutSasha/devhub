@@ -1,0 +1,81 @@
+﻿{
+   "Routes": [
+      {
+         "DownstreamPathTemplate": "/api/auth/register",
+         "DownstreamScheme": "http",
+         "DownstreamHostAndPorts": [
+            {
+               "Host": "localhost",
+               "Port": 5279
+            }
+         ],
+         "UpstreamPathTemplate": "/api/auth/register",
+         "UpstreamHttpMethod": ["POST"]
+      },
+      {
+         "DownstreamPathTemplate": "/api/auth/login",
+         "DownstreamScheme": "http",
+         "DownstreamHostAndPorts": [
+            {
+               "Host": "localhost",
+               "Port": 5279
+            }
+         ],
+         "UpstreamPathTemplate": "/api/auth/login",
+         "UpstreamHttpMethod": ["POST"]
+      },
+      {
+         "DownstreamPathTemplate": "/api/auth/verify-email",
+         "DownstreamScheme": "http",
+         "DownstreamHostAndPorts": [
+            {
+               "Host": "localhost",
+               "Port": 5279
+            }
+         ],
+         "UpstreamPathTemplate": "/api/auth/verify-email",
+         "UpstreamHttpMethod": ["POST"]
+      },
+      {
+         "DownstreamPathTemplate": "/api/auth/refresh",
+         "DownstreamScheme": "http",
+         "DownstreamHostAndPorts": [
+            {
+               "Host": "localhost",
+               "Port": 5279
+            }
+         ],
+         "UpstreamPathTemplate": "/api/auth/refresh",
+         "UpstreamHttpMethod": ["POST"]
+      },
+      
+      {
+         "DownstreamPathTemplate": "/api/post/create",
+         "DownstreamScheme": "http",
+         "DownstreamHostAndPorts": [
+            {
+               "Host": "localhost",
+               "Port": 8080
+            }
+         ],
+         "UpstreamPathTemplate": "/api/posts/create",
+         "UpstreamHttpMethod": ["POST"]
+      },
+      {
+         "DownstreamPathTemplate": "/api/post/{id}",
+         "DownstreamScheme": "http",
+         "DownstreamHostAndPorts": [
+            {
+               "Host": "localhost",
+               "Port": 8080
+            }
+         ],
+         "UpstreamPathTemplate": "/api/posts/{id}",
+         "UpstreamHttpMethod": ["PATCH","DELETE","GET"]
+      }
+   ],
+   "GlobalConfiguration": {
+      "BaseUrl": "http://localhost:5295"
+   }
+   
+}

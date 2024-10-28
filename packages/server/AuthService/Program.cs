@@ -9,6 +9,16 @@ using MongoDB.Driver;
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAPIGateway", policy =>
+    {
+        policy.WithOrigins("http://localhost:5295") 
+            .AllowAnyMethod()
+            .AllowAnyHeader();
+    });
+});
+
 builder.Services.Configure<JwtOptions>(configuration.GetSection(nameof(JwtOptions)));
 builder.Services.AddApiAuthentication(builder.Configuration);
 builder.Services.AddAuthorization();
@@ -41,6 +51,8 @@ builder.Services.AddScoped<AuthService.Services.AuthService>();
 
 var app = builder.Build();
 
+app.UseCors("AllowAPIGateway");
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -52,6 +64,7 @@ app.UseCors(x =>
     x.WithHeaders().AllowAnyHeader();
     x.WithHeaders().AllowCredentials();
     x.WithOrigins("http://localhost:3000");
+    x.WithOrigins("http://localhost:5295");
     x.WithMethods().AllowAnyMethod();
 });
 
