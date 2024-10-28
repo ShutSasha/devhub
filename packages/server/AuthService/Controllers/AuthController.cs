@@ -48,10 +48,10 @@ public class AuthController : ControllerBase
          HttpContext.Response.Cookies.Append("refreshToken", loginResult.RefreshToken, new CookieOptions()
          {
             HttpOnly = true,
-            //TODO: На продакшн
+            //TODO: Сделать проверку на environment mode 
             // Secure = true,
             SameSite = SameSiteMode.Strict,
-            Expires = DateTime.UtcNow.AddDays(15)
+            Expires = DateTime.Now.AddSeconds(30)
          });
          return Ok(new { Token = loginResult.AccessToken, User = loginResult.UserData });
       }
@@ -93,16 +93,16 @@ public class AuthController : ControllerBase
    {
       try
       {
-         var token = HttpContext.Request.Cookies["refreshToken"];
+         var refreshToken = HttpContext.Request.Cookies["refreshToken"];
 
-         var refreshResult = await _authService.Refresh(token);
+         var refreshResult = await _authService.RefreshTokens(refreshToken);
 
          HttpContext.Response.Cookies.Append("refreshToken", refreshResult.RefreshToken, new CookieOptions()
          {
             HttpOnly = true,
             // Secure = true,
             SameSite = SameSiteMode.Strict,
-            Expires = DateTime.UtcNow.AddDays(15)
+            Expires = DateTime.UtcNow.AddDays(30)
          });
 
          return Ok(new { Message = "Tokens updated", Token = refreshResult.AccessToken });

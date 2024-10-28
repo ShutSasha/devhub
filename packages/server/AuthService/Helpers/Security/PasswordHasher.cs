@@ -1,5 +1,6 @@
 using BCrypt.Net;
-namespace AuthService.Helpers.Password;
+
+namespace AuthService.Helpers.Security;
 
 public class PasswordHasher
 {

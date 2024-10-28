@@ -24,15 +24,16 @@ public class JwtProvider(IOptions<JwtOptions> options)
          new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.AccessSecretKey)),  
          SecurityAlgorithms.HmacSha256);
 
-      var token = new JwtSecurityToken(
+      var accessToken = new JwtSecurityToken(
          claims: claims,
          signingCredentials: signingCredentials,
-         expires: DateTime.Now.AddSeconds(_options.ExpiresDuration));
+         expires: DateTime.Now.AddMinutes(_options.AccessExpiresDuration));
   
-      var tokenValue = new JwtSecurityTokenHandler().WriteToken(token);  
+      var tokenValue = new JwtSecurityTokenHandler().WriteToken(accessToken);  
   
       return tokenValue;  
    }
+   
    public string GenerateRefreshToken(User user)
    {
       Claim[] claims = new[]
@@ -49,7 +50,7 @@ public class JwtProvider(IOptions<JwtOptions> options)
       var refreshToken = new JwtSecurityToken(
          claims: claims,
          signingCredentials: signingCredentials,
-         expires: DateTime.UtcNow.AddDays(_options.RefreshExpiresDuration));
+         expires: DateTime.Now.AddDays(_options.RefreshExpiresDuration));
 
       return new JwtSecurityTokenHandler().WriteToken(refreshToken);
    }

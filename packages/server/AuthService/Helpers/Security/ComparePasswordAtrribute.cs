@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
-namespace AuthService.Helpers.Password;
+
+namespace AuthService.Helpers.Security;
 
 public class ComparePasswordsAttribute : ValidationAttribute
 {

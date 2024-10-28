@@ -1,6 +1,6 @@
 using AuthService.Extensions;
 using AuthService.Helpers.Jwt;
-using AuthService.Helpers.Password;
+using AuthService.Helpers.Security;
 using AuthService.Models;
 using AuthService.Services;
 using Microsoft.Extensions.Options;
