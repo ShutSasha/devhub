@@ -133,7 +133,13 @@ public class AuthController : ControllerBase
          return Ok(data);
       }
 
-      return StatusCode((int)response.StatusCode, "Error fetching data from jsonplaceholder");
+      return Unauthorized(new
+      {
+         status = 401,
+         errors = new Dictionary<string, List<string>>
+         {
+            { "Fetch Error", new List<string> {"Cannot fetch"} }
+         }
+      });
    }
-   
 }
