@@ -1,5 +1,4 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <style name="Base.Theme.DevHubApp" parent="Theme.AppCompat.Light.NoActionBar">
-    </style>
+    <style name="Base.Theme.DevHubApp" parent="Theme.AppCompat.Light.NoActionBar"/>
     <style name="Theme.DevHubApp" parent="Base.Theme.DevHubApp" />
 </resources>

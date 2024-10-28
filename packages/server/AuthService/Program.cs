@@ -1,6 +1,6 @@
 using AuthService.Extensions;
 using AuthService.Helpers.Jwt;
-using AuthService.Helpers.Password;
+using AuthService.Helpers.Security;
 using AuthService.Models;
 using AuthService.Services;
 using Microsoft.Extensions.Options;
@@ -17,6 +17,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddHttpClient();
 builder.Services.Configure<MongoDbSettings>(configuration.GetSection("MongoDbSettings"));
 builder.Services.Configure<SenderDataSettings>(configuration.GetSection("SenderData"));
 builder.Services.AddSingleton<IMongoClient>(sp =>
@@ -46,9 +47,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
-app.MapControllers();
-
 app.UseCors(x =>
 {
     x.WithHeaders().AllowAnyHeader();
@@ -56,5 +54,12 @@ app.UseCors(x =>
     x.WithOrigins("http://localhost:3000");
     x.WithMethods().AllowAnyMethod();
 });
+
+app.UseHttpsRedirection();
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.MapControllers();
 
 app.Run();

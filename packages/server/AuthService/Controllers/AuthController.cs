@@ -44,14 +44,14 @@ public class AuthController : ControllerBase
    {
       try
       {
-         var loginResult = await _authService.Login(request.UserName, request.Password);
+         var loginResult = await _authService.Login(request.Username, request.Password);
          HttpContext.Response.Cookies.Append("refreshToken", loginResult.RefreshToken, new CookieOptions()
          {
             HttpOnly = true,
-            //TODO: На продакшн
+            //TODO: Сделать проверку на environment mode 
             // Secure = true,
             SameSite = SameSiteMode.Strict,
-            Expires = DateTime.UtcNow.AddDays(15)
+            Expires = DateTime.Now.AddSeconds(30)
          });
          return Ok(new { Token = loginResult.AccessToken, User = loginResult.UserData });
       }
@@ -93,16 +93,16 @@ public class AuthController : ControllerBase
    {
       try
       {
-         var token = HttpContext.Request.Cookies["refreshToken"];
+         var refreshToken = HttpContext.Request.Cookies["refreshToken"];
 
-         var refreshResult = await _authService.Refresh(token);
+         var refreshResult = await _authService.RefreshTokens(refreshToken);
 
          HttpContext.Response.Cookies.Append("refreshToken", refreshResult.RefreshToken, new CookieOptions()
          {
             HttpOnly = true,
             // Secure = true,
             SameSite = SameSiteMode.Strict,
-            Expires = DateTime.UtcNow.AddDays(15)
+            Expires = DateTime.UtcNow.AddDays(30)
          });
 
          return Ok(new { Message = "Tokens updated", Token = refreshResult.AccessToken });
@@ -119,5 +119,27 @@ public class AuthController : ControllerBase
          });
       }
    }
-   
+
+   [Authorize]
+   [HttpGet("testinfo")]
+   public async Task<IActionResult> GetInformation([FromServices] IHttpClientFactory httpClientFactory)
+   {
+      var httpClient = httpClientFactory.CreateClient();
+      var response = await httpClient.GetAsync("https://jsonplaceholder.typicode.com/posts/1");
+
+      if (response.IsSuccessStatusCode)
+      {
+         var data = await response.Content.ReadFromJsonAsync<object>();
+         return Ok(data);
+      }
+
+      return Unauthorized(new
+      {
+         status = 401,
+         errors = new Dictionary<string, List<string>>
+         {
+            { "Fetch Error", new List<string> {"Cannot fetch"} }
+         }
+      });
+   }
 }
