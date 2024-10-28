@@ -47,10 +47,8 @@ func (h *PrettyHandler) Handle(_ context.Context, r slog.Record) error {
 	}
 
 	fields := make(map[string]interface{}, r.NumAttrs())
-
 	r.Attrs(func(a slog.Attr) bool {
 		fields[a.Key] = a.Value.Any()
-
 		return true
 	})
 
@@ -68,7 +66,8 @@ func (h *PrettyHandler) Handle(_ context.Context, r slog.Record) error {
 		}
 	}
 
-	timeStr := r.Time.Format("[15:05:05.000]")
+	// Use the log event time rather than the current time
+	timeStr := r.Time.Format("[15:04:05.000]")
 	msg := color.CyanString(r.Message)
 
 	h.l.Println(

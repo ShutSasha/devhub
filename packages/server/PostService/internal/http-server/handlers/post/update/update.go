@@ -19,24 +19,24 @@ import (
 
 // Request struct defines the fields allowed for updating a post.
 // - Title: The title of the post (optional, between 1 and 128 characters).
-// - Description: The description of the post (optional, max 62792 characters).
+// - Content: The content of the post (optional, max 62792 characters).
 // - HeaderImage: Optional image URL to update the post header.
 // - Tags: Optional list of tags associated with the post.
 type Request struct {
 	Title       string   `json:"title,omitempty" validate:"max=128,min=1"`
-	Description string   `json:"description,omitempty" validate:"max=62792"`
+	Content     string   `json:"content,omitempty" validate:"max=62792"`
 	HeaderImage string   `json:"header_image,omitempty"`
 	Tags        []string `json:"tags,omitempty"`
 }
 
 // PostUpdater is an interface that defines the method for updating a post.
-// Update takes a context, postId, title, description, header image, and tags, and returns an error if the update fails.
+// Update takes a context, postId, title, content, header image, and tags, and returns an error if the update fails.
 type PostUpdater interface {
 	Update(
 		ctx context.Context,
 		postId primitive.ObjectID,
 		title string,
-		description string,
+		content string,
 		headerImage string,
 		tags []string,
 	) error
@@ -45,7 +45,7 @@ type PostUpdater interface {
 // New is a handler function that processes the HTTP request for updating a post.
 // It validates the request body, checks for errors, and calls the PostUpdater to update the post.
 // @Summary Update an existing post
-// @Description This endpoint allows a user to update an existing post with a new title, description, header image, and tags.
+// @Description This endpoint allows a user to update an existing post with a new title, content, header image, and tags.
 // @Tags posts
 // @Accept json
 // @Produce json
@@ -117,7 +117,7 @@ func New(log *slog.Logger, postUpdater PostUpdater) http.HandlerFunc {
 			context.TODO(),
 			postId,
 			req.Title,
-			req.Description,
+			req.Content,
 			req.HeaderImage,
 			req.Tags,
 		)

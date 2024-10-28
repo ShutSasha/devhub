@@ -26,9 +26,6 @@ func New(
 	httpApp := httpapp.New(
 		log,
 		storage,
-		storage,
-		storage,
-		storage,
 		httpPort,
 		timeout,
 	)
