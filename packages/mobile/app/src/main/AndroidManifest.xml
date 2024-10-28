@@ -13,6 +13,12 @@
         android:theme="@style/Theme.DevHubApp"
         tools:targetApi="31">
         <activity
+            android:name=".activity.SplashActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activity.WelcomeActivity"
+            android:exported="true" />
+        <activity
             android:name=".activity.LogInActivity"
             android:exported="true" />
         <activity

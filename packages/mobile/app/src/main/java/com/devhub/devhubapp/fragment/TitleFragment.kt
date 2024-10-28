@@ -31,6 +31,10 @@ class TitleFragment : Fragment() {
 
         val title: TextView = view.findViewById(R.id.title)
         title.text = titleText
+
+        backArrow.setOnClickListener {
+            requireActivity().onBackPressedDispatcher.onBackPressed()
+        }
     }
 
     fun setShowBackArrow(show: Boolean) {

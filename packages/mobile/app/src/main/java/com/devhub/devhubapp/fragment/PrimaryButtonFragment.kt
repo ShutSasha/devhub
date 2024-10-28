@@ -13,6 +13,7 @@ class PrimaryButtonFragment : Fragment() {
 
     private lateinit var button: Button
     private var text: String? = null
+    private var buttonAction: (() -> Unit)? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -23,10 +24,18 @@ class PrimaryButtonFragment : Fragment() {
         button = view.findViewById(R.id.primarybtn)
         button.text = this.text
 
+        button.setOnClickListener {
+            buttonAction?.invoke()
+        }
+
         return view
     }
 
     fun setButtonText(text: String) {
         this.text = text
+    }
+
+    fun setButtonAction(action: () -> Unit) {
+        this.buttonAction = action
     }
 }
