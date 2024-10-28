@@ -46,8 +46,8 @@ func New(
 		httpSwagger.URL(fmt.Sprintf("http://localhost:%d/swagger/doc.json", port)),
 	))
 
-	router.Route("/api/post", func(r chi.Router) {
-		r.Post("/create", save.New(log, postSaver))
+	router.Route("/api/posts", func(r chi.Router) {
+		r.Post("/", save.New(log, postSaver))
 
 		r.Get("/{id}", get.New(log, postProvider))
 
