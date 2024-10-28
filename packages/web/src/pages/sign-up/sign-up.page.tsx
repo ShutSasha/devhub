@@ -16,10 +16,10 @@ import { handleServerException } from '@utils/handleServerException.util'
 import { ErrorSpan } from '@shared/components/errors/error-span.component'
 import loaderGif from '@assets/gif/loading.gif'
 import { ROUTES } from '@pages/router/routes.enum'
+import { AuthTransparentBtn } from '@shared/components/auth/transparent-btn/sign-up-transparent-btn'
+import { EmphasizeLine } from '@shared/components/auth/emphasize-line/emphasize-line.component'
 
 import { AuthIcon, ImgContainer, InputsContainer, SixDigitalCodeSpan } from './sign-up.style'
-import { SignUpTransparentBtn } from './components/sign-up-transparent-btn'
-import { EmphasizeLine } from './components/emphasize-line.component'
 
 import { ErrorException } from '~types/error/error.type'
 
@@ -91,7 +91,7 @@ export const SignUp: FC = () => {
           style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '16px' }}
         >
           <Text text="Already have an account?" color="#0D1A26" fontSize="16px" $lineHeight="24px" />
-          <SignUpTransparentBtn />
+          <AuthTransparentBtn text="Sign In" />
         </div>
         <EmphasizeLine />
         <Text

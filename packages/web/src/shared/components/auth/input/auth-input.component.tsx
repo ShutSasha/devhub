@@ -44,6 +44,7 @@ export const AuthInput: FC<AuthInputProps> = ({ label, type, placeholder, style,
     <InputContainer>
       <Span>{label}</Span>
       <Input
+        autoComplete="on"
         type={type || 'text'}
         placeholder={placeholder}
         style={{ ...style }}
