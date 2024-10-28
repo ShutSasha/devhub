@@ -2,6 +2,7 @@ using System.Text;
 using AuthService.Helpers.Jwt;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 
 namespace AuthService.Extensions
 {
@@ -12,7 +13,6 @@ namespace AuthService.Extensions
         {
             var jwtOptions = new JwtOptions();
             configuration.GetSection(nameof(JwtOptions)).Bind(jwtOptions);
-            
             services.Configure<JwtOptions>(configuration.GetSection(nameof(JwtOptions)));
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -44,6 +44,24 @@ namespace AuthService.Extensions
                             }
 
                             return Task.CompletedTask;
+                        },
+                        
+                        OnChallenge = context =>
+                        {
+                            context.HandleResponse();
+
+                            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                            context.Response.ContentType = "application/json";
+                            var response = new
+                            {
+                                status = 401,
+                                errors = new Dictionary<string, List<string>>
+                                {
+                                    { "Authorization error", new List<string> { "User is unauthorized" } }
+                                }
+                            };
+
+                            return context.Response.WriteAsync(JsonConvert.SerializeObject(response));
                         }
                     };
                 });
