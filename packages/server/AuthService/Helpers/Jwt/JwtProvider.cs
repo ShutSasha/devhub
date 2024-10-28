@@ -22,12 +22,12 @@ public class JwtProvider(IOptions<JwtOptions> options)
       }; 
       var signingCredentials = new SigningCredentials(  
          new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.AccessSecretKey)),  
-         SecurityAlgorithms.HmacSha256);  
-  
-      var token = new JwtSecurityToken(  
-         claims: claims,  
-         signingCredentials: signingCredentials,  
-         expires: DateTime.UtcNow.AddHours(_options.ExpiresDuration));  
+         SecurityAlgorithms.HmacSha256);
+
+      var token = new JwtSecurityToken(
+         claims: claims,
+         signingCredentials: signingCredentials,
+         expires: DateTime.Now.AddSeconds(_options.ExpiresDuration));
   
       var tokenValue = new JwtSecurityTokenHandler().WriteToken(token);  
   

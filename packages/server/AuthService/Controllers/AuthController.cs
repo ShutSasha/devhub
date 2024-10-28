@@ -119,5 +119,21 @@ public class AuthController : ControllerBase
          });
       }
    }
+
+   [Authorize]
+   [HttpGet("testinfo")]
+   public async Task<IActionResult> GetInformation([FromServices] IHttpClientFactory httpClientFactory)
+   {
+      var httpClient = httpClientFactory.CreateClient();
+      var response = await httpClient.GetAsync("https://jsonplaceholder.typicode.com/posts/1");
+
+      if (response.IsSuccessStatusCode)
+      {
+         var data = await response.Content.ReadFromJsonAsync<object>();
+         return Ok(data);
+      }
+
+      return StatusCode((int)response.StatusCode, "Error fetching data from jsonplaceholder");
+   }
    
 }

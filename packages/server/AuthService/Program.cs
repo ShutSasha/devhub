@@ -17,6 +17,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddHttpClient();
 builder.Services.Configure<MongoDbSettings>(configuration.GetSection("MongoDbSettings"));
 builder.Services.Configure<SenderDataSettings>(configuration.GetSection("SenderData"));
 builder.Services.AddSingleton<IMongoClient>(sp =>
@@ -47,6 +48,10 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
+app.UseAuthorization();
+
 app.MapControllers();
 
 app.UseCors(x =>
