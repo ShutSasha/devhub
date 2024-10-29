@@ -166,6 +166,27 @@ public class AuthService
       
       return true; 
    }
+
+   public async Task SendVerificationCode(string email)
+   {
+      var user = await _userCollection.Find(u => u.Email == email).FirstOrDefaultAsync();
+
+      if (user == null)
+      {
+         throw new Exception("User with this email wasn't found");
+      }
+
+      var verificationCode = GenerateActivationCode();
+      
+      var update = Builders<User>.Update.Set(u => u.ActivationCode, verificationCode);
+      
+      await _userCollection.UpdateOneAsync(
+         u => u.Email == email,
+         update
+      );
+
+      await _mailService.SendVerificationCode(user.Email, verificationCode);
+   }
    
    private string GenerateActivationCode()
    {

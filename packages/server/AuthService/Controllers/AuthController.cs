@@ -1,4 +1,6 @@
+using AuthService.Contracts.Email;
 using AuthService.Contracts.User;
+using AuthService.Helpers.Response;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -86,6 +88,7 @@ public class AuthController : ControllerBase
             { "ActivationCode", new List<string> { "Invalid email or activation code" } }
          }
       });
+      //ErrorResponseHelper.CreateErrorResponse(400,"Activat")
    }
 
    [HttpPost("refresh")]
@@ -120,6 +123,20 @@ public class AuthController : ControllerBase
       }
    }
 
+   [HttpPatch("send-verification-code")]
+   public async Task<IActionResult> SendVerificationCode([FromBody] SendVerificationCodeRequest request)
+   {
+      try
+      {
+         await _authService.SendVerificationCode(request.Email);
+         return Ok("Verification code has been sent to your email.");
+      }
+      catch (Exception e)
+      {
+        return ErrorResponseHelper.CreateErrorResponse(401, "Send Verification error", e.Message);
+      }
+   }
+   
    [Authorize]
    [HttpGet("testinfo")]
    public async Task<IActionResult> GetInformation([FromServices] IHttpClientFactory httpClientFactory)
