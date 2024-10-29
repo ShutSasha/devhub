@@ -33,7 +33,7 @@ type PostRemover interface {
 // @Success 200 {object} map[string]interface{} "Success message"
 // @Failure 400 {object} map[string]interface{} "Invalid postId format"
 // @Failure 500 {object} map[string]interface{} "Internal server error"
-// @Router /posts/{id} [delete]
+// @Router /api/posts/{id} [delete]
 func New(log *slog.Logger, postRemover PostRemover) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		const op = "handlers.post.delete.New"

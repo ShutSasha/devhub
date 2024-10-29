@@ -36,7 +36,7 @@ type PostSearcher interface {
 // @Success 200 {object} []models.Post "The requested posts"
 // @Failure 404 {object} map[string]interface{} "Posts not found"
 // @Failure 500 {object} map[string]interface{} "Internal server error"
-// @Router /posts/search [get]
+// @Router /api/posts/search [get]
 func New(log *slog.Logger, postSearcher PostSearcher) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		const op = "handlers.post.search.New"

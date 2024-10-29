@@ -53,7 +53,7 @@ type PostUpdater interface {
 // @Param request body Request true "Update post request body"
 // @Success 200 {object} map[string]interface{} "Success message"
 // @Failure 400 {object} map[string]interface{} "Validation errors or request decoding failures"
-// @Router /posts/{id} [patch]
+// @Router /api/posts/{id} [patch]
 func New(log *slog.Logger, postUpdater PostUpdater) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		const op = "handlers.post.update.New"

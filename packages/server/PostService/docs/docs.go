@@ -15,7 +15,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/posts": {
+        "/api/posts": {
             "post": {
                 "description": "This endpoint allows a user to save a new post with a title, content, and optional tags.",
                 "consumes": [
@@ -57,7 +57,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/posts/search": {
+        "/api/posts/search": {
             "get": {
                 "description": "This endpoint retrieves posts by query.",
                 "consumes": [
@@ -97,7 +97,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/posts/{id}": {
+        "/api/posts/{id}": {
             "get": {
                 "description": "This endpoint retrieves a post by its unique ID.",
                 "consumes": [

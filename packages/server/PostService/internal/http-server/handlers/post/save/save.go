@@ -52,7 +52,7 @@ type PostSaver interface {
 // @Param request body Request true "Post save request body"
 // @Success 200 {object} map[string]interface{} "Returns the ID of the newly created post"
 // @Failure 400 {object} map[string]interface{} "Validation errors or request decoding failures"
-// @Router /posts [post]
+// @Router /api/posts [post]
 func New(log *slog.Logger, postSaver PostSaver) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		const op = "handlers.post.save.New"

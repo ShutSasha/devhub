@@ -38,7 +38,7 @@ type PostProvider interface {
 // @Failure 400 {object} map[string]interface{} "Invalid postId format"
 // @Failure 404 {object} map[string]interface{} "Post not found"
 // @Failure 500 {object} map[string]interface{} "Internal server error"
-// @Router /posts/{id} [get]
+// @Router /api/posts/{id} [get]
 func New(log *slog.Logger, postProvider PostProvider) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		const op = "handlers.post.get.New"
