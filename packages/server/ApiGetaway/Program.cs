@@ -4,6 +4,18 @@ using Ocelot.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddCors(options =>
+{
+   options.AddPolicy("AllowMultipleOrigins", policy =>
+   {
+      policy.WithHeaders().AllowAnyHeader();
+      policy.WithHeaders().AllowCredentials();
+      policy.WithOrigins("http://localhost:3000", "http://10.0.2.2:3000")
+         .AllowAnyHeader()
+         .AllowAnyMethod();
+   });
+});
+
 builder.Configuration.SetBasePath(builder.Environment.ContentRootPath)
    .AddJsonFile("ocelot.json", optional: false, reloadOnChange: true)
    .AddEnvironmentVariables();
@@ -17,6 +29,8 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 var app = builder.Build();
+
+app.UseCors("AllowMultipleOrigins");
 
 if (app.Environment.IsDevelopment())
 {
