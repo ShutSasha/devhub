@@ -10,7 +10,7 @@ public class UserService : global::UserService.UserService.UserServiceBase
 {
    private readonly ILogger<UserService> _logger;
    private readonly IMongoCollection<User> _userCollection;
-   
+
    public UserService(IMongoDatabase mongoDatabase, IOptions<MongoDbSettings> mongoDbSettings,
       ILogger<UserService> logger)
    {
@@ -21,13 +21,13 @@ public class UserService : global::UserService.UserService.UserServiceBase
    public override async Task<AddPostResponse> AddPostToUser(AddPostRequest request, ServerCallContext context)
    {
       var userId = request.UserId;
-      
+
       var filter = Builders<User>.Filter.Eq(u => u.Id, userId);
       var update = Builders<User>.Update.Push(u => u.Posts, request.PostId);
 
       var result = await _userCollection.UpdateOneAsync(filter, update);
 
-      
+
       if (result.ModifiedCount > 0)
       {
          return new AddPostResponse { Success = true, Message = "Post added successfully" };
@@ -36,5 +36,39 @@ public class UserService : global::UserService.UserService.UserServiceBase
       {
          return new AddPostResponse { Success = false, Message = "Failed to add post" };
       }
+   }
+
+   public override async Task<DeletePostResponse> DeletePostFromUser(DeletePostRequest request,
+      ServerCallContext context)
+   {
+      var filter = Builders<User>.Filter.AnyEq(u => u.Posts, request.PostId);
+      var user = await _userCollection.Find(filter).FirstOrDefaultAsync();
+
+      if (user == null)
+      {
+         return new DeletePostResponse
+         {
+            Success = false,
+            Message = "User or post not found."
+         };
+      }
+
+      var update = Builders<User>.Update.Pull(u => u.Posts, request.PostId);
+      var updateResult = await _userCollection.UpdateOneAsync(filter, update);
+
+      if (updateResult.ModifiedCount > 0)
+      {
+         return new DeletePostResponse
+         {
+            Success = true,
+            Message = "Post deleted successfully."
+         };
+      }
+
+      return new DeletePostResponse
+      {
+         Success = false,
+         Message = "Failed to delete post."
+      };
    }
 }

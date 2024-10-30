@@ -4,6 +4,7 @@ option csharp_namespace = "UserService";
 
 service UserService{
   rpc AddPostToUser (AddPostRequest) returns (AddPostResponse);
+  rpc DeletePostFromUser (DeletePostRequest) returns (DeletePostResponse);
 }
 
 message  AddPostRequest{
@@ -12,6 +13,15 @@ message  AddPostRequest{
 }
 
 message AddPostResponse{
+  bool success = 1;
+  string message = 2;
+}
+
+message DeletePostRequest{
+  string postId = 1;
+}
+
+message DeletePostResponse{
   bool success = 1;
   string message = 2;
 }
