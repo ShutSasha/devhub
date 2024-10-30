@@ -90,7 +90,6 @@ public class AuthController : ControllerBase
             { "ActivationCode", new List<string> { "Invalid email or activation code" } }
          }
       });
-      //ErrorResponseHelper.CreateErrorResponse(400,"Activat")
    }
 
    [HttpPost("refresh")]
@@ -125,7 +124,7 @@ public class AuthController : ControllerBase
       }
    }
 
-   [HttpPatch("send-verification-code")]
+   [HttpPatch("password-verification-code")]
    public async Task<IActionResult> SendVerificationCode([FromBody] SendVerificationCodeRequest request)
    {
       try
