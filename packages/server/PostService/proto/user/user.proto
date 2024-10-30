@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+option go_package = "github.com/ShutSasha/devhub/packages/server/PostService;user";
+
+option csharp_namespace = "UserService";
+
+service UserService{
+  rpc AddPostToUser (AddPostRequest) returns (AddPostResponse);
+}
+
+message  AddPostRequest{
+  string userId = 1;
+  string postId = 2;
+}
+
+message AddPostResponse{
+  bool success = 1;
+  string message = 2;
+}

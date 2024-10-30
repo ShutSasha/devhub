@@ -9,6 +9,7 @@ import (
 	"time"
 
 	_ "github.com/ShutSasha/devhub/tree/main/packages/server/PostService/docs"
+	pb "github.com/ShutSasha/devhub/tree/main/packages/server/PostService/gen/go/user"
 	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/http-server/handlers/post/delete"
 	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/http-server/handlers/post/get"
 	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/http-server/handlers/post/save"
@@ -38,6 +39,7 @@ type PostStorage interface {
 func New(
 	log *slog.Logger,
 	postStorage PostStorage,
+	grpcClient pb.UserServiceClient,
 	port int,
 	timout time.Duration,
 ) *App {
@@ -62,7 +64,7 @@ func New(
 
 	router.Route("/api/posts", func(r chi.Router) {
 		r.Get("/{id}", get.New(log, postStorage))
-		r.Post("/", save.New(log, postStorage))
+		r.Post("/", save.New(log, postStorage, postStorage, grpcClient))
 		r.Delete("/{id}", delete.New(log, postStorage))
 		r.Patch("/{id}", update.New(log, postStorage))
 
