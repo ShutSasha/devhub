@@ -1,5 +1,7 @@
+import { ROUTES } from '@pages/router/routes.enum'
 import { AuthTransparentBtn } from '@shared/components/auth/transparent-btn/sign-up-transparent-btn'
 import { FONTS } from '@shared/consts/fonts.enum'
+import { Link } from 'react-router-dom'
 import styled from 'styled-components'
 
 const StyledContainer = styled.div`
@@ -22,7 +24,9 @@ export const CreateAccount = () => {
   return (
     <StyledContainer>
       <StyledText>Don't have an account?</StyledText>
-      <AuthTransparentBtn text="Sign Up" />
+      <Link to={ROUTES.SIGN_UP}>
+        <AuthTransparentBtn text="Sign Up" />
+      </Link>
     </StyledContainer>
   )
 }

@@ -22,6 +22,7 @@ import { EmphasizeLine } from '@shared/components/auth/emphasize-line/emphasize-
 import { AuthIcon, ImgContainer, InputsContainer, SixDigitalCodeSpan } from './sign-up.style'
 
 import { ErrorException } from '~types/error/error.type'
+import { Link } from 'react-router-dom'
 
 export const SignUp: FC = () => {
   const [register, { isLoading, error: signUpError }] = useRegisterMutation()
@@ -91,7 +92,9 @@ export const SignUp: FC = () => {
           style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '16px' }}
         >
           <Text text="Already have an account?" color="#0D1A26" fontSize="16px" $lineHeight="24px" />
-          <AuthTransparentBtn text="Sign In" />
+          <Link to={ROUTES.LOGIN}>
+            <AuthTransparentBtn text="Sign In" />
+          </Link>
         </div>
         <EmphasizeLine />
         <Text
