@@ -1,5 +1,6 @@
 import { FC } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { AuthLayout } from '@shared/layouts/auth/auth.layout'
 import { Text } from '@shared/components/text/text.component'
 import { FONTS } from '@shared/consts/fonts.enum'
@@ -22,7 +23,6 @@ import { EmphasizeLine } from '@shared/components/auth/emphasize-line/emphasize-
 import { AuthIcon, ImgContainer, InputsContainer, SixDigitalCodeSpan } from './sign-up.style'
 
 import { ErrorException } from '~types/error/error.type'
-import { Link } from 'react-router-dom'
 
 export const SignUp: FC = () => {
   const [register, { isLoading, error: signUpError }] = useRegisterMutation()
