@@ -18,8 +18,25 @@ const navElements: NavItem[] = [
   { title: 'Chats', icon: chats },
 ]
 
-export const Header = () => {
+const AuthDisplay = () => {
   const user = useAppSelector(state => state.userSlice.user)
+
+  return (
+    <>
+      {user ? (
+        <p>user logged in</p>
+      ) : (
+        <>
+          <LogInLink to={ROUTES.LOGIN}>Log in</LogInLink>
+          <CreateAccountLink to={ROUTES.SIGN_UP}>Create account</CreateAccountLink>
+        </>
+      )}
+    </>
+  )
+}
+
+export const Header = () => {
+  const isLoading = useAppSelector(state => state.userSlice.loading) || false
 
   return (
     <Wrapper>
@@ -30,16 +47,7 @@ export const Header = () => {
             <NavItem key={el.title} icon={el.icon} navTitle={el.title} />
           ))}
         </NavList>
-        <AuthContainer>
-          {user ? (
-            <p>re</p>
-          ) : (
-            <>
-              <LogInLink to={ROUTES.LOGIN}>Log in</LogInLink>
-              <CreateAccountLink to={ROUTES.SIGN_UP}>Create account</CreateAccountLink>
-            </>
-          )}
-        </AuthContainer>
+        <AuthContainer>{isLoading ? <div>Loading...</div> : <AuthDisplay />}</AuthContainer>
       </Container>
     </Wrapper>
   )
