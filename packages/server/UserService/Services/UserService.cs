@@ -1,5 +1,7 @@
 using Grpc.Core;
+using Microsoft.Extensions.Options;
 using MongoDB.Driver;
+using UserService.Models.Database;
 using UserService.Models.User;
 
 namespace UserService.Services;
@@ -9,10 +11,11 @@ public class UserService : global::UserService.UserService.UserServiceBase
    private readonly ILogger<UserService> _logger;
    private readonly IMongoCollection<User> _userCollection;
    
-   public UserService(ILogger<UserService> logger, IMongoCollection<User> userCollection)
+   public UserService(IMongoDatabase mongoDatabase, IOptions<MongoDbSettings> mongoDbSettings,
+      ILogger<UserService> logger)
    {
       _logger = logger;
-      _userCollection = userCollection;
+      _userCollection = mongoDatabase.GetCollection<User>(mongoDbSettings.Value.CollectionName);
    }
 
    public override async Task<AddPostResponse> AddPostToUser(AddPostRequest request, ServerCallContext context)

@@ -21,6 +21,7 @@ builder.Services.AddSingleton<IMongoClient>(sp =>
    var settings = sp.GetRequiredService<IOptions<MongoDbSettings>>().Value;
    return new MongoClient(settings.ConnectionUri);
 });
+
 builder.Services.AddSingleton<IMongoDatabase>(sp =>
 {
    var mongoClient = sp.GetRequiredService<IMongoClient>();
