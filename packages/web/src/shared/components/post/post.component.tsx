@@ -24,10 +24,10 @@ export const Post: FC<PostProps> = post => {
           <S.StyledAvatar src={post.avatar} />
           <S.Username>{post.username}</S.Username>
         </S.StyledUserCredentialsContainer>
-        <S.StyledStar isSaved={false} />
+        <S.StyledStar $isSaved={false} />
       </S.PostHeader>
       <S.PostTitle>{post.postTitle}</S.PostTitle>
-      <S.TagsContainer>{post.tags && post.tags.map(tag => <S.Tag>#{tag}</S.Tag>)}</S.TagsContainer>
+      <S.TagsContainer>{post.tags && post.tags.map((tag, index) => <S.Tag key={index}>#{tag}</S.Tag>)}</S.TagsContainer>
       <S.ReactionWrapper>
         <S.LikesDislikesContainer>
           <S.ReactionContainer>

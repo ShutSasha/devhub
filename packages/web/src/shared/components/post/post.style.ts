@@ -63,14 +63,14 @@ export const Username = styled.p`
 `
 
 interface StyledStarProps {
-  isSaved?: boolean
+  $isSaved?: boolean
 }
 
 export const StyledStar = styled.div<StyledStarProps>`
   height: 24px;
   width: 24px;
   transition: all 0.25s ease-in;
-  background-image: ${({ isSaved }) => (isSaved ? `url(${savedStar})` : `url(${star})`)};
+  background-image: ${({ $isSaved }) => ($isSaved ? `url(${savedStar})` : `url(${star})`)};
   background-size: 100% 100%;
   background-position: center;
   box-sizing: border-box;
@@ -78,7 +78,7 @@ export const StyledStar = styled.div<StyledStarProps>`
   cursor: pointer;
 
   &:hover {
-    background-image: ${({ isSaved }) => (isSaved ? `url(${savedStar})` : `url(${starHover})`)};
+    background-image: ${({ $isSaved }) => ($isSaved ? `url(${savedStar})` : `url(${starHover})`)};
   }
 `
 

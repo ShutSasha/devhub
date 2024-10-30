@@ -15,19 +15,19 @@ export const Footer = () => {
           <S.InfoColumn>
             <S.ColumnTitle>Products</S.ColumnTitle>
             {products.map(product => (
-              <S.ColumnText>{product}</S.ColumnText>
+              <S.ColumnText key={product}>{product}</S.ColumnText>
             ))}
           </S.InfoColumn>
           <S.InfoColumn>
             <S.ColumnTitle>Resources</S.ColumnTitle>
-            {resources.map(product => (
-              <S.ColumnText>{product}</S.ColumnText>
+            {resources.map(resource => (
+              <S.ColumnText key={resource}>{resource}</S.ColumnText>
             ))}
           </S.InfoColumn>
           <S.InfoColumn>
             <S.ColumnTitle>Company</S.ColumnTitle>
-            {companyInfo.map(product => (
-              <S.ColumnText>{product}</S.ColumnText>
+            {companyInfo.map(infoItem => (
+              <S.ColumnText key={infoItem}>{infoItem}</S.ColumnText>
             ))}
           </S.InfoColumn>
         </S.InfoListContainer>
