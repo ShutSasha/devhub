@@ -2,6 +2,7 @@ import { FC, ReactNode } from 'react'
 import styled from 'styled-components'
 import { Header } from '@shared/components/header/header.component'
 import { colors } from '@shared/consts/colors.const'
+import { Footer } from '@shared/components/footer/footer.component'
 
 const Wrapper = styled.div`
   min-height: 100vh;
@@ -31,7 +32,7 @@ export const MainLayout: FC<MainLayoutProps> = ({ children }) => {
     <Wrapper>
       <Header />
       <Container>{children}</Container>
-      <p style={{ marginTop: 'auto' }}>footer</p>
+      <Footer />
     </Wrapper>
   )
 }
