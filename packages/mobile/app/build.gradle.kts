@@ -33,6 +33,16 @@ android {
     kotlinOptions {
         jvmTarget = "11"
     }
+    sourceSets {
+        getByName("main") {
+            res {
+                srcDirs("src\\main\\res", "src\\main\\res\\layouts\\activities",
+                    "src\\main\\res",
+                    "src\\main\\res\\layouts\\fragments", "src\\main\\res", "src\\main\\res\\layouts\\activitie"
+                )
+            }
+        }
+    }
 }
 
 dependencies {

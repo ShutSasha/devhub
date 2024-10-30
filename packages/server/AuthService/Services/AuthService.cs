@@ -2,7 +2,7 @@
 using AuthService.Contracts.User;
 using AuthService.Dtos;
 using AuthService.Helpers.Jwt;
-using AuthService.Helpers.Password;
+using AuthService.Helpers.Security;
 using AuthService.Models;
 using AuthService.Models.Enums;
 using AutoMapper;
@@ -84,8 +84,7 @@ public class AuthService
       await _mailService.SendVerificationCode(email,newCode);
       return user;
    }
-
-
+   
    public async Task<LoginUserResponse> Login(string userName,string password)
    {
       var loginResponse = new LoginUserResponse();
@@ -113,7 +112,8 @@ public class AuthService
       return loginResponse;
       
    }
-   public async Task<LoginUserResponse> Refresh(string refreshToken)
+   
+   public async Task<LoginUserResponse> RefreshTokens(string refreshToken)
    {
       var loginResponse = new LoginUserResponse();
 
@@ -136,6 +136,7 @@ public class AuthService
       }
       
       var user = await _userCollection.Find(u => u.Id == userId).FirstOrDefaultAsync();
+      
       if (user == null)
       {
          throw new Exception("Unauthorized user");
@@ -148,7 +149,6 @@ public class AuthService
       loginResponse.UserData = _mapper.Map<UserDto>(user);
       return loginResponse;
    }
-
    
    public async Task<bool> VerifyEmail(string email, string activationCode)
    {
@@ -165,6 +165,47 @@ public class AuthService
       await _userCollection.ReplaceOneAsync(u => u.Id == user.Id, user);
       
       return true; 
+   }
+
+   public async Task SendVerificationCode(string email)
+   {
+      var user = await _userCollection.Find(u => u.Email == email).FirstOrDefaultAsync();
+
+      if (user == null)
+      {
+         throw new Exception("User with this email wasn't found");
+      }
+
+      var verificationCode = GenerateActivationCode();
+      
+      var update = Builders<User>.Update.Set(u => u.ActivationCode, verificationCode);
+      
+      await _userCollection.UpdateOneAsync(
+         u => u.Email == email,
+         update
+      );
+
+      await _mailService.SendVerificationCode(user.Email, verificationCode);
+   }
+
+   public async Task ChangePassword(string email,string password)
+   {
+      var user = await _userCollection.Find(u => u.Email == email).FirstOrDefaultAsync();
+
+      if (user == null)
+      {
+         throw new Exception("User wasn't found");
+      }
+
+      var hashedPassword = _passwordHasher.GenerateHash(password);
+
+      var update = Builders<User>.Update.Combine(
+         Builders<User>.Update.Set(u => u.Password, hashedPassword),
+         Builders<User>.Update.Set(u => u.ActivationCode,null)
+         );
+
+      await _userCollection.UpdateOneAsync(u => u.Email == email, update);
+
    }
    
    private string GenerateActivationCode()

@@ -5,6 +5,8 @@ import baseQueryWithReauth from './baseQueryWithReauth'
 import { SignUpDto } from '~types/auth/sign-up.dto'
 import { IUser } from '~types/user/user.type'
 import { VerifyEmailDto, VerifyEmailResponse } from '~types/auth/verify-email.type'
+import { LoginResponse } from '~types/auth/login-response.type'
+import { LoginDto } from '~types/auth/login.dto'
 
 export const api = createApi({
   reducerPath: 'authApi',
@@ -24,7 +26,14 @@ export const api = createApi({
         body,
       }),
     }),
+    login: builder.mutation<LoginResponse, LoginDto>({
+      query: body => ({
+        url: 'auth/login',
+        method: 'POST',
+        body,
+      }),
+    }),
   }),
 })
 
-export const { useRegisterMutation, useVerifyEmailMutation } = api
+export const { useRegisterMutation, useVerifyEmailMutation, useLoginMutation } = api

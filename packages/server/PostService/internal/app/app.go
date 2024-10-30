@@ -1,6 +1,7 @@
 package app
 
 import (
+	"log/slog"
 	"time"
 
 	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/app/httpapp"
@@ -11,13 +12,23 @@ type App struct {
 	HttpServer *httpapp.App
 }
 
-func New(storagePath string, httpPort int, timeout time.Duration) *App {
+func New(
+	log *slog.Logger,
+	storagePath string,
+	httpPort int,
+	timeout time.Duration,
+) *App {
 	storage, err := mongodb.New(storagePath)
 	if err != nil {
 		panic(err)
 	}
 
-	httpApp := httpapp.New(storage, storage, storage, httpPort, timeout)
+	httpApp := httpapp.New(
+		log,
+		storage,
+		httpPort,
+		timeout,
+	)
 
 	return &App{
 		HttpServer: httpApp,

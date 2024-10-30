@@ -1,0 +1,117 @@
+﻿{
+   "Routes": [
+      {
+         "DownstreamPathTemplate": "/api/auth/register",
+         "DownstreamScheme": "http",
+         "DownstreamHostAndPorts": [
+            {
+               "Host": "localhost",
+               "Port": 5279
+            }
+         ],
+         "UpstreamPathTemplate": "/api/auth/register",
+         "UpstreamHttpMethod": ["POST"]
+      },
+      {
+         "DownstreamPathTemplate": "/api/auth/login",
+         "DownstreamScheme": "http",
+         "DownstreamHostAndPorts": [
+            {
+               "Host": "localhost",
+               "Port": 5279
+            }
+         ],
+         "UpstreamPathTemplate": "/api/auth/login",
+         "UpstreamHttpMethod": ["POST"]
+      },
+      {
+         "DownstreamPathTemplate": "/api/auth/verify-email",
+         "DownstreamScheme": "http",
+         "DownstreamHostAndPorts": [
+            {
+               "Host": "localhost",
+               "Port": 5279
+            }
+         ],
+         "UpstreamPathTemplate": "/api/auth/verify-email",
+         "UpstreamHttpMethod": ["POST"]
+      },
+      {
+         "DownstreamPathTemplate": "/api/auth/refresh",
+         "DownstreamScheme": "http",
+         "DownstreamHostAndPorts": [
+            {
+               "Host": "localhost",
+               "Port": 5279
+            }
+         ],
+         "UpstreamPathTemplate": "/api/auth/refresh",
+         "UpstreamHttpMethod": ["POST"]
+      },
+      {
+         "DownstreamPathTemplate": "/api/auth/password-verification-code",
+         "DownstreamScheme": "http",
+         "DownstreamHostAndPorts": [
+            {
+               "Host": "localhost",
+               "Port": 5279
+            }
+         ],
+         "UpstreamPathTemplate": "/api/auth/password-verification-code",
+         "UpstreamHttpMethod": ["PATCH"]
+      },
+      {
+         "DownstreamPathTemplate": "/api/auth/change-password",
+         "DownstreamScheme": "http",
+         "DownstreamHostAndPorts": [
+            {
+               "Host": "localhost",
+               "Port": 5279
+            }
+         ],
+         "UpstreamPathTemplate": "/api/auth/change-password",
+         "UpstreamHttpMethod": ["PATCH"]
+      },
+      
+      {
+         "DownstreamPathTemplate": "/api/posts",
+         "DownstreamScheme": "http",
+         "DownstreamHostAndPorts": [
+            {
+               "Host": "localhost",
+               "Port": 8080
+            }
+         ],
+         "UpstreamPathTemplate": "/api/posts",
+         "UpstreamHttpMethod": ["POST"]
+      },
+      {
+         "DownstreamPathTemplate": "/api/posts/{id}",
+         "DownstreamScheme": "http",
+         "DownstreamHostAndPorts": [
+            {
+               "Host": "localhost",
+               "Port": 8080
+            }
+         ],
+         "UpstreamPathTemplate": "/api/posts/{id}",
+         "UpstreamHttpMethod": ["PATCH","DELETE","GET"]
+      },
+      {
+         "DownstreamPathTemplate": "/api/posts/search",
+         "DownstreamScheme": "http",
+         "DownstreamHostAndPorts": [
+            {
+               "Host": "localhost",
+               "Port": 8080
+            }
+         ],
+         "UpstreamPathTemplate": "/api/posts/search",
+         "UpstreamHttpMethod": ["GET"]
+      }
+   ],
+   "GlobalConfiguration": {
+      "BaseUrl": "http://localhost:5295"
+   }
+   
+}
