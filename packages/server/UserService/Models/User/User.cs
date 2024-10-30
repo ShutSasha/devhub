@@ -1,9 +1,9 @@
-﻿using System.Text.Json.Serialization;
-using AuthService.Models.Enums;
+using System.Text.Json.Serialization;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using UserService.Models.Enums;
 
-namespace AuthService.Models;
+namespace UserService.Models.User;
 
 [BsonIgnoreExtraElements]
 public class User
@@ -45,5 +45,34 @@ public class User
    [BsonElement("roles")]
    [BsonRepresentation(BsonType.String)]
    public List<UserRole> UserRole { get; set; } = new List<UserRole> { Enums.UserRole.User };
+   
+   [BsonElement("posts")]
+   [BsonRepresentation(BsonType.ObjectId)]
+   public List<string> Posts { get; set; } = new List<string>();
+   
+   // [BsonElement("marks")]
+   // [BsonRepresentation(BsonType.ObjectId)]
+   // public List<string> Reports { get; set; } = new List<string>();
+
+   [BsonElement("tags")]
+   [BsonRepresentation(BsonType.String)]
+   public List<string> Tags { get; set; } = new List<string>();
+   
+   [BsonElement("comments")]
+   [BsonRepresentation(BsonType.ObjectId)]
+   public List<string> Comments { get; set; } = new List<string>();
+   
+   [BsonElement("friends")]
+   [BsonRepresentation(BsonType.ObjectId)]
+   public List<string> Friends { get; set; } = new List<string>();
+   
+   [BsonElement("chats")]
+   [BsonRepresentation(BsonType.ObjectId)]
+   public List<string> Chats { get; set; } = new List<string>();
+   
+   [BsonElement("reports")]
+   [BsonRepresentation(BsonType.ObjectId)]
+   public List<string> Reports { get; set; } = new List<string>();
+   
    
 }
