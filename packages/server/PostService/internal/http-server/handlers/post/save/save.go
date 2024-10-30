@@ -165,7 +165,7 @@ func New(
 
 		log.Info("post added", slog.Any("id", id))
 
-		response, err := grpcClient.AddPostToUser(context.TODO(), &pb.AddPostRequest{
+		grpcAddResponse, err := grpcClient.AddPostToUser(context.TODO(), &pb.AddPostRequest{
 			UserId: req.UserId,
 			PostId: id.Hex(),
 		})
@@ -187,8 +187,8 @@ func New(
 			))
 			return
 		}
-		if !response.Success {
-			log.Error("user service returned failure", slog.String("message", response.Message))
+		if !grpcAddResponse.Success {
+			log.Error("user service returned failure", slog.String("message", grpcAddResponse.Message))
 
 			// TODO: refactor
 			log.Info("deleting post", slog.Any("id", id))
@@ -201,11 +201,13 @@ func New(
 			}
 
 			render.JSON(w, r, resp.Error(
-				map[string][]string{"userService": {"User service returned failure: " + response.Message}},
+				map[string][]string{"userService": {"User service returned failure: " + grpcAddResponse.Message}},
 				http.StatusInternalServerError,
 			))
 			return
 		}
+
+		log.Info("post succesfully added to user")
 
 		render.JSON(w, r, map[string]interface{}{
 			"_id": id,
