@@ -187,6 +187,26 @@ public class AuthService
 
       await _mailService.SendVerificationCode(user.Email, verificationCode);
    }
+
+   public async Task ChangePassword(string email,string password)
+   {
+      var user = await _userCollection.Find(u => u.Email == email).FirstOrDefaultAsync();
+
+      if (user == null)
+      {
+         throw new Exception("User wasn't found");
+      }
+
+      var hashedPassword = _passwordHasher.GenerateHash(password);
+
+      var update = Builders<User>.Update.Combine(
+         Builders<User>.Update.Set(u => u.Password, hashedPassword),
+         Builders<User>.Update.Set(u => u.ActivationCode,null)
+         );
+
+      await _userCollection.UpdateOneAsync(u => u.Email == email, update);
+
+   }
    
    private string GenerateActivationCode()
    {

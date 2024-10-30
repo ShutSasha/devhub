@@ -11,7 +11,7 @@ namespace AuthService.Controllers;
 public class AuthController : ControllerBase
 {
    private readonly Services.AuthService _authService;
-   
+
    public AuthController(Services.AuthService authService)
    {
       _authService = authService;
@@ -24,14 +24,16 @@ public class AuthController : ControllerBase
       {
          if (!ModelState.IsValid)
          {
-            return BadRequest(ModelState); 
+            return BadRequest(ModelState);
          }
+
          var userResult = await _authService.Register(request.Username, request.Password, request.Email);
          return Ok(userResult);
       }
       catch (Exception e)
       {
-         return BadRequest(new {
+         return BadRequest(new
+         {
             status = 400,
             errors = new Dictionary<string, List<string>>
             {
@@ -129,14 +131,28 @@ public class AuthController : ControllerBase
       try
       {
          await _authService.SendVerificationCode(request.Email);
-         return Ok("Verification code has been sent to your email.");
+         return Ok(new { Message = "Verification code has been sent to your email." });
       }
       catch (Exception e)
       {
-        return ErrorResponseHelper.CreateErrorResponse(401, "Send Verification error", e.Message);
+         return ErrorResponseHelper.CreateErrorResponse(400, "Send Verification error", e.Message);
       }
    }
-   
+
+   [HttpPatch("change-password")]
+   public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
+   {
+      try
+      {
+         var changePasswordResult = _authService.ChangePassword(request.Email, request.Password);
+         return Ok(new { Message = "Password updated successfully" });
+      }
+      catch (Exception e)
+      {
+         return ErrorResponseHelper.CreateErrorResponse(400, "Change password error", e.Message);
+      }
+   }
+
    [Authorize]
    [HttpGet("testinfo")]
    public async Task<IActionResult> GetInformation([FromServices] IHttpClientFactory httpClientFactory)
@@ -155,7 +171,7 @@ public class AuthController : ControllerBase
          status = 401,
          errors = new Dictionary<string, List<string>>
          {
-            { "Fetch Error", new List<string> {"Cannot fetch"} }
+            { "Fetch Error", new List<string> { "Cannot fetch" } }
          }
       });
    }
