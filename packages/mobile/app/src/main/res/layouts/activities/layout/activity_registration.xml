@@ -11,7 +11,7 @@
         android:src="@drawable/ic_devhub_logo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="83dp"
+        android:layout_marginBottom="40dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/registration_container" />
@@ -19,7 +19,7 @@
     <FrameLayout
         android:id="@+id/registration_container"
         android:layout_width="wrap_content"
-        android:layout_height="420dp"
+        android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
