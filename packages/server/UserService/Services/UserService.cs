@@ -71,4 +71,46 @@ public class UserService : global::UserService.UserService.UserServiceBase
          Message = "Failed to delete post."
       };
    }
+
+   public override async Task<RestorePostResponse> RestoreUserPost(RestorePostRequest request,
+      ServerCallContext context)
+   {
+      var user = await _userCollection.Find(u => u.Id == request.UserId).FirstOrDefaultAsync();
+
+      if (user == null)
+      {
+         return new RestorePostResponse
+         {
+            Success = false,
+            Message = "User wasn't found"
+         };
+      }
+
+      if (user.Posts.Contains(request.PostId))
+      {
+         return new RestorePostResponse
+         {
+            Success = false,
+            Message = "Post is already restored"
+         };
+      }
+
+      var update = Builders<User>.Update.Push(u => u.Posts, request.PostId);
+      var result = await _userCollection.UpdateOneAsync(u => u.Id == request.UserId, update);
+
+      if (result.ModifiedCount > 0)
+      {
+         return new RestorePostResponse
+         {
+            Success = true,
+            Message = "Post restored successfully"
+         };
+      }
+
+      return new RestorePostResponse
+      {
+         Success = false,
+         Message = "Failed to restore post"
+      };
+   }
 }
