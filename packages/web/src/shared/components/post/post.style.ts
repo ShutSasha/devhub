@@ -23,7 +23,7 @@ export const Container = styled.div`
 `
 
 export const HeaderImage = styled.img`
-  height: 330px;
+  height: 250px;
   width: 100%;
 
   object-fit: cover;
