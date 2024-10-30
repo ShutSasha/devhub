@@ -42,6 +42,7 @@ func (s *Storage) Save(
 	userId primitive.ObjectID,
 	title string,
 	content string,
+	headerImage string,
 	tags []string,
 ) (primitive.ObjectID, error) {
 	const op = "storage.mongodb.Save"
@@ -55,7 +56,7 @@ func (s *Storage) Save(
 		CreatedAt:   time.Now(),
 		Likes:       0,
 		Dislikes:    0,
-		HeaderImage: "",
+		HeaderImage: headerImage,
 		Comments:    []models.Comment{},
 		Tags:        tags,
 	}
@@ -73,12 +74,12 @@ func (s *Storage) Save(
 func (s *Storage) GetById(
 	ctx context.Context,
 	postId primitive.ObjectID,
-) (*models.Post, error) {
+) (*storage.PostModel, error) {
 	const op = "storage.mongodb.GetById"
 
 	collection := s.db.Database("DevHubDB").Collection("posts")
 
-	post := &models.Post{}
+	post := &storage.PostModel{}
 	filter := bson.M{"_id": postId}
 
 	err := collection.FindOne(context.TODO(), filter).Decode(post)
@@ -132,13 +133,28 @@ func (s *Storage) Update(
 	collection := s.db.Database("DevHubDB").Collection("posts")
 
 	filter := bson.M{"_id": postId}
+	updateFields := bson.M{}
+	if title != "" {
+		updateFields["title"] = title
+	}
 
-	update := bson.M{"$set": bson.M{
-		"title":        title,
-		"content":      content,
-		"header_image": headerImage,
-		"tags":         tags,
-	}}
+	if content != "" {
+		updateFields["content"] = content
+	}
+
+	if headerImage != "" {
+		updateFields["header_image"] = headerImage
+	}
+
+	if tags != nil {
+		updateFields["tags"] = tags
+	}
+
+	if len(updateFields) == 0 {
+		return nil
+	}
+
+	update := bson.M{"$set": updateFields}
 
 	_, err := collection.UpdateOne(ctx, filter, update)
 	if err != nil {
@@ -153,7 +169,7 @@ func (s *Storage) Search(
 	sortBy string,
 	query string,
 	tags []string,
-) ([]models.Post, error) {
+) ([]storage.PostModel, error) {
 	const op = "storage.mongodb.Searcg"
 
 	collection := s.db.Database("DevHubDB").Collection("posts")
@@ -203,7 +219,7 @@ func (s *Storage) Search(
 	}
 	defer cursor.Close(ctx)
 
-	var posts []models.Post
+	var posts []storage.PostModel
 	if err := cursor.All(ctx, &posts); err != nil {
 		return nil, fmt.Errorf("%s: could not decode results: %w", op, err)
 	}
