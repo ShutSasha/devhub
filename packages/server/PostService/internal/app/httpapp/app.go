@@ -1,7 +1,6 @@
 package httpapp
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"log/slog"
@@ -10,7 +9,6 @@ import (
 	"time"
 
 	_ "github.com/ShutSasha/devhub/tree/main/packages/server/PostService/docs"
-	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/domain/models"
 	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/http-server/handlers/post/delete"
 	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/http-server/handlers/post/get"
 	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/http-server/handlers/post/save"
@@ -21,7 +19,6 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/rs/cors"
 	httpSwagger "github.com/swaggo/http-swagger/v2"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type App struct {
@@ -30,56 +27,12 @@ type App struct {
 	port   int
 }
 
-type PostSaver interface {
-	Save(
-		ctx context.Context,
-		userId primitive.ObjectID,
-		title string,
-		content string,
-		tags []string,
-	) (primitive.ObjectID, error)
-}
-
-type PostProvider interface {
-	GetById(
-		ctx context.Context,
-		postId primitive.ObjectID,
-	) (*models.Post, error)
-}
-
-type PostRemover interface {
-	Delete(
-		ctx context.Context,
-		postId primitive.ObjectID,
-	) error
-}
-
-type PostUpdater interface {
-	Update(
-		ctx context.Context,
-		postId primitive.ObjectID,
-		title string,
-		content string,
-		headerImage string,
-		tags []string,
-	) error
-}
-
-type PostSearcher interface {
-	Search(
-		ctx context.Context,
-		sortBy string,
-		query string,
-		tags []string,
-	) ([]models.Post, error)
-}
-
 type PostStorage interface {
-	PostSaver
-	PostProvider
-	PostRemover
-	PostUpdater
-	PostSearcher
+	save.PostSaver
+	get.PostProvider
+	delete.PostRemover
+	update.PostUpdater
+	search.PostSearcher
 }
 
 func New(

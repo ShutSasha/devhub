@@ -1,4 +1,4 @@
-namespace AuthService.Controllers;
+namespace AuthService.Contracts.Email;
 
 public record VerifyEmailRequest
 {
