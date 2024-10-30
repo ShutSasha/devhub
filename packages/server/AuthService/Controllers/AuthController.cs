@@ -144,7 +144,7 @@ public class AuthController : ControllerBase
    {
       try
       {
-         var changePasswordResult = _authService.ChangePassword(request.Email, request.Password);
+         await _authService.ChangePassword(request.Email, request.Password);
          return Ok(new { Message = "Password updated successfully" });
       }
       catch (Exception e)
