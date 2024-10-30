@@ -109,7 +109,7 @@ public class AuthController : ControllerBase
             Expires = DateTime.UtcNow.AddDays(30)
          });
 
-         return Ok(new { Message = "Tokens updated", Token = refreshResult.AccessToken });
+         return Ok(new { Message = "Tokens updated", Token = refreshResult.AccessToken, User = refreshResult.UserData });
       }
       catch (Exception e)
       {
