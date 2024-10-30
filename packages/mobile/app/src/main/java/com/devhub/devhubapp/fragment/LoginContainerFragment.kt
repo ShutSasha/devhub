@@ -1,5 +1,6 @@
 package com.devhub.devhubapp.fragment
 
+import android.content.Intent
 import android.os.Bundle
 import android.text.InputType
 import androidx.fragment.app.Fragment
@@ -9,7 +10,8 @@ import android.view.ViewGroup
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import com.devhub.devhubapp.R
-
+import com.devhub.devhubapp.activity.LogInActivity
+import com.devhub.devhubapp.activity.RegistrationActivity
 
 
 class LoginContainerFragment : Fragment() {
@@ -40,7 +42,7 @@ class LoginContainerFragment : Fragment() {
         fragmentTransaction.add(R.id.password_input_container, passwordInputFragment)
 
         val primaryButtonFragment = PrimaryButtonFragment()
-        primaryButtonFragment.setButtonText("next")
+        primaryButtonFragment.setButtonText("Next")
         fragmentTransaction.add(R.id.primary_button_container, primaryButtonFragment)
 
         val lineFragment = LineFragment()
@@ -49,7 +51,11 @@ class LoginContainerFragment : Fragment() {
         val textAndLinkFragment = TextWithLinkFragment()
         textAndLinkFragment.setTextAndLinkText(
             getString(R.string.dont_have_an_account),
-            getString(R.string.sign_in)
+            getString(R.string.sign_up),
+            View.OnClickListener {
+                val intent = Intent(requireContext(), RegistrationActivity::class.java)
+                startActivity(intent)
+            }
         )
         fragmentTransaction.add(R.id.text_and_linkText_container, textAndLinkFragment)
 
