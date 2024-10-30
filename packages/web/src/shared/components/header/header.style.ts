@@ -44,6 +44,23 @@ export const LogInLink = styled(Link)`
   font-size: 18px;
   line-height: 24px;
   padding: 7px 10px;
+
+  text-decoration: none;
+  outline: none;
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 10px;
+    border: 1px solid transparent;
+    transition: all 0.25s ease-in;
+  }
+
+  &:hover::before {
+    border-color: #fff;
+  }
 `
 
 export const CreateAccountLink = styled(Link)`

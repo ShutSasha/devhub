@@ -10,6 +10,26 @@ const NavIcon = styled.img`
   height: 20px;
 `
 
+const LinkContainer = styled(Link)`
+  text-decoration: none;
+  outline: none;
+  position: relative;
+  padding: 6px 10px;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 10px;
+    border: 1px solid transparent;
+    transition: all 0.34s ease-in;
+  }
+
+  &:hover::before {
+    border-color: #fff;
+  }
+`
+
 interface NavItemProps {
   icon: string
   navTitle: string
@@ -17,7 +37,7 @@ interface NavItemProps {
 
 export const NavItem: FC<NavItemProps> = ({ icon, navTitle }) => {
   return (
-    <Link style={{ display: 'flex', alignItems: 'center', gap: '10px' }} to={'/'}>
+    <LinkContainer style={{ display: 'flex', alignItems: 'center', gap: '10px' }} to={'/'}>
       <NavIcon src={icon} />
       <Text
         fontFamily={FONTS.MONTSERRAT}
@@ -27,6 +47,6 @@ export const NavItem: FC<NavItemProps> = ({ icon, navTitle }) => {
         fontSize="18px"
         $lineHeight="24px"
       />
-    </Link>
+    </LinkContainer>
   )
 }
