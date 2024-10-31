@@ -13,7 +13,9 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAPIGateway", policy =>
     {
-        policy.WithOrigins("http://localhost:5295") 
+        policy.WithHeaders().AllowAnyHeader();
+        policy.WithHeaders().AllowCredentials();
+        policy.WithOrigins("http://localhost:5295","http://localhost:3000","http://10.0.2.2:3000") 
             .AllowAnyMethod()
             .AllowAnyHeader();
     });
@@ -58,15 +60,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
-app.UseCors(x =>
-{
-    x.WithHeaders().AllowAnyHeader();
-    x.WithHeaders().AllowCredentials();
-    x.WithOrigins("http://localhost:3000");
-    x.WithOrigins("http://localhost:5295");
-    x.WithMethods().AllowAnyMethod();
-});
 
 app.UseHttpsRedirection();
 

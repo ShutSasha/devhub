@@ -6,7 +6,6 @@ import (
 	"log/slog"
 	"net/http"
 
-	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/domain/models"
 	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/storage"
 
 	resp "github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/lib/api/response"
@@ -23,7 +22,7 @@ type PostSearcher interface {
 		sortBy string,
 		query string,
 		tags []string,
-	) ([]models.Post, error)
+	) ([]storage.PostModel, error)
 }
 
 // New is a handler function that processes the HTTP request to retrieve posts by query.

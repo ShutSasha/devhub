@@ -6,6 +6,7 @@ import (
 	"io"
 	"log/slog"
 	"net/http"
+	"regexp"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -23,11 +24,13 @@ import (
 // - HeaderImage: Optional image URL to update the post header.
 // - Tags: Optional list of tags associated with the post.
 type Request struct {
-	Title       string   `json:"title,omitempty" validate:"max=128,min=1"`
-	Content     string   `json:"content,omitempty" validate:"max=62792"`
+	Title       string   `json:"title,omitempty" validate:"omitempty,max=128,min=1"`
+	Content     string   `json:"content,omitempty" validate:"omitempty,min=1,max=62792"`
 	HeaderImage string   `json:"header_image,omitempty"`
 	Tags        []string `json:"tags,omitempty"`
 }
+
+var URLRegex = regexp.MustCompile(`^(https?://[^\s/$.?#].[^\s]*)$`)
 
 // PostUpdater is an interface that defines the method for updating a post.
 // Update takes a context, postId, title, content, header image, and tags, and returns an error if the update fails.
@@ -40,6 +43,16 @@ type PostUpdater interface {
 		headerImage string,
 		tags []string,
 	) error
+}
+
+func urlIfContentNotEmpty(fl validator.FieldLevel) bool {
+	headerImage := fl.Field().String()
+	content := fl.Parent().FieldByName("Content").String()
+
+	if content != "" {
+		return URLRegex.MatchString(headerImage)
+	}
+	return true
 }
 
 // New is a handler function that processes the HTTP request for updating a post.
@@ -89,6 +102,18 @@ func New(log *slog.Logger, postUpdater PostUpdater) http.HandlerFunc {
 
 		log.Info("request body decoded", slog.Any("request", req))
 
+		if req.Title == "" && req.Content == "" && req.HeaderImage == "" && len(req.Tags) == 0 {
+			log.Error("no fields provided for update")
+
+			render.JSON(w, r, resp.Error(
+				map[string][]string{"body": {"At least one field must be provided"}},
+				http.StatusBadRequest,
+			))
+			return
+		}
+
+		validate := validator.New()
+		validate.RegisterValidation("url_if_content_not_empty", urlIfContentNotEmpty)
 		if err := validator.New().Struct(req); err != nil {
 			validateErr := err.(validator.ValidationErrors)
 

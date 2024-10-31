@@ -48,6 +48,30 @@
          "UpstreamPathTemplate": "/api/auth/refresh",
          "UpstreamHttpMethod": ["POST"]
       },
+      {
+         "DownstreamPathTemplate": "/api/auth/password-verification-code",
+         "DownstreamScheme": "http",
+         "DownstreamHostAndPorts": [
+            {
+               "Host": "localhost",
+               "Port": 5279
+            }
+         ],
+         "UpstreamPathTemplate": "/api/auth/password-verification-code",
+         "UpstreamHttpMethod": ["PATCH"]
+      },
+      {
+         "DownstreamPathTemplate": "/api/auth/change-password",
+         "DownstreamScheme": "http",
+         "DownstreamHostAndPorts": [
+            {
+               "Host": "localhost",
+               "Port": 5279
+            }
+         ],
+         "UpstreamPathTemplate": "/api/auth/change-password",
+         "UpstreamHttpMethod": ["PATCH"]
+      },
       
       {
          "DownstreamPathTemplate": "/api/posts",

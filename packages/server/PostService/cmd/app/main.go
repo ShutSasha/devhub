@@ -25,12 +25,12 @@ func main() {
 
 	log := setupLogger(cfg.Env)
 
-	application := app.New(log, cfg.StoragePath, cfg.Http.Port, cfg.Http.Timeout)
+	application := app.New(log, cfg.StoragePath, cfg.Http.Port, cfg.Grpc.UserServicePort, cfg.Http.Timeout)
 	done := make(chan os.Signal, 1)
 	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 
 	go func() {
-		if err := application.HttpServer.Run(); err != nil {
+		if err := application.HttpApp.Run(); err != nil {
 			log.Error("failed to start server")
 		}
 	}()
@@ -43,7 +43,7 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	if err := application.HttpServer.Server.Shutdown(ctx); err != nil {
+	if err := application.HttpApp.Server.Shutdown(ctx); err != nil {
 		log.Error("failed to stop server", sl.Err(err))
 
 		return

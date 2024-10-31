@@ -6,26 +6,41 @@ import (
 	"io"
 	"log/slog"
 	"net/http"
+	"regexp"
 
+	pb "github.com/ShutSasha/devhub/tree/main/packages/server/PostService/gen/go/user"
+	resp "github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/lib/api/response"
+	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/lib/logger/sl"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/render"
 	"github.com/go-playground/validator/v10"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-
-	resp "github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/lib/api/response"
-	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/lib/logger/sl"
 )
+
+var URLRegex = regexp.MustCompile(`^(https?://[^\s/$.?#].[^\s]*)$`)
 
 // Request struct defines the JSON request body for the handler.
 // - UserId: The ID of the user creating the post (required).
 // - Title: The title of the post (required, between 1 and 128 characters).
 // - Content: The content of the post (required, max 62792 characters).
+// - HeaderImage: The image at the top of the post.
 // - Tags: Optional tags associated with the post.
 type Request struct {
-	UserId  string   `json:"userId" validate:"required"`
-	Title   string   `json:"title" validate:"required,max=128,min=1"`
-	Content string   `json:"content" validate:"required,max=62792"`
-	Tags    []string `json:"tags,omitempty"`
+	UserId      string   `json:"user" validate:"required"`
+	Title       string   `json:"title" validate:"required,max=128,min=1"`
+	Content     string   `json:"content" validate:"required,max=62792"`
+	HeaderImage string   `json:"header_image,omitempty"`
+	Tags        []string `json:"tags,omitempty"`
+}
+
+func urlIfContentNotEmpty(fl validator.FieldLevel) bool {
+	headerImage := fl.Field().String()
+	content := fl.Parent().FieldByName("Content").String()
+
+	if content != "" {
+		return URLRegex.MatchString(headerImage)
+	}
+	return true
 }
 
 // PostSaver is an interface defining the method to save a post.
@@ -37,8 +52,18 @@ type PostSaver interface {
 		userId primitive.ObjectID,
 		title string,
 		content string,
+		headerImage string,
 		tags []string,
 	) (primitive.ObjectID, error)
+}
+
+// PostRemover is an interface that defines the method for deleting a post by its ID.
+// Delete takes a context and postId, and returns an error if the deletion fails.
+type PostRemover interface {
+	Delete(
+		ctx context.Context,
+		postId primitive.ObjectID,
+	) error
 }
 
 // New is a handler function that processes the HTTP request for saving a post.
@@ -53,7 +78,12 @@ type PostSaver interface {
 // @Success 200 {object} map[string]interface{} "Returns the ID of the newly created post"
 // @Failure 400 {object} map[string]interface{} "Validation errors or request decoding failures"
 // @Router /api/posts [post]
-func New(log *slog.Logger, postSaver PostSaver) http.HandlerFunc {
+func New(
+	log *slog.Logger,
+	postSaver PostSaver,
+	postRemover PostRemover,
+	grpcClient pb.UserServiceClient,
+) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		const op = "handlers.post.save.New"
 
@@ -87,6 +117,9 @@ func New(log *slog.Logger, postSaver PostSaver) http.HandlerFunc {
 
 		log.Info("request body decoded", slog.Any("request", req))
 
+		validate := validator.New()
+		validate.RegisterValidation("url_if_content_not_empty", urlIfContentNotEmpty)
+
 		if err := validator.New().Struct(req); err != nil {
 			validateErr := err.(validator.ValidationErrors)
 
@@ -116,6 +149,7 @@ func New(log *slog.Logger, postSaver PostSaver) http.HandlerFunc {
 			userId,
 			req.Title,
 			req.Content,
+			req.HeaderImage,
 			req.Tags,
 		)
 		if err != nil {
@@ -130,6 +164,50 @@ func New(log *slog.Logger, postSaver PostSaver) http.HandlerFunc {
 		}
 
 		log.Info("post added", slog.Any("id", id))
+
+		grpcAddResponse, err := grpcClient.AddPostToUser(context.TODO(), &pb.AddPostRequest{
+			UserId: req.UserId,
+			PostId: id.Hex(),
+		})
+		if err != nil {
+			log.Error("failed to notify user service", sl.Err(err))
+
+			log.Info("deleting post", slog.Any("id", id))
+
+			err = postRemover.Delete(context.TODO(), id)
+			if err != nil {
+				log.Error("can not delete post", sl.Err(err))
+			} else {
+				log.Info("post successfully deleted", slog.Any("id", id))
+			}
+
+			render.JSON(w, r, resp.Error(
+				map[string][]string{"userService": {"Failed to notify user service"}},
+				http.StatusInternalServerError,
+			))
+			return
+		}
+		if !grpcAddResponse.Success {
+			log.Error("user service returned failure", slog.String("message", grpcAddResponse.Message))
+
+			// TODO: refactor
+			log.Info("deleting post", slog.Any("id", id))
+
+			err = postRemover.Delete(context.TODO(), id)
+			if err != nil {
+				log.Error("can not delete post", sl.Err(err))
+			} else {
+				log.Info("post successfully deleted", slog.Any("id", id))
+			}
+
+			render.JSON(w, r, resp.Error(
+				map[string][]string{"userService": {"User service returned failure: " + grpcAddResponse.Message}},
+				http.StatusInternalServerError,
+			))
+			return
+		}
+
+		log.Info("post succesfully added to user")
 
 		render.JSON(w, r, map[string]interface{}{
 			"_id": id,
