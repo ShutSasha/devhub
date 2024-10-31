@@ -43,6 +43,6 @@ public class User
 
    [BsonElement("roles")]
    [BsonRepresentation(BsonType.String)]
-   public List<UserRole> UserRole { get; set; } = new List<UserRole> { Enums.UserRole.User };
+   public List<string> UserRole { get; set; } = new List<string> { Enums.UserRole.User.ToString() };
    
 }

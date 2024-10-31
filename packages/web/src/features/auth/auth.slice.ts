@@ -5,6 +5,7 @@ export interface IAuthState {
   password: string
   repeatPassword: string
   email: string
+  forgetPasswordEmail: string
 }
 
 const initialState: IAuthState = {
@@ -12,6 +13,7 @@ const initialState: IAuthState = {
   password: '',
   repeatPassword: '',
   email: '',
+  forgetPasswordEmail: '',
 }
 
 const authSlice = createSlice({
@@ -30,6 +32,9 @@ const authSlice = createSlice({
     setEmail: (state, action: PayloadAction<string>) => {
       state.email = action.payload
     },
+    setForgetPasswordEmail: (state, action: PayloadAction<string>) => {
+      state.forgetPasswordEmail = action.payload
+    },
   },
   selectors: {
     getUsername: state => state.username,
@@ -41,5 +46,5 @@ const authSlice = createSlice({
 
 export default authSlice
 
-export const { setUsername, setPassword, setRepeatPassword, setEmail } = authSlice.actions
+export const { setUsername, setPassword, setRepeatPassword, setEmail, setForgetPasswordEmail } = authSlice.actions
 export const { getUsername, getPassword, getRepeatPassword, getEmail } = authSlice.selectors

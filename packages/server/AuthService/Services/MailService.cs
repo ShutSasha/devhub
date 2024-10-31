@@ -1,7 +1,7 @@
 using AuthService.Models;
+using MailKit.Net.Smtp;
 using Microsoft.Extensions.Options;
-using SendGrid;
-using SendGrid.Helpers.Mail;
+using MimeKit;
 
 namespace AuthService.Services;
 
@@ -12,21 +12,34 @@ public class MailService
    {
      _senderDataSettings = senderDataSettings.Value;
    }
-   
+
    public async Task SendVerificationCode(string recieverEmail, string code)
    {
-      var apiKey = _senderDataSettings.SendGridKey;
-      var client = new SendGridClient(apiKey);
-      var from = new EmailAddress(_senderDataSettings.SenderEmail,"DevHub");
-      var subject = "Activation link DevHub";
-      var to = new EmailAddress(recieverEmail);
+      var email = new MimeMessage();
+      email.From.Add(new MailboxAddress("DevHub", _senderDataSettings.SenderEmail));
+      email.To.Add(new MailboxAddress("", recieverEmail));
+      email.Subject = "Verification Code";
+
       var templatePath = Path.Combine(Directory.GetCurrentDirectory(), "Templates", "EmailTemplate.html");
       var htmlContent = await File.ReadAllTextAsync(templatePath);
-      
       htmlContent = htmlContent.Replace("{{code}}", code);
-      var plainTextContent = "";
-      var msg = MailHelper.CreateSingleEmail(from, to, subject, plainTextContent, htmlContent);
-      var response = await client.SendEmailAsync(msg);
+      
+      email.Body = new TextPart("html")
+      {
+         Text = htmlContent
+      };
+      
+      using var smtp = new SmtpClient();
+      try
+      {
+         await smtp.ConnectAsync("smtp.gmail.com", 587, MailKit.Security.SecureSocketOptions.StartTls);
+         await smtp.AuthenticateAsync(_senderDataSettings.SenderEmail, _senderDataSettings.SenderPassword);
+         await smtp.SendAsync(email);
+      }
+      finally
+      {
+         await smtp.DisconnectAsync(true);
+      }
    }
    
 }
