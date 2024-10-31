@@ -10,10 +10,10 @@ type Post struct {
 	User        primitive.ObjectID `json:"user" bson:"user"`
 	Title       string             `json:"title" bson:"title"`
 	Content     string             `json:"content" bson:"content"`
-	CreatedAt   time.Time          `json:"created_at" bson:"created_at"`
+	CreatedAt   time.Time          `json:"createdAt" bson:"createdAt"`
 	Likes       int                `json:"likes" bson:"likes"`
 	Dislikes    int                `json:"dislikes" bson:"dislikes"`
-	HeaderImage string             `json:"header_image" bson:"header_image"`
+	HeaderImage string             `json:"headerImage" bson:"headerImage"`
 	Comments    []Comment          `json:"comments" bson:"comments"`
 	Tags        []string           `json:"tags" bson:"tags"`
 }

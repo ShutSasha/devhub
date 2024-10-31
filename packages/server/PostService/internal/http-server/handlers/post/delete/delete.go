@@ -118,7 +118,7 @@ func New(
 			}
 
 			_, rollbackErr := grpcClient.RestoreUserPost(context.TODO(), &pb.RestorePostRequest{
-				UserId: post.User.Hex(),
+				UserId: post.User.Id.Hex(),
 				PostId: postId.Hex(),
 			})
 			if rollbackErr != nil {
