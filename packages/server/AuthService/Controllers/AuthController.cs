@@ -152,6 +152,21 @@ public class AuthController : ControllerBase
       }
    }
 
+   [HttpPost("logout")]
+   public async Task<IActionResult> Logout()
+   {
+      try
+      {
+         HttpContext.Response.Cookies.Delete("refreshToken");
+         return Ok(new {Message = "Successfully logout"});
+      }
+      catch  (Exception e)
+      {
+        return ErrorResponseHelper.CreateErrorResponse(500, "Logout error", "Something went wrong");
+      }
+      
+   }
+
    [Authorize]
    [HttpGet("testinfo")]
    public async Task<IActionResult> GetInformation([FromServices] IHttpClientFactory httpClientFactory)
