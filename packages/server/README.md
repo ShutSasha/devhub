@@ -47,6 +47,8 @@ Before running the services, ensure that you have:
 	http:
 	  port: 8080
 	  timeout: 10s
+   grpc:
+      user_service_port: 5228
   ```
 
 

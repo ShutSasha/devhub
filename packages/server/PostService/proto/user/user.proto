@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+option go_package = "github.com/ShutSasha/devhub/packages/server/PostService;user";
+
+service UserService{
+  rpc AddPostToUser (AddPostRequest) returns (AddPostResponse);
+  rpc DeletePostFromUser (DeletePostRequest) returns (DeletePostResponse);
+  rpc RestoreUserPost (RestorePostRequest) returns (RestorePostResponse);
+}
+
+message  AddPostRequest{
+  string userId = 1;
+  string postId = 2;
+}
+
+message AddPostResponse{
+  bool success = 1;
+  string message = 2;
+}
+
+message DeletePostRequest{
+  string postId = 1;
+}
+
+message DeletePostResponse{
+  bool success = 1;
+  string message = 2;
+}
+
+message RestorePostRequest{
+  string userId = 1;
+  string postId = 2;
+}
+
+message RestorePostResponse{
+  bool success = 1;
+  string message = 2;
+}
