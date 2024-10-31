@@ -17,6 +17,7 @@ import com.devhub.devhubapp.User
 import com.devhub.devhubapp.UserAPI
 import com.devhub.devhubapp.UserRegistrationRequest
 import com.devhub.devhubapp.activity.LogInActivity
+import com.devhub.devhubapp.activity.WelcomeActivity
 import com.devhub.devhubapp.databinding.FragmentRegistrationContainerBinding
 import com.google.gson.Gson
 import okhttp3.ResponseBody
@@ -153,6 +154,8 @@ class RegistrationContainerFragment : Fragment(){
             override fun onResponse(call: Call<User>, response: Response<User>) {
                 if (response.isSuccessful) {
                     Log.e("Registration", "Registration Successful")
+                    val intent = Intent(requireContext(), WelcomeActivity::class.java)
+                    startActivity(intent)
                 } else {
                     handleErrors(response.errorBody())
                     Log.e("Registration", "Registration Failed: ${response.message()}")
