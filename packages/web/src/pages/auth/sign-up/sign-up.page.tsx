@@ -1,5 +1,6 @@
 import { FC } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { AuthLayout } from '@shared/layouts/auth/auth.layout'
 import { Text } from '@shared/components/text/text.component'
 import { FONTS } from '@shared/consts/fonts.enum'
@@ -91,7 +92,9 @@ export const SignUp: FC = () => {
           style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '16px' }}
         >
           <Text text="Already have an account?" color="#0D1A26" fontSize="16px" $lineHeight="24px" />
-          <AuthTransparentBtn text="Sign In" />
+          <Link to={ROUTES.LOGIN}>
+            <AuthTransparentBtn text="Sign In" />
+          </Link>
         </div>
         <EmphasizeLine />
         <Text
