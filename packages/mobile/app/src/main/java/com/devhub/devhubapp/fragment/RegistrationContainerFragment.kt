@@ -1,5 +1,6 @@
 package com.devhub.devhubapp.fragment
 
+import DateDeserializer
 import android.content.Intent
 import android.os.Bundle
 import android.text.InputType
@@ -20,13 +21,16 @@ import com.devhub.devhubapp.activity.LogInActivity
 import com.devhub.devhubapp.activity.WelcomeActivity
 import com.devhub.devhubapp.databinding.FragmentRegistrationContainerBinding
 import com.google.gson.Gson
+import com.google.gson.JsonDeserializer
+import com.google.gson.JsonElement
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-
+import com.google.gson.GsonBuilder
+import java.sql.Date
 
 class RegistrationContainerFragment : Fragment(){
 
@@ -50,9 +54,13 @@ class RegistrationContainerFragment : Fragment(){
         savedInstanceState: Bundle?
     ): View? {
 
+        val gson = GsonBuilder()
+            .registerTypeAdapter(Date::class.java, DateDeserializer())
+            .create()
+
         val retrofit = Retrofit.Builder()
             .baseUrl(baseURL)
-            .addConverterFactory(GsonConverterFactory.create())
+            .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
 
         userAPI = retrofit.create(UserAPI::class.java)
@@ -214,4 +222,5 @@ class RegistrationContainerFragment : Fragment(){
         }
     }
 }
+
 
