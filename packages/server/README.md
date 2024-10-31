@@ -14,7 +14,7 @@ Before running the services, ensure that you have:
 
 1. **Paste configuration files into services**
 
-   For AuthService paste this appsettings.Development.json file into **root** directory of a service **(Ask Developer for SendGridKey)**
+   For AuthService paste this appsettings.Development.json file into **root** directory of a service **(Ask Developer for Application key)**
    
 ```json
 {  
@@ -29,12 +29,13 @@ Before running the services, ensure that you have:
       "DatabaseName": "DevHubDB",  
       "CollectionName": "users"  
    },  
-   "SenderData": {    
+   "SenderData": {
+	  "SenderPassword": "<app_password>", 
       "SenderEmail" : "devhubmailsystem@gmail.com"  
    },   
    "JwtOptions": {  
       "AccessSecretKey": "MyExtraMegaSuperKeyThatYouCanUnderstand",  
-      "RefreshSecretKey": "MyExtraMegaSuperRefreshKeyThatYouCanUnderstand",  
+      "RefreshSecretKey": "MyExtraMegaSuperRefreshKeyThatYouCanUnderstand"  
    }
 }
 ```
@@ -60,15 +61,15 @@ Before running the services, ensure that you have:
    
    For PostService add a **config** folder into **root** directory of a service and paste this config.yaml file into this config folder.
    
-  ```yaml
-	env: "local"
-	storage_path: "mongodb+srv://root:<db_password>@devhubdb.jsttz.mongodb.net/?retryWrites=true&w=majority&appName=DevHubDB"
-	http:
-	  port: 8080
-	  timeout: 10s
-   grpc:
-      user_service_port: 5228
-  ```
+```yaml
+env: "local"
+storage_path: "mongodb+srv://root:<db_password>@devhubdb.jsttz.mongodb.net/?retryWrites=true&w=majority&appName=DevHubDB"
+http:
+  port: 8080
+  timeout: 10s
+grpc:
+  user_service_port: 5228
+```
 
 
 2. **Navigate to the project folder:**
