@@ -1,6 +1,6 @@
 package com.devhub.devhubapp
 
-import java.sql.Date
+import java.util.Date
 
 data class User(
     val _id: String,
