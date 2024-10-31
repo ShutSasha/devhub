@@ -226,3 +226,29 @@ func (s *Storage) Search(
 
 	return posts, nil
 }
+
+func (s *Storage) GetPaginated(ctx context.Context, limit, page int) ([]storage.PostModel, error) {
+	const op = "storage.mongodb.GetPaginated"
+
+	collection := s.db.Database("DevHubDB").Collection("posts")
+	findOptions := options.Find()
+	findOptions.SetLimit(int64(limit))
+	findOptions.SetSkip(int64((page - 1) * limit))
+	findOptions.SetSort(bson.D{{Key: "created_at", Value: -1}})
+
+	cursor, err := collection.Find(ctx, bson.M{}, findOptions)
+	if err != nil {
+		if errors.Is(err, mongo.ErrNilCursor) {
+			return nil, storage.ErrPostsNotFound
+		}
+		return nil, fmt.Errorf("%s: could not retrieve paginated posts: %w", op, err)
+	}
+	defer cursor.Close(ctx)
+
+	var posts []storage.PostModel
+	if err := cursor.All(ctx, &posts); err != nil {
+		return nil, fmt.Errorf("%s: could not decode results: %w", op, err)
+	}
+
+	return posts, nil
+}

@@ -12,6 +12,8 @@ import (
 	pb "github.com/ShutSasha/devhub/tree/main/packages/server/PostService/gen/go/user"
 	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/http-server/handlers/post/delete"
 	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/http-server/handlers/post/get"
+	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/http-server/handlers/post/get/paginate"
+	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/http-server/handlers/post/get/single"
 	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/http-server/handlers/post/save"
 	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/http-server/handlers/post/search"
 	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/http-server/handlers/post/update"
@@ -63,8 +65,9 @@ func New(
 	))
 
 	router.Route("/api/posts", func(r chi.Router) {
-		r.Get("/{id}", get.New(log, postStorage))
+		r.Get("/{id}", single.New(log, postStorage))
 		r.Post("/", save.New(log, postStorage, postStorage, grpcClient))
+		r.Get("/", paginate.New(log, postStorage))
 		r.Delete("/{id}", delete.New(log, postStorage, postStorage, grpcClient))
 		r.Patch("/{id}", update.New(log, postStorage))
 
