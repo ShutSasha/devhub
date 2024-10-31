@@ -18,15 +18,15 @@ export const Container = styled.div`
   align-items: center;
 `
 
-export const Logo = styled.img`
-  padding: 10px 0;
-`
+export const Logo = styled.img``
 
 export const NavList = styled.nav`
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 30px;
+
+  padding: 12px 0;
 `
 
 export const AuthContainer = styled.div`
@@ -80,4 +80,40 @@ export const CreateAccountLink = styled(Link)`
     color: ${colors.text};
     background-color: ${colors.textPrimary};
   }
+`
+
+export const UserActionsContainer = styled.div`
+  display: flex;
+  gap:;
+`
+
+export const CreatePost = styled.button`
+  box-sizing: border-box;
+  color: ${colors.textPrimary};
+  font-family: ${FONTS.MONTSERRAT};
+  font-weight: 500;
+  font-size: 20px;
+  line-height: 24px;
+  padding: 7px 12px;
+  background: transparent;
+  cursor: pointer;
+
+  border-radius: 10px;
+  border: 1px solid ${colors.textPrimary};
+
+  transition: all 0.25s ease-in;
+
+  &:hover {
+    background: ${colors.textPrimary};
+    color: ${colors.text};
+  }
+`
+
+export const UserAvatar = styled.img`
+  height: 42px;
+  width: 42px;
+  border-radius: 50%;
+
+  cursor: pointer;
+  object-fit: cover;
 `

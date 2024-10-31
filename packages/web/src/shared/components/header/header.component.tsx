@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import logo from '@assets/images/logo.svg'
 import home from '@assets/images/header/home.svg'
 import friends from '@assets/images/header/friends.svg'
@@ -7,7 +8,17 @@ import { ROUTES } from '@pages/router/routes.enum'
 import { useAppSelector } from '@app/store/store'
 
 import { NavItem } from './nav-item.component'
-import { AuthContainer, Container, CreateAccountLink, LogInLink, Logo, NavList, Wrapper } from './header.style'
+import {
+  AuthContainer,
+  Container,
+  CreateAccountLink,
+  CreatePost,
+  LogInLink,
+  Logo,
+  NavList,
+  UserAvatar,
+  Wrapper,
+} from './header.style'
 
 type NavItem = { title: string; icon: string }
 
@@ -24,7 +35,10 @@ const AuthDisplay = () => {
   return (
     <>
       {user ? (
-        <p>user logged in</p>
+        <>
+          <CreatePost>Create Post</CreatePost>
+          <UserAvatar src={user.avatar} />
+        </>
       ) : (
         <>
           <LogInLink to={ROUTES.LOGIN}>Log in</LogInLink>
@@ -36,7 +50,17 @@ const AuthDisplay = () => {
 }
 
 export const Header = () => {
-  const isLoading = useAppSelector(state => state.userSlice.loading) || false
+  const loadingFromState = useAppSelector(state => state.userSlice.loading)
+
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(loadingFromState)
+    }, 300)
+
+    return () => clearTimeout(timer)
+  }, [loadingFromState])
 
   return (
     <Wrapper>
