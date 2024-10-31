@@ -57,7 +57,7 @@ public class AuthController : ControllerBase
             SameSite = SameSiteMode.Strict,
             Expires = DateTime.Now.AddSeconds(30)
          });
-         return Ok(new { Token = loginResult.AccessToken, User = loginResult.UserData });
+         return Ok(new { AccessToken = loginResult.AccessToken, RefreshToken = loginResult.RefreshToken, User = loginResult.UserData });
       }
       catch (Exception e)
       {
