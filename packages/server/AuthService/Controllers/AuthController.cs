@@ -1,8 +1,10 @@
 using AuthService.Contracts.Email;
 using AuthService.Contracts.User;
 using AuthService.Helpers.Response;
+using AuthService.Helpers.ThirdParty;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 
 namespace AuthService.Controllers;
 
@@ -11,10 +13,12 @@ namespace AuthService.Controllers;
 public class AuthController : ControllerBase
 {
    private readonly Services.AuthService _authService;
+   private readonly GoogleAuthOptions _googleAuthOptions;
 
-   public AuthController(Services.AuthService authService)
+   public AuthController(Services.AuthService authService, IOptions<GoogleAuthOptions> googleAuthOptions)
    {
       _authService = authService;
+      _googleAuthOptions = googleAuthOptions.Value;
    }
 
    [HttpPost("register")]
@@ -109,7 +113,8 @@ public class AuthController : ControllerBase
             Expires = DateTime.UtcNow.AddDays(30)
          });
 
-         return Ok(new { Message = "Tokens updated", Token = refreshResult.AccessToken, User = refreshResult.UserData });
+         return Ok(new
+            { Message = "Tokens updated", Token = refreshResult.AccessToken, User = refreshResult.UserData });
       }
       catch (Exception e)
       {
@@ -158,13 +163,12 @@ public class AuthController : ControllerBase
       try
       {
          HttpContext.Response.Cookies.Delete("refreshToken");
-         return Ok(new {Message = "Successfully logout"});
+         return Ok(new { Message = "Successfully logout" });
       }
-      catch  (Exception e)
+      catch (Exception e)
       {
-        return ErrorResponseHelper.CreateErrorResponse(500, "Logout error", "Something went wrong");
+         return ErrorResponseHelper.CreateErrorResponse(500, "Logout error", "Something went wrong");
       }
-      
    }
 
    [Authorize]
@@ -188,5 +192,42 @@ public class AuthController : ControllerBase
             { "Fetch Error", new List<string> { "Cannot fetch" } }
          }
       });
+   }
+
+   [HttpGet("google-login")]
+   public async Task<IActionResult> GoogleLogin()
+   {
+      var authorizationUrl = $"https://accounts.google.com/o/oauth2/v2/auth?" +
+                             $"client_id={_googleAuthOptions.ClientId}" +
+                             $"&response_type=code" +
+                             $"&scope=email%20profile" +
+                             $"&redirect_uri={_googleAuthOptions.RedirectionUri}" +
+                             $"&access_type=offline";
+
+      return Redirect(authorizationUrl);
+   }
+
+
+   [HttpGet("signin-google")]
+   public async Task<IActionResult> GoogleCallback(string code)
+   {
+      if (string.IsNullOrEmpty(code))
+      {
+         return BadRequest("Authorization code not provided");
+      }
+
+      try
+      {
+         var tokenResponse = await _authService.ExchangeCodeForTokensAsync(code);
+         var userInfo = await _authService.GetGoogleUserInfoAsync(tokenResponse.access_token);
+
+         var userResult = await _authService.GoogleSignInOrSignUp(userInfo);
+
+         return Ok(new { Token = userResult.AccessToken, User = userResult.UserData });
+      }
+      catch (Exception e)
+      {
+         return ErrorResponseHelper.CreateErrorResponse(400, "Google auth error", e.Message);
+      }
    }
 }
