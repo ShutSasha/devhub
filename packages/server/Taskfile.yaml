@@ -14,9 +14,25 @@ tasks:
       - |
         cd ./PostService/cmd/app
         go run main.go --config ../../config/config.yaml
+        
+  run_user_service:
+    desc: "Run the C# UserService"
+    cmds:
+      - |
+        cd ./UserService
+        dotnet run
+
+  run_api_getaway:
+    desc: "Run the api getaway"
+    cmds:
+      - |
+        cd ./ApiGetaway
+        dotnet run
 
   run_all:
     desc: "Run both AuthService and PostService"
     deps:
       - run_auth_service
       - run_post_service
+      - run_user_service
+      - run_api_getaway

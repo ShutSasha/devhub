@@ -9,13 +9,19 @@ import (
 )
 
 type Config struct {
+	Env         string     `yaml:"env" env-default:"local"`
 	StoragePath string     `yaml:"storage_path" env-required:"true"`
 	Http        HttpConfig `yaml:"http"`
+	Grpc        GrpcConfig `yaml:"grpc"`
 }
 
 type HttpConfig struct {
 	Port    int           `yaml:"port"`
 	Timeout time.Duration `yaml:"timout"`
+}
+
+type GrpcConfig struct {
+	UserServicePort int `yaml:"user_service_port"`
 }
 
 func MustLoad() *Config {

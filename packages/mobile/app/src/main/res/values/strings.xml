@@ -3,4 +3,17 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="already_have_an_account">Already have an account?</string>
     <string name="log_in">Log In</string>
+    <string name="dont_have_an_account">Don’t have an account?</string>
+    <string name="sign_up"> Sign up</string>
+    <string name="forgot_password">Forgot password?</string>
+    <string name="or_sign_in_with">Or sign in with</string>
+    <string name="devhub_logo">DevHub logo</string>
+    <string name="confirming_email">Confirming email</string>
+    <string name="enter_code_from_email">Enter code from email</string>
+    <string name="code_has_been_sent_to_your_email">Code has been sent to your email</string>
+    <string name="we_will_send_you_6_digital_code">We will send you 6-digital code</string>
+    <string name="next">Next</string>
+    <string name="back_arrow">Back arrow</string>
+    <string name="welcome">Welcome!</string>
+    <string name="code_collaborate_create">Code, Collaborate, Create</string>
 </resources>

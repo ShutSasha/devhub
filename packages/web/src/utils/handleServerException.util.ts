@@ -1,5 +1,8 @@
 import { ErrorException } from '~types/error/error.type'
 
-export const handleServerException = (error: ErrorException | undefined): string[] | undefined => {
+type ErrorExceptionType = ErrorException | undefined | null
+
+export const handleServerException = (error: ErrorExceptionType): string[] | undefined => {
+  if (!error || !error.data) return undefined
   return error ? Object.values((error as ErrorException)?.data?.errors).flat() : undefined
 }

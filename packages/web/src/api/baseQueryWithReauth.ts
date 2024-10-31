@@ -1,9 +1,10 @@
 import { RootState } from '@app/store/store'
-import { logout, setAccessToken } from '@features/user/user.slice'
+import { logout, setAccessToken, setUser } from '@features/user/user.slice'
 import { fetchBaseQuery } from '@reduxjs/toolkit/query'
 import type { BaseQueryFn, FetchArgs, FetchBaseQueryError } from '@reduxjs/toolkit/query'
 import { Mutex } from 'async-mutex'
 
+import { RefreshResponse } from '~types/auth/refresh-response.type'
 // create a new mutex
 const mutex = new Mutex()
 
@@ -35,7 +36,7 @@ const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQue
 
   let result = await baseQuery(args, api, extraOptions)
 
-  if (result.error && result.error.status === 401) {
+  if (result.error?.status === 401) {
     // checking whether the mutex is locked
     if (!mutex.isLocked()) {
       const release = await mutex.acquire()
@@ -44,10 +45,12 @@ const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQue
           { credentials: 'include', url: '/auth/refresh', method: 'POST' },
           api,
           extraOptions,
-        )) as { data: { token: { accessToken: string } } }
+        )) as { data: RefreshResponse }
 
-        api.dispatch(setAccessToken(refreshResult.data.token.accessToken))
-        if (refreshResult.data) {
+        api.dispatch(setAccessToken(refreshResult.data.token))
+        api.dispatch(setUser(refreshResult.data.user))
+
+        if (refreshResult.data.token) {
           // retry the initial query
           result = await baseQuery(args, api, extraOptions)
         } else {

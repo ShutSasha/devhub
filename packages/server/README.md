@@ -1,3 +1,4 @@
+
 # How to Run All Services
 
 This guide explains how to easily run all services using the provided taskfile script located in the `server` folder of the project.
@@ -13,10 +14,10 @@ Before running the services, ensure that you have:
 
 1. **Paste configuration files into services**
 
-   For AuthService paste this appsettings.Development.json file into **core** directory (Ask Developer for SendGripKey)
+   For AuthService paste this appsettings.Development.json file into **root** directory of a service **(Ask Developer for Application key)**
    
-   ```json
-   {  
+```json
+{  
    "Logging": {  
       "LogLevel": {  
          "Default": "Information",  
@@ -24,36 +25,51 @@ Before running the services, ensure that you have:
       }  
    },  
    "MongoDbSettings":{  
-      "ConnectionUri":"mongodb+srv://root:e8vGcbKC5vm5spFw@devhubdb.jsttz.mongodb.net/?retryWrites=true&w=majority&appName=DevHubDB",  
+      "ConnectionUri":"mongodb+srv://root:<db_password>@devhubdb.jsttz.mongodb.net/?retryWrites=true&w=majority&appName=DevHubDB",  
       "DatabaseName": "DevHubDB",  
       "CollectionName": "users"  
    },  
-   "SenderData": {    
+   "SenderData": {
+	  "SenderPassword": "<app_password>", 
       "SenderEmail" : "devhubmailsystem@gmail.com"  
-   },  
-   "JwtSettings": {  
-      "Issuer": "JwtIssuer",  
-      "Audience": "JwtAudience",  
-      "Key": "MyExtraMegaSuperKeyThatYouCanUnderstand",  
-      "ExpiresHours": "1"  
-   },  
+   },   
    "JwtOptions": {  
       "AccessSecretKey": "MyExtraMegaSuperKeyThatYouCanUnderstand",  
-      "RefreshSecretKey": "MyExtraMegaSuperRefreshKeyThatYouCanUnderstand",  
-      "ExpiresDuration": "1"  
-   }  
+      "RefreshSecretKey": "MyExtraMegaSuperRefreshKeyThatYouCanUnderstand"  
+   }
 }
-   ```
+```
+
+   For UserService paste this appsettings.Development.json file into **root** directory of a service
    
-   For PostService add a **config** folder into **core** directory and paste this config.yaml file into this config folder.
+```json
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "MongoDbSettings":{
+    "ConnectionUri":"mongodb+srv://root:<db_password>@devhubdb.jsttz.mongodb.net/?retryWrites=true&w=majority&appName=DevHubDB",
+    "DatabaseName": "DevHubDB",
+    "CollectionName": "users"
+  }
+}
+
+```
    
-   ```yaml
-   storage_path: "mongodb+srv://root:e8vGcbKC5vm5spFw@devhubdb.jsttz.mongodb.net/?retryWrites=true&w=majority&appName=DevHubDB"
+   For PostService add a **config** folder into **root** directory of a service and paste this config.yaml file into this config folder.
+   
+```yaml
+env: "local"
+storage_path: "mongodb+srv://root:<db_password>@devhubdb.jsttz.mongodb.net/?retryWrites=true&w=majority&appName=DevHubDB"
 http:
   port: 8080
   timeout: 10s
-
-   ```
+grpc:
+  user_service_port: 5228
+```
 
 
 2. **Navigate to the project folder:**
@@ -86,3 +102,8 @@ task run_[ServiceName]_service
 
 - Ensure that all configuration files for each service are properly set up before running the services.
 - If you encounter issues with the configuration, double-check that the necessary environment variables and config files are correctly placed in the respective service directories.
+
+## Using of Api Getaway
+
+- You can use api getaway after running `all` services.
+- You can see swaggers of all services by pasting this adress: `http://localhost:5295/index.html`

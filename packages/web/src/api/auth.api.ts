@@ -5,6 +5,10 @@ import baseQueryWithReauth from './baseQueryWithReauth'
 import { SignUpDto } from '~types/auth/sign-up.dto'
 import { IUser } from '~types/user/user.type'
 import { VerifyEmailDto, VerifyEmailResponse } from '~types/auth/verify-email.type'
+import { LoginResponse } from '~types/auth/login-response.type'
+import { LoginDto } from '~types/auth/login.dto'
+import { ForgetPasswordRequest } from '~types/auth/forget-password-verify.type'
+import { ChangePasswordRequest } from '~types/auth/change-password.type'
 
 export const api = createApi({
   reducerPath: 'authApi',
@@ -24,7 +28,34 @@ export const api = createApi({
         body,
       }),
     }),
+    login: builder.mutation<LoginResponse, LoginDto>({
+      query: body => ({
+        url: 'auth/login',
+        method: 'POST',
+        body,
+      }),
+    }),
+    passwordVerificationCode: builder.mutation<{ message: string }, ForgetPasswordRequest>({
+      query: body => ({
+        url: 'auth/password-verification-code',
+        method: 'PATCH',
+        body,
+      }),
+    }),
+    changePassword: builder.mutation<{ message: string }, ChangePasswordRequest>({
+      query: body => ({
+        url: 'auth/change-password',
+        method: 'PATCH',
+        body,
+      }),
+    }),
   }),
 })
 
-export const { useRegisterMutation, useVerifyEmailMutation } = api
+export const {
+  useRegisterMutation,
+  useVerifyEmailMutation,
+  useLoginMutation,
+  usePasswordVerificationCodeMutation,
+  useChangePasswordMutation,
+} = api

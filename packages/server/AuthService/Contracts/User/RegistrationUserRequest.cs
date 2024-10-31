@@ -1,5 +1,5 @@
 using System.ComponentModel.DataAnnotations;
-using AuthService.Helpers.Password;
+using AuthService.Helpers.Security;
 
 namespace AuthService.Contracts.User;
 
