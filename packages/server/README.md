@@ -38,6 +38,25 @@ Before running the services, ensure that you have:
    }
 }
 ```
+
+   For UserService paste this appsettings.Development.json file into **root** directory of a service
+   
+```json
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "MongoDbSettings":{
+    "ConnectionUri":"mongodb+srv://root:<db_password>@devhubdb.jsttz.mongodb.net/?retryWrites=true&w=majority&appName=DevHubDB",
+    "DatabaseName": "DevHubDB",
+    "CollectionName": "users"
+  }
+}
+
+```
    
    For PostService add a **config** folder into **root** directory of a service and paste this config.yaml file into this config folder.
    
