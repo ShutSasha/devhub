@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="./web/public/favicon.svg" alt="DevHub Logo" width="150">
+  <img src="./packages/web/public/favicon.svg" alt="DevHub Logo" width="150">
 </div>
 
 # DevHub
