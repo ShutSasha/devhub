@@ -30,8 +30,7 @@ public class User
    public string Email { get; set; }
    
    [BsonElement("createdAt")] 
-   [BsonRepresentation(BsonType.DateTime)]
-   public DateTime CreatedAt { get; set; } = DateTime.Now;
+   public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
    
    [BsonElement("devPoints")] 
    public int DevPoints { get; set; } = 0;
