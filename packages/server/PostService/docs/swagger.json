@@ -5,6 +5,50 @@
     },
     "paths": {
         "/api/posts": {
+            "get": {
+                "description": "Retrieves a paginated list of posts with optional limit and page query parameters.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "posts"
+                ],
+                "summary": "Get Paginated Posts",
+                "parameters": [
+                    {
+                        "minimum": 1,
+                        "type": "integer",
+                        "description": "Number of posts per page (default is 10)",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "minimum": 1,
+                        "type": "integer",
+                        "description": "Page number for pagination (default is 1)",
+                        "name": "page",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of paginated posts",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/storage.PostModel"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {}
+                    }
+                }
+            },
             "post": {
                 "description": "This endpoint allows a user to save a new post with a title, content, and optional tags.",
                 "consumes": [
@@ -253,9 +297,6 @@
         "models.Post": {
             "type": "object",
             "properties": {
-                "_id": {
-                    "type": "string"
-                },
                 "comments": {
                     "type": "array",
                     "items": {
@@ -296,12 +337,15 @@
             "required": [
                 "content",
                 "title",
-                "userId"
+                "user"
             ],
             "properties": {
                 "content": {
                     "type": "string",
                     "maxLength": 62792
+                },
+                "header_image": {
+                    "type": "string"
                 },
                 "tags": {
                     "type": "array",
@@ -314,7 +358,68 @@
                     "maxLength": 128,
                     "minLength": 1
                 },
-                "userId": {
+                "user": {
+                    "type": "string"
+                }
+            }
+        },
+        "storage.CommentModel": {
+            "type": "object",
+            "properties": {
+                "_id": {
+                    "type": "string"
+                },
+                "comment_text": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "likes": {
+                    "type": "integer"
+                },
+                "user": {
+                    "type": "string"
+                }
+            }
+        },
+        "storage.PostModel": {
+            "type": "object",
+            "properties": {
+                "_id": {
+                    "type": "string"
+                },
+                "comments": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/storage.CommentModel"
+                    }
+                },
+                "content": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "dislikes": {
+                    "type": "integer"
+                },
+                "header_image": {
+                    "type": "string"
+                },
+                "likes": {
+                    "type": "integer"
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "title": {
+                    "type": "string"
+                },
+                "user": {
                     "type": "string"
                 }
             }
@@ -324,7 +429,8 @@
             "properties": {
                 "content": {
                     "type": "string",
-                    "maxLength": 62792
+                    "maxLength": 62792,
+                    "minLength": 1
                 },
                 "header_image": {
                     "type": "string"

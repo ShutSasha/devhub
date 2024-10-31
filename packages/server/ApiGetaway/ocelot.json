@@ -108,6 +108,18 @@
          ],
          "UpstreamPathTemplate": "/api/posts/search",
          "UpstreamHttpMethod": ["GET"]
+      },
+      {
+         "DownstreamPathTemplate": "/api/posts",
+         "DownstreamScheme": "http",
+         "DownstreamHostAndPorts": [
+            {
+               "Host": "localhost",
+               "Port": 8080
+            }
+         ],
+         "UpstreamPathTemplate": "/api/posts",
+         "UpstreamHttpMethod": ["GET"]
       }
    ],
    "GlobalConfiguration": {
