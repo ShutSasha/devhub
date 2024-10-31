@@ -2,14 +2,15 @@ import { createApi } from '@reduxjs/toolkit/query/react'
 
 import baseQueryWithReauth from './baseQueryWithReauth'
 
+import { IPost } from '~types/post/post.type'
+
 export const api = createApi({
   reducerPath: 'postApi',
   baseQuery: baseQueryWithReauth,
   endpoints: builder => ({
-    getPosts: builder.query<any, any>({
+    getPosts: builder.query<IPost[], void>({
       query: () => ({
-        // TODO: change to correct endpoint
-        url: 'auth/new-endpoint',
+        url: 'posts',
         method: 'GET',
       }),
     }),
