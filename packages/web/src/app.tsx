@@ -1,9 +1,11 @@
+import { RouterProvider } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '@app/store/store'
 import GlobalStyle from '@app/styles/global.styles'
-import { setAccessToken, setLoading } from '@features/user/user.slice'
+import { setAccessToken, setLoading, setUser } from '@features/user/user.slice'
 import router from '@pages/router'
 import { useEffect } from 'react'
-import { RouterProvider } from 'react-router-dom'
+
+import { RefreshResponse } from '~types/auth/refresh-response.type'
 
 const baseUrl = `${process.env.REACT_APP_API_URL}`
 
@@ -21,8 +23,10 @@ export const App = () => {
           credentials: 'include',
         })
 
-        const json: { token: string } = await response.json()
-        dispatch(setAccessToken(json.token))
+        const { token, user }: RefreshResponse = await response.json()
+
+        dispatch(setAccessToken(token))
+        dispatch(setUser(user))
       } catch (e) {
         console.error(e)
       } finally {
