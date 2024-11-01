@@ -41,6 +41,11 @@ namespace AuthService.Extensions
                             else
                             {
                                 context.Token = context.Request.Cookies["refreshToken"];
+
+                                if (string.IsNullOrEmpty(context.Token))
+                                {
+                                    context.Token = context.Request.Headers["X-Refresh-Token"];
+                                }
                             }
 
                             return Task.CompletedTask;

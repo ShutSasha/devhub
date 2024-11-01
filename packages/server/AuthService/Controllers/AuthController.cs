@@ -97,7 +97,12 @@ public class AuthController : ControllerBase
    {
       try
       {
-         var refreshToken = HttpContext.Request.Cookies["refreshToken"];
+         var refreshToken = HttpContext.Request.Headers["X-Refresh-Token"].FirstOrDefault();
+        
+         if (string.IsNullOrEmpty(refreshToken))
+         {
+            refreshToken = HttpContext.Request.Cookies["refreshToken"];
+         }
 
          var refreshResult = await _authService.RefreshTokens(refreshToken);
 
