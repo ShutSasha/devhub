@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import logo from '@assets/images/logo.svg'
 import home from '@assets/images/header/home.svg'
 import friends from '@assets/images/header/friends.svg'
@@ -30,13 +31,18 @@ const navElements: NavItem[] = [
 ]
 
 const AuthDisplay = () => {
+  const navigate = useNavigate()
   const user = useAppSelector(state => state.userSlice.user)
+
+  const handleCreatePostBtn = () => {
+    navigate(ROUTES.CREATE_POST)
+  }
 
   return (
     <>
       {user ? (
         <>
-          <CreatePost>Create Post</CreatePost>
+          <CreatePost onClick={handleCreatePostBtn}>Create Post</CreatePost>
           <UserAvatar src={user.avatar} />
         </>
       ) : (

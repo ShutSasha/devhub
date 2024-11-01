@@ -280,10 +280,10 @@
         "models.Comment": {
             "type": "object",
             "properties": {
-                "comment_text": {
+                "commentText": {
                     "type": "string"
                 },
-                "created_at": {
+                "createdAt": {
                     "type": "string"
                 },
                 "likes": {
@@ -306,13 +306,13 @@
                 "content": {
                     "type": "string"
                 },
-                "created_at": {
+                "createdAt": {
                     "type": "string"
                 },
                 "dislikes": {
                     "type": "integer"
                 },
-                "header_image": {
+                "headerImage": {
                     "type": "string"
                 },
                 "likes": {
@@ -337,14 +337,14 @@
             "required": [
                 "content",
                 "title",
-                "user"
+                "userId"
             ],
             "properties": {
                 "content": {
                     "type": "string",
                     "maxLength": 62792
                 },
-                "header_image": {
+                "headerImage": {
                     "type": "string"
                 },
                 "tags": {
@@ -358,7 +358,7 @@
                     "maxLength": 128,
                     "minLength": 1
                 },
-                "user": {
+                "userId": {
                     "type": "string"
                 }
             }
@@ -369,10 +369,10 @@
                 "_id": {
                     "type": "string"
                 },
-                "comment_text": {
+                "commentText": {
                     "type": "string"
                 },
-                "created_at": {
+                "createdAt": {
                     "type": "string"
                 },
                 "likes": {
@@ -398,13 +398,13 @@
                 "content": {
                     "type": "string"
                 },
-                "created_at": {
+                "createdAt": {
                     "type": "string"
                 },
                 "dislikes": {
                     "type": "integer"
                 },
-                "header_image": {
+                "headerImage": {
                     "type": "string"
                 },
                 "likes": {
@@ -420,6 +420,26 @@
                     "type": "string"
                 },
                 "user": {
+                    "$ref": "#/definitions/storage.UserModel"
+                }
+            }
+        },
+        "storage.UserModel": {
+            "type": "object",
+            "properties": {
+                "_id": {
+                    "type": "string"
+                },
+                "avatar": {
+                    "type": "string"
+                },
+                "devPoints": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "username": {
                     "type": "string"
                 }
             }
@@ -432,7 +452,7 @@
                     "maxLength": 62792,
                     "minLength": 1
                 },
-                "header_image": {
+                "headerImage": {
                     "type": "string"
                 },
                 "tags": {

@@ -26,10 +26,10 @@ var URLRegex = regexp.MustCompile(`^(https?://[^\s/$.?#].[^\s]*)$`)
 // - HeaderImage: The image at the top of the post.
 // - Tags: Optional tags associated with the post.
 type Request struct {
-	UserId      string   `json:"user" validate:"required"`
+	UserId      string   `json:"userId" validate:"required"`
 	Title       string   `json:"title" validate:"required,max=128,min=1"`
 	Content     string   `json:"content" validate:"required,max=62792"`
-	HeaderImage string   `json:"header_image,omitempty"`
+	HeaderImage string   `json:"headerImage,omitempty"`
 	Tags        []string `json:"tags,omitempty"`
 }
 
