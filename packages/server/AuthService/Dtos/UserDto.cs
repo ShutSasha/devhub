@@ -12,5 +12,5 @@ public class UserDto
    public int DevPoints { get; set; } = 0;
    public string? ActivationCode { get; set; }
    public bool IsActivated { get; set; } = false;
-   public List<UserRole> UserRole { get; set; } = new List<UserRole> { Models.Enums.UserRole.User };
+   public List<string> UserRole { get; set; } = new List<string> { Models.Enums.UserRole.User.ToString() };
 }
