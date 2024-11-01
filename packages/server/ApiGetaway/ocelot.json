@@ -72,6 +72,30 @@
          "UpstreamPathTemplate": "/api/auth/change-password",
          "UpstreamHttpMethod": ["PATCH"]
       },
+      {
+         "DownstreamPathTemplate": "/api/auth/testinfo",
+         "DownstreamScheme": "http",
+         "DownstreamHostAndPorts": [
+            {
+               "Host": "localhost",
+               "Port": 5279
+            }
+         ],
+         "UpstreamPathTemplate": "/api/auth/testinfo",
+         "UpstreamHttpMethod": ["GET"]
+      },
+      {
+         "DownstreamPathTemplate": "/api/auth/logout",
+         "DownstreamScheme": "http",
+         "DownstreamHostAndPorts": [
+            {
+               "Host": "localhost",
+               "Port": 5279
+            }
+         ],
+         "UpstreamPathTemplate": "/api/auth/logout",
+         "UpstreamHttpMethod": ["POST"]
+      },
       
       {
          "DownstreamPathTemplate": "/api/posts",
