@@ -1,4 +1,4 @@
-package com.devhub.devhubapp
+package com.devhub.devhubapp.dataClasses
 
 data class UserRegistrationRequest(
     val username: String,
