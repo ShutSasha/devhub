@@ -1,5 +1,6 @@
 using System.Text;
 using AuthService.Helpers.Jwt;
+using AuthService.Helpers.Response;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
