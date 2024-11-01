@@ -16,6 +16,7 @@ class TextWithLinkFragment : Fragment() {
     private lateinit var linkTextView: TextView
     private var text: String? = null
     private var linkText: String? = null
+    private var linkClickListener: View.OnClickListener? = null
 
     @SuppressLint("MissingInflatedId")
     override fun onCreateView(
@@ -38,15 +39,23 @@ class TextWithLinkFragment : Fragment() {
             linkTextView.text = linkText
             linkTextView.paintFlags = linkTextView.paintFlags or Paint.UNDERLINE_TEXT_FLAG
             linkTextView.visibility = View.VISIBLE
+
+            linkClickListener?.let {
+                linkTextView.setOnClickListener(it)
+            } ?: run {
+                linkTextView.setOnClickListener(null)
+            }
         } else {
             linkTextView.visibility = View.GONE
         }
 
+
         return view
     }
 
-    fun setTextAndLinkText(text: String?, linkText: String?) {
+    fun setTextAndLinkText(text: String?, linkText: String?, onClickListener: View.OnClickListener?) {
         this.text = text
         this.linkText = linkText
+        this.linkClickListener = onClickListener
     }
 }

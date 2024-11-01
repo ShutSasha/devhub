@@ -2,31 +2,24 @@ import { FC } from 'react'
 
 import * as S from './post.style'
 
-type Comment = string
+import { IPost } from '~types/post/post.type'
 
 interface PostProps {
-  headerImage?: string
-  avatar: string
-  username: string
-  postTitle: string
-  tags?: string[]
-  likes: number
-  dislikes: number
-  comments: Comment[]
+  post: IPost
 }
 
-export const Post: FC<PostProps> = post => {
+export const Post: FC<PostProps> = ({ post }) => {
   return (
     <S.Container>
       {post.headerImage && <S.HeaderImage src={post.headerImage} />}
       <S.PostHeader>
         <S.StyledUserCredentialsContainer>
-          <S.StyledAvatar src={post.avatar} />
-          <S.Username>{post.username}</S.Username>
+          <S.StyledAvatar src={post.user.avatar} />
+          <S.Username>{post.user.userName}</S.Username>
         </S.StyledUserCredentialsContainer>
         <S.StyledStar $isSaved={false} />
       </S.PostHeader>
-      <S.PostTitle>{post.postTitle}</S.PostTitle>
+      <S.PostTitle>{post.title}</S.PostTitle>
       <S.TagsContainer>{post.tags && post.tags.map((tag, index) => <S.Tag key={index}>#{tag}</S.Tag>)}</S.TagsContainer>
       <S.ReactionWrapper>
         <S.LikesDislikesContainer>

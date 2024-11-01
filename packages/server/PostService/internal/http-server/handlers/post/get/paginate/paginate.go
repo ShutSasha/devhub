@@ -21,8 +21,8 @@ import (
 // @Param        limit  query  int     false  "Number of posts per page (default is 10)"  minimum(1)
 // @Param        page   query  int     false  "Page number for pagination (default is 1)" minimum(1)
 // @Success      200    {array}  storage.PostModel  "List of paginated posts"
-// @Failure      500    {object}  resp.Error        "Internal Server Error"
-// @Router       /posts [get]
+// @Failure      500    {object}  error        "Internal Server Error"
+// @Router       /api/posts [get]
 func New(log *slog.Logger, postProvider get.PostProvider) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		const op = "handlers.post.get.paginate.New"

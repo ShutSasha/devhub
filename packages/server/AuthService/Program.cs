@@ -55,9 +55,9 @@ builder.Services.AddSingleton<IMongoDatabase>(sp =>
 });
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+builder.Services.AddScoped<MailService>();
 builder.Services.AddScoped<PasswordHasher>();
 builder.Services.AddScoped<JwtProvider>();
-builder.Services.AddScoped<MailService>();
 builder.Services.AddScoped<TokenService>();
 builder.Services.AddScoped<AuthService.Services.AuthService>();
 

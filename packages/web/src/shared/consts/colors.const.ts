@@ -4,4 +4,5 @@ export const colors = Object.freeze({
   accent: '#F7971D',
   bgPage: '#1A1A1D',
   background: '#2A2A2D',
+  wrong: '#E33629',
 })

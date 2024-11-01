@@ -54,7 +54,7 @@ public class AuthController : ControllerBase
             SameSite = SameSiteMode.Strict,
             Expires = DateTime.Now.AddSeconds(30)
          });
-         return Ok(new { Token = loginResult.AccessToken, User = loginResult.UserData });
+         return Ok(new { AccessToken = loginResult.AccessToken, RefreshToken = loginResult.RefreshToken, User = loginResult.UserData });
       }
       catch (Exception e)
       {
@@ -93,12 +93,7 @@ public class AuthController : ControllerBase
             Expires = DateTime.UtcNow.AddDays(30)
          });
 
-         return Ok(new
-         {
-            Message = "Tokens updated",
-            Token = refreshResult.AccessToken,
-            User = refreshResult.UserData
-         });
+         return Ok(new { Message = "Tokens updated", AccesssToken = refreshResult.AccessToken, RefreshToken = refreshResult.RefreshToken,  User = refreshResult.UserData });
       }
       catch (Exception e)
       {
