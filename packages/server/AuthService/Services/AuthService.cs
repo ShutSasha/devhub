@@ -155,21 +155,19 @@ public class AuthService
       return loginResponse;
    }
 
-   public async Task<bool> VerifyEmail(string email, string activationCode)
+   public async Task VerifyEmail(string email, string activationCode)
    {
       var user = await _userCollection.Find(u => u.Email == email).FirstOrDefaultAsync();
 
       if (user == null || user.ActivationCode != activationCode)
       {
-         return false;
+         throw new Exception("Invalid email or password");
       }
 
       user.IsActivated = true;
       user.ActivationCode = null;
 
       await _userCollection.ReplaceOneAsync(u => u.Id == user.Id, user);
-
-      return true;
    }
 
    public async Task SendVerificationCode(string email)

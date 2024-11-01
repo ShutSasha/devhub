@@ -36,14 +36,7 @@ public class AuthController : ControllerBase
       }
       catch (Exception e)
       {
-         return BadRequest(new
-         {
-            status = 400,
-            errors = new Dictionary<string, List<string>>
-            {
-               { "Registration error", new List<string> { e.Message } }
-            }
-         });
+         return ErrorResponseHelper.CreateErrorResponse(400, $"{nameof(Register)} error", e.Message);
       }
    }
 
@@ -65,35 +58,22 @@ public class AuthController : ControllerBase
       }
       catch (Exception e)
       {
-         return BadRequest(new
-         {
-            status = 400,
-            errors = new Dictionary<string, List<string>>
-            {
-               { "Login error", new List<string> { e.Message } }
-            }
-         });
+         return ErrorResponseHelper.CreateErrorResponse(400, "Login error", e.Message);
       }
    }
 
    [HttpPost("verify-email")]
    public async Task<IActionResult> VerifyEmail([FromBody] VerifyEmailRequest request)
    {
-      var result = await _authService.VerifyEmail(request.Email, request.ActivationCode);
-
-      if (result)
+      try
       {
+         await _authService.VerifyEmail(request.Email, request.ActivationCode);
          return Ok(new { message = "Email successfully verified" });
       }
-
-      return BadRequest(new
+      catch (Exception e)
       {
-         status = 400,
-         errors = new Dictionary<string, List<string>>
-         {
-            { "ActivationCode", new List<string> { "Invalid email or activation code" } }
-         }
-      });
+         return ErrorResponseHelper.CreateErrorResponse(400, "Activation code error", e.Message);
+      }
    }
 
    [HttpPost("refresh")]
@@ -114,18 +94,15 @@ public class AuthController : ControllerBase
          });
 
          return Ok(new
-            { Message = "Tokens updated", Token = refreshResult.AccessToken, User = refreshResult.UserData });
+         {
+            Message = "Tokens updated",
+            Token = refreshResult.AccessToken,
+            User = refreshResult.UserData
+         });
       }
       catch (Exception e)
       {
-         return Unauthorized(new
-         {
-            status = 401,
-            errors = new Dictionary<string, List<string>>
-            {
-               { "Refresh error", new List<string> { e.Message } }
-            }
-         });
+         return ErrorResponseHelper.CreateErrorResponse(401, "Refresh error", e.Message);
       }
    }
 
@@ -184,14 +161,7 @@ public class AuthController : ControllerBase
          return Ok(data);
       }
 
-      return Unauthorized(new
-      {
-         status = 401,
-         errors = new Dictionary<string, List<string>>
-         {
-            { "Fetch Error", new List<string> { "Cannot fetch" } }
-         }
-      });
+      return ErrorResponseHelper.CreateErrorResponse(401, "Fetch error", "Can't fetch");
    }
 
    [HttpGet("google-login")]
