@@ -25,4 +25,4 @@ export const api = createApi({
   }),
 })
 
-export const { useGetPostsQuery } = api
+export const { useGetPostsQuery, useCreatePostMutation } = api

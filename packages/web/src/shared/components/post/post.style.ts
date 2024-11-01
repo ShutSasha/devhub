@@ -22,11 +22,15 @@ export const Container = styled.div`
   border-radius: 10px;
 `
 
-export const HeaderImage = styled.img`
-  height: 250px;
-  width: 100%;
+export const HeaderImage = styled.div<{ $image: string }>`
+  height: 420px;
 
-  object-fit: cover;
+  background: ${({ $image }) => ($image ? `url(${$image})` : '')};
+  background-repeat: no-repeat;
+
+  background-size: 100% 155%;
+  background-position: top;
+  box-sizing: border-box;
   border-radius: 8px;
 
   margin-bottom: 18px;

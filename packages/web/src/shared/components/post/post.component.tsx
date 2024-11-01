@@ -11,7 +11,7 @@ interface PostProps {
 export const Post: FC<PostProps> = ({ post }) => {
   return (
     <S.Container>
-      {post.headerImage && <S.HeaderImage src={post.headerImage} />}
+      {post.headerImage && <S.HeaderImage $image={post.headerImage} />}
       <S.PostHeader>
         <S.StyledUserCredentialsContainer>
           <S.StyledAvatar src={post.user.avatar} />
