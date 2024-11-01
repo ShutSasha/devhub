@@ -41,8 +41,8 @@ export const Login = () => {
 
   const handleLogin = async () => {
     try {
-      const { token, user } = await login({ username, password }).unwrap()
-      dispatch(setAccessToken(token))
+      const { accessToken, user } = await login({ username, password }).unwrap()
+      dispatch(setAccessToken(accessToken))
       dispatch(setUser(user))
 
       navigate(ROUTES.HOME)

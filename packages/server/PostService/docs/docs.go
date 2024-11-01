@@ -291,10 +291,10 @@ const docTemplate = `{
         "models.Comment": {
             "type": "object",
             "properties": {
-                "comment_text": {
+                "commentText": {
                     "type": "string"
                 },
-                "created_at": {
+                "createdAt": {
                     "type": "string"
                 },
                 "likes": {
@@ -317,13 +317,13 @@ const docTemplate = `{
                 "content": {
                     "type": "string"
                 },
-                "created_at": {
+                "createdAt": {
                     "type": "string"
                 },
                 "dislikes": {
                     "type": "integer"
                 },
-                "header_image": {
+                "headerImage": {
                     "type": "string"
                 },
                 "likes": {
@@ -348,14 +348,14 @@ const docTemplate = `{
             "required": [
                 "content",
                 "title",
-                "user"
+                "userId"
             ],
             "properties": {
                 "content": {
                     "type": "string",
                     "maxLength": 62792
                 },
-                "header_image": {
+                "headerImage": {
                     "type": "string"
                 },
                 "tags": {
@@ -369,7 +369,7 @@ const docTemplate = `{
                     "maxLength": 128,
                     "minLength": 1
                 },
-                "user": {
+                "userId": {
                     "type": "string"
                 }
             }
@@ -380,10 +380,10 @@ const docTemplate = `{
                 "_id": {
                     "type": "string"
                 },
-                "comment_text": {
+                "commentText": {
                     "type": "string"
                 },
-                "created_at": {
+                "createdAt": {
                     "type": "string"
                 },
                 "likes": {
@@ -409,13 +409,13 @@ const docTemplate = `{
                 "content": {
                     "type": "string"
                 },
-                "created_at": {
+                "createdAt": {
                     "type": "string"
                 },
                 "dislikes": {
                     "type": "integer"
                 },
-                "header_image": {
+                "headerImage": {
                     "type": "string"
                 },
                 "likes": {
@@ -431,6 +431,26 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "user": {
+                    "$ref": "#/definitions/storage.UserModel"
+                }
+            }
+        },
+        "storage.UserModel": {
+            "type": "object",
+            "properties": {
+                "_id": {
+                    "type": "string"
+                },
+                "avatar": {
+                    "type": "string"
+                },
+                "devPoints": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "username": {
                     "type": "string"
                 }
             }
@@ -443,7 +463,7 @@ const docTemplate = `{
                     "maxLength": 62792,
                     "minLength": 1
                 },
-                "header_image": {
+                "headerImage": {
                     "type": "string"
                 },
                 "tags": {
