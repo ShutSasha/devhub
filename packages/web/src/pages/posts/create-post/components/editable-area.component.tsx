@@ -1,4 +1,4 @@
-import { FC, ForwardedRef, forwardRef, useState } from 'react'
+import { ForwardedRef, forwardRef, useState } from 'react'
 import styled from 'styled-components'
 
 const EditableDiv = styled.span`
