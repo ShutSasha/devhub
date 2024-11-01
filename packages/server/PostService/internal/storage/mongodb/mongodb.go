@@ -79,17 +79,39 @@ func (s *Storage) GetById(
 
 	collection := s.db.Database("DevHubDB").Collection("posts")
 
-	post := &storage.PostModel{}
-	filter := bson.M{"_id": postId}
+	pipeline := mongo.Pipeline{
+		bson.D{
+			{Key: "$match", Value: bson.D{
+				{Key: "_id", Value: postId},
+			}},
+		},
+		bson.D{
+			{Key: "$lookup", Value: bson.D{
+				{Key: "from", Value: "users"},
+				{Key: "localField", Value: "user"},
+				{Key: "foreignField", Value: "_id"},
+				{Key: "as", Value: "user"},
+			}},
+		},
+		bson.D{
+			{Key: "$unwind", Value: bson.D{
+				{Key: "path", Value: "$user"},
+				{Key: "preserveNullAndEmptyArrays", Value: true},
+			}},
+		},
+	}
 
-	err := collection.FindOne(context.TODO(), filter).Decode(post)
-
+	cursor, err := collection.Aggregate(ctx, pipeline)
 	if err != nil {
-		if errors.Is(err, mongo.ErrNoDocuments) {
-			return nil, storage.ErrPostNotFound
-		}
-
 		return nil, fmt.Errorf("%s: %w", op, err)
+	}
+	defer cursor.Close(ctx)
+
+	post := &storage.PostModel{}
+	if cursor.Next(ctx) {
+		if err := cursor.Decode(post); err != nil {
+			return nil, fmt.Errorf("%s: %w", op, err)
+		}
 	}
 
 	return post, nil
@@ -133,6 +155,7 @@ func (s *Storage) Update(
 	collection := s.db.Database("DevHubDB").Collection("posts")
 
 	filter := bson.M{"_id": postId}
+
 	updateFields := bson.M{}
 	if title != "" {
 		updateFields["title"] = title
@@ -170,30 +193,57 @@ func (s *Storage) Search(
 	query string,
 	tags []string,
 ) ([]storage.PostModel, error) {
-	const op = "storage.mongodb.Searcg"
+	const op = "storage.mongodb.Search"
 
 	collection := s.db.Database("DevHubDB").Collection("posts")
 
-	filter := bson.M{}
+	pipeline := mongo.Pipeline{}
+
+	searchFilter := bson.D{}
 	if query != "" {
-		filter["$or"] = bson.A{
-			bson.M{"title": bson.M{"$regex": query, "$options": "i"}},
-			bson.M{"content": bson.M{"$regex": query, "$options": "i"}},
-		}
+		searchFilter = append(searchFilter, bson.E{
+			Key: "$or", Value: bson.A{
+				bson.M{"title": bson.M{"$regex": query, "$options": "i"}},
+				bson.M{"content": bson.M{"$regex": query, "$options": "i"}},
+			},
+		})
 	}
 
 	if len(tags) > 0 {
-		var regexTags []bson.M
+		var regexTagFilters []bson.M
 		for _, tag := range tags {
-			regexTags = append(regexTags, bson.M{
-				"$elemMatch": bson.M{
-					"$regex":   tag,
-					"$options": "i",
+			regexTagFilters = append(regexTagFilters, bson.M{
+				"tags": bson.M{
+					"$elemMatch": bson.M{
+						"$regex":   tag,
+						"$options": "i",
+					},
 				},
 			})
 		}
-		filter["tags"] = bson.M{"$all": regexTags}
+
+		searchFilter = append(searchFilter, bson.E{Key: "$and", Value: regexTagFilters})
 	}
+
+	if len(searchFilter) > 0 {
+		pipeline = append(pipeline, bson.D{{Key: "$match", Value: searchFilter}})
+	}
+
+	pipeline = append(pipeline, bson.D{
+		{Key: "$lookup", Value: bson.D{
+			{Key: "from", Value: "users"},
+			{Key: "localField", Value: "user"},
+			{Key: "foreignField", Value: "_id"},
+			{Key: "as", Value: "user"},
+		}},
+	})
+
+	pipeline = append(pipeline, bson.D{
+		{Key: "$unwind", Value: bson.D{
+			{Key: "path", Value: "$user"},
+			{Key: "preserveNullAndEmptyArrays", Value: true},
+		}},
+	})
 
 	var sortField string
 	switch sortBy {
@@ -205,16 +255,13 @@ func (s *Storage) Search(
 		sortField = "likes"
 	}
 
-	findOptions := options.Find()
-	findOptions.SetSort(bson.D{{Key: sortField, Value: -1}})
+	pipeline = append(pipeline, bson.D{{Key: "$sort", Value: bson.D{{Key: sortField, Value: -1}}}})
 
-	cursor, err := collection.Find(ctx, filter, findOptions)
-
+	cursor, err := collection.Aggregate(ctx, pipeline)
 	if err != nil {
 		if errors.Is(err, mongo.ErrNilCursor) {
 			return nil, storage.ErrPostsNotFound
 		}
-
 		return nil, fmt.Errorf("%s: could not execute search query: %w", op, err)
 	}
 	defer cursor.Close(ctx)
@@ -231,12 +278,34 @@ func (s *Storage) GetPaginated(ctx context.Context, limit, page int) ([]storage.
 	const op = "storage.mongodb.GetPaginated"
 
 	collection := s.db.Database("DevHubDB").Collection("posts")
-	findOptions := options.Find()
-	findOptions.SetLimit(int64(limit))
-	findOptions.SetSkip(int64((page - 1) * limit))
-	findOptions.SetSort(bson.D{{Key: "created_at", Value: -1}})
 
-	cursor, err := collection.Find(ctx, bson.M{}, findOptions)
+	pipeline := mongo.Pipeline{
+		bson.D{
+			{Key: "$lookup", Value: bson.D{
+				{Key: "from", Value: "users"},
+				{Key: "localField", Value: "user"},
+				{Key: "foreignField", Value: "_id"},
+				{Key: "as", Value: "user"},
+			}},
+		},
+		bson.D{
+			{Key: "$unwind", Value: bson.D{
+				{Key: "path", Value: "$user"},
+				{Key: "preserveNullAndEmptyArrays", Value: true},
+			}},
+		},
+		bson.D{
+			{Key: "$sort", Value: bson.D{{Key: "created_at", Value: -1}}},
+		},
+		bson.D{
+			{Key: "$skip", Value: int64((page - 1) * limit)},
+		},
+		bson.D{
+			{Key: "$limit", Value: int64(limit)},
+		},
+	}
+
+	cursor, err := collection.Aggregate(ctx, pipeline)
 	if err != nil {
 		if errors.Is(err, mongo.ErrNilCursor) {
 			return nil, storage.ErrPostsNotFound

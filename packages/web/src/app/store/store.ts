@@ -15,7 +15,8 @@ export const store = configureStore({
     [authSlice.name]: authSlice.reducer,
     [userSlice.name]: userSlice.reducer,
   },
-  middleware: getDefaultMiddleware => getDefaultMiddleware().concat(userApi.middleware, authApi.middleware),
+  middleware: getDefaultMiddleware =>
+    getDefaultMiddleware().concat(userApi.middleware, authApi.middleware, postApi.middleware),
 })
 
 setupListeners(store.dispatch)
