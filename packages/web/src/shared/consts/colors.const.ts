@@ -5,4 +5,7 @@ export const colors = Object.freeze({
   bgPage: '#1A1A1D',
   background: '#2A2A2D',
   wrong: '#E33629',
+  textSecondary: '#CFCFCF',
+  black300: '#B3B3B3',
+  black600: '#666666',
 })

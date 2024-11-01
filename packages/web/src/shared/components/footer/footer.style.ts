@@ -4,6 +4,7 @@ import { FONTS } from '@shared/consts/fonts.enum'
 
 export const Wrapper = styled.div`
   background-color: ${colors.background};
+  margin-top: auto;
 `
 
 export const Container = styled.div`
