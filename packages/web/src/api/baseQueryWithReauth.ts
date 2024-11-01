@@ -47,10 +47,10 @@ const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQue
           extraOptions,
         )) as { data: RefreshResponse }
 
-        api.dispatch(setAccessToken(refreshResult.data.token))
+        api.dispatch(setAccessToken(refreshResult.data.accessToken))
         api.dispatch(setUser(refreshResult.data.user))
 
-        if (refreshResult.data.token) {
+        if (refreshResult.data.accessToken) {
           // retry the initial query
           result = await baseQuery(args, api, extraOptions)
         } else {

@@ -23,9 +23,9 @@ export const App = () => {
           credentials: 'include',
         })
 
-        const { token, user }: RefreshResponse = await response.json()
+        const { accessToken, user }: RefreshResponse = await response.json()
 
-        dispatch(setAccessToken(token))
+        dispatch(setAccessToken(accessToken))
         dispatch(setUser(user))
       } catch (e) {
         console.error(e)
