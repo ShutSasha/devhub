@@ -6,9 +6,10 @@ import friends from '@assets/images/header/friends.svg'
 import star from '@assets/images/header/star.svg'
 import chats from '@assets/images/header/chats.svg'
 import { ROUTES } from '@pages/router/routes.enum'
-import { useAppSelector } from '@app/store/store'
+import { useAppDispatch, useAppSelector } from '@app/store/store'
+import { useLogoutMutation } from '@api/auth.api'
+import { logout as logoutStore } from '@features/user/user.slice'
 
-import { NavItem } from './nav-item.component'
 import {
   AuthContainer,
   Container,
@@ -16,10 +17,12 @@ import {
   CreatePost,
   LogInLink,
   Logo,
+  Logout,
   NavList,
   UserAvatar,
   Wrapper,
 } from './header.style'
+import { NavItem } from './nav-item.component'
 
 type NavItem = { title: string; icon: string }
 
@@ -32,10 +35,21 @@ const navElements: NavItem[] = [
 
 const AuthDisplay = () => {
   const navigate = useNavigate()
+  const dispatch = useAppDispatch()
   const user = useAppSelector(state => state.userSlice.user)
+  const [logout] = useLogoutMutation()
 
   const handleCreatePostBtn = () => {
     navigate(ROUTES.CREATE_POST)
+  }
+
+  const handleLogout = async () => {
+    try {
+      await logout().unwrap()
+      dispatch(logoutStore())
+    } catch (e) {
+      console.error(e)
+    }
   }
 
   return (
@@ -44,6 +58,7 @@ const AuthDisplay = () => {
         <>
           <CreatePost onClick={handleCreatePostBtn}>Create Post</CreatePost>
           <UserAvatar src={user.avatar} />
+          <Logout onClick={handleLogout} />
         </>
       ) : (
         <>
