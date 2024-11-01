@@ -9,16 +9,27 @@ import android.view.ViewGroup
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import com.devhub.devhubapp.R
+import com.devhub.devhubapp.databinding.FragmentLoginContainerBinding
 
 
 class ForgotPasswordContainerFragment : Fragment() {
+
+    private lateinit var binding : FragmentLoginContainerBinding
+
+    private var emailInput: String = ""
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_forgot_password_container, container, false)
+        binding = FragmentLoginContainerBinding.inflate(layoutInflater, container, false)
 
+        setUpFragment()
+
+        return binding.root
+    }
+
+    fun setUpFragment(){
         val fragmentManager : FragmentManager = childFragmentManager
         val fragmentTransaction : FragmentTransaction = fragmentManager.beginTransaction()
 
@@ -32,13 +43,17 @@ class ForgotPasswordContainerFragment : Fragment() {
         emailInputFragment.setInputHint("Enter your email or username")
         fragmentTransaction.add(R.id.email_input_container, emailInputFragment)
 
+        emailInputFragment.setTextWatcher(object : InputTextListener {
+            override fun onTextInputChanged(text: String) {
+                emailInput = text
+            }
+        })
+
         val primaryButtonFragment = PrimaryButtonFragment()
         primaryButtonFragment.setButtonText("Next")
         fragmentTransaction.add(R.id.primary_button_container, primaryButtonFragment)
 
         fragmentTransaction.commit()
-
-        return view
     }
 
 }

@@ -1,6 +1,5 @@
 package com.devhub.devhubapp.fragment
 
-import DateDeserializer
 import android.content.Intent
 import android.os.Bundle
 import android.text.InputType
@@ -12,30 +11,25 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
-import com.devhub.devhubapp.ErrorResponse
+import com.devhub.devhubapp.dataClasses.ErrorResponse
 import com.devhub.devhubapp.R
-import com.devhub.devhubapp.User
-import com.devhub.devhubapp.UserAPI
-import com.devhub.devhubapp.UserRegistrationRequest
+import com.devhub.devhubapp.dataClasses.User
+import com.devhub.devhubapp.api.AuthAPI
+import com.devhub.devhubapp.dataClasses.UserRegistrationRequest
 import com.devhub.devhubapp.activity.LogInActivity
 import com.devhub.devhubapp.activity.WelcomeActivity
+import com.devhub.devhubapp.classes.RetrofitClient
 import com.devhub.devhubapp.databinding.FragmentRegistrationContainerBinding
 import com.google.gson.Gson
-import com.google.gson.JsonDeserializer
-import com.google.gson.JsonElement
-import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
-import com.google.gson.GsonBuilder
-import java.sql.Date
+import okhttp3.ResponseBody
 
 class RegistrationContainerFragment : Fragment(){
 
     private val baseURL = "http://10.0.2.2:5295/api/"
-    private lateinit var userAPI: UserAPI
+    private lateinit var authAPI: AuthAPI
 
     private lateinit var binding: FragmentRegistrationContainerBinding
 
@@ -53,17 +47,7 @@ class RegistrationContainerFragment : Fragment(){
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
-        val gson = GsonBuilder()
-            .registerTypeAdapter(Date::class.java, DateDeserializer())
-            .create()
-
-        val retrofit = Retrofit.Builder()
-            .baseUrl(baseURL)
-            .addConverterFactory(GsonConverterFactory.create(gson))
-            .build()
-
-        userAPI = retrofit.create(UserAPI::class.java)
+        authAPI = RetrofitClient.getInstance(requireContext()).getRetrofit().create(AuthAPI::class.java)
         binding = FragmentRegistrationContainerBinding.inflate(layoutInflater, container, false)
 
         setUpFragments()
@@ -107,7 +91,7 @@ class RegistrationContainerFragment : Fragment(){
 
         val primaryButtonFragment = PrimaryButtonFragment()
         primaryButtonFragment.setButtonText("Next")
-        primaryButtonFragment.setButtonAction { onPrimaryButtonClick()}
+        primaryButtonFragment.setButtonAction { Register()}
         fragmentTransaction.add(R.id.primary_button_container, primaryButtonFragment)
 
         val lineFragment = LineFragment()
@@ -150,7 +134,7 @@ class RegistrationContainerFragment : Fragment(){
         }
     }
 
-    private fun onPrimaryButtonClick() {
+    private fun Register() {
         val user = UserRegistrationRequest(
             username = usernameInput,
             email = emailInput,
@@ -158,10 +142,11 @@ class RegistrationContainerFragment : Fragment(){
             repeatPassword = repeatPasswordInput
         )
 
-        userAPI.register(user).enqueue(object : Callback<User> {
+        authAPI.register(user).enqueue(object : Callback<User> {
             override fun onResponse(call: Call<User>, response: Response<User>) {
                 if (response.isSuccessful) {
-                    Log.e("Registration", "Registration Successful")
+                    Log.i("Registration", "Registration Successful")
+                    Log.d("Response", "Response received: ${response.code()}")
                     val intent = Intent(requireContext(), WelcomeActivity::class.java)
                     startActivity(intent)
                 } else {
