@@ -23,7 +23,6 @@ import {
   Wrapper,
 } from './header.style'
 import { NavItem } from './nav-item.component'
-import { Link } from 'react-router-dom'
 
 type NavItem = { title: string; icon: string }
 
