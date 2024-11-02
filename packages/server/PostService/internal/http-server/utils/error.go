@@ -26,6 +26,8 @@ func HandleError(
 		log.Error(logMessage)
 	}
 
+	w.WriteHeader(statusCode)
+
 	render.JSON(w, r, resp.Error(map[string][]string{
 		key: {userMessage},
 	}, statusCode))
@@ -41,6 +43,7 @@ func HandleValidatorError(
 	statusCode int,
 ) {
 	log.Error(logMessage, sl.Err(err))
+	w.WriteHeader(statusCode)
 	render.JSON(w, r, resp.ValidationError(
 		validateErr,
 		statusCode,
