@@ -1,7 +1,7 @@
 import { ForwardedRef, forwardRef, useState } from 'react'
 import styled from 'styled-components'
 
-const EditableDiv = styled.span`
+const EditableDiv = styled.span<{ $isPlaceholderVisible: boolean }>`
   display: block;
   font-size: 20px;
   line-height: 1.5;
@@ -11,11 +11,13 @@ const EditableDiv = styled.span`
   white-space: pre-wrap;
   word-break: break-word;
   padding-bottom: 20px;
-`
 
-const Placeholder = styled.span`
-  color: #aaa;
-  user-select: none;
+  &::before {
+    content: ${({ $isPlaceholderVisible }) => ($isPlaceholderVisible ? '"Enter your text here..."' : '""')};
+    color: #aaa;
+    pointer-events: none;
+    user-select: none;
+  }
 `
 
 export const InputContainer = forwardRef<HTMLSpanElement, React.PropsWithChildren<{}>>(
@@ -24,13 +26,17 @@ export const InputContainer = forwardRef<HTMLSpanElement, React.PropsWithChildre
 
     const handleInput = () => {
       const text = (ref as React.MutableRefObject<HTMLSpanElement | null>).current?.textContent || ''
-      setPlaceholderVisible(text === '')
+      setPlaceholderVisible(text.trim() === '')
     }
 
     return (
-      <EditableDiv ref={ref} contentEditable onInput={handleInput} suppressContentEditableWarning={true}>
-        {isPlaceholderVisible && <Placeholder>Enter your text here...</Placeholder>}
-      </EditableDiv>
+      <EditableDiv
+        ref={ref}
+        contentEditable
+        $isPlaceholderVisible={isPlaceholderVisible}
+        onInput={handleInput}
+        suppressContentEditableWarning={true}
+      />
     )
   },
 )
