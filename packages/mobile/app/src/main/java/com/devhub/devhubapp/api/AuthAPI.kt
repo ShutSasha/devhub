@@ -5,6 +5,7 @@ import com.devhub.devhubapp.dataClasses.TokenResponse
 import com.devhub.devhubapp.dataClasses.UserRegistrationRequest
 import com.devhub.devhubapp.dataClasses.User
 import com.devhub.devhubapp.dataClasses.UserLoginRequest
+import com.devhub.devhubapp.dataClasses.VerifyEmailRequest
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.http.Body
@@ -17,6 +18,9 @@ interface AuthAPI {
 
     @POST("auth/register")
     fun register(@Body user: UserRegistrationRequest): Call<User>
+
+    @POST("auth/verify-email")
+    fun verifyEmail(@Body user: VerifyEmailRequest): Call<User>
 
     @POST("auth/login")
     fun login(@Body user: UserLoginRequest): Call<LoginResponse>
