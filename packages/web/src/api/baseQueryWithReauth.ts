@@ -13,9 +13,8 @@ const baseUrl = `${process.env.REACT_APP_API_URL}`
 const baseQuery = fetchBaseQuery({
   baseUrl,
   prepareHeaders: (headers, { getState }) => {
-    headers.set('Content-Type', 'application/json')
-
     const token = (getState() as RootState).userSlice.accessToken
+
     // If we have a token set in state, let's assume that we should be passing it.
     if (token) {
       headers.set('authorization', `Bearer ${token}`)
