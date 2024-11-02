@@ -9,16 +9,26 @@ import android.view.ViewGroup
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import com.devhub.devhubapp.R
+import com.devhub.devhubapp.databinding.FragmentConfirmEmailContainerBinding
+import com.devhub.devhubapp.databinding.FragmentLoginContainerBinding
 
 
 class ConfirmEmailContainerFragment : Fragment() {
+
+    private lateinit var binding: FragmentConfirmEmailContainerBinding
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-         val view = inflater.inflate(R.layout.fragment_confirm_email_container, container, false)
+        binding =  FragmentConfirmEmailContainerBinding.inflate(layoutInflater, container, false)
 
+        setUpFragment()
+
+        return binding.root
+    }
+
+    fun setUpFragment(){
         val fragmentManager : FragmentManager = childFragmentManager
         val fragmentTransaction : FragmentTransaction = fragmentManager.beginTransaction()
 
@@ -37,8 +47,6 @@ class ConfirmEmailContainerFragment : Fragment() {
         fragmentTransaction.add(R.id.primary_button_container, primaryButtonFragment)
 
         fragmentTransaction.commit()
-
-        return view
     }
 
 }
