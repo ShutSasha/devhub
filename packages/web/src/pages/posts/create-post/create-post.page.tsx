@@ -1,4 +1,6 @@
 import { ChangeEvent, useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { toast } from 'react-toastify'
 import { CreatePostLayout } from '@shared/layouts/posts/create-post.layout'
 import { StyledAvatar, StyledUserCredentialsContainer, Username } from '@shared/components/post/post.style'
 import { useAppSelector } from '@app/store/store'
@@ -7,13 +9,17 @@ import { FONTS } from '@shared/consts/fonts.enum'
 import { colors } from '@shared/consts/colors.const'
 import uploadSvg from '@assets/images/post/upload.svg'
 import { useCreatePostMutation } from '@api/post.api'
+import { ROUTES } from '@pages/router/routes.enum'
+import { handleServerException } from '@utils/handleServerException.util'
 
 import { InputContainer } from './components/editable-area.component'
 import * as S from './create-post.style'
 
 import { PostDto } from '~types/post/post.dto'
+import { ErrorException } from '~types/error/error.type'
 
 export const CreatePost = () => {
+  const navigate = useNavigate()
   const content = useRef<HTMLSpanElement>(null)
   const [createPost] = useCreatePostMutation()
   const user = useAppSelector(state => state.userSlice.user)
@@ -37,13 +43,13 @@ export const CreatePost = () => {
     setTitle(e.target.value)
   }
 
-  const createFormData = (data: PostDto): FormData => {
+  const createFormData = (postDto: PostDto): FormData => {
     const formData = new FormData()
-    formData.append('content', data.content)
-    formData.append('title', data.title)
-    formData.append('userId', data.userId)
-    formData.append('tags', JSON.stringify(data.tags))
-    formData.append('headerImage', data.headerImage)
+    formData.append('content', postDto.content)
+    formData.append('title', postDto.title)
+    formData.append('userId', postDto.userId)
+    formData.append('tags', JSON.stringify(postDto.tags))
+    formData.append('headerImage', postDto.headerImage)
 
     return formData
   }
@@ -60,10 +66,12 @@ export const CreatePost = () => {
 
       const formData = createFormData(postData)
 
-      const res = await createPost(formData).unwrap()
-      console.log(res)
+      await createPost(formData).unwrap()
+
+      navigate(ROUTES.HOME)
     } catch (e) {
       console.error(e)
+      toast.error(handleServerException(e as ErrorException)?.join(', '))
     }
   }
 
