@@ -12,7 +12,7 @@ export const Post: FC<PostProps> = ({ post }) => {
   return (
     <S.Container>
       {post.headerImage && (
-        <S.HeaderImage $image={'https://mydevhubimagebucket.s3.eu-west-3.amazonaws.com/' + post.headerImage} />
+        <S.HeaderImage src={'https://mydevhubimagebucket.s3.eu-west-3.amazonaws.com/' + post.headerImage} />
       )}
       <S.PostHeader>
         <S.StyledUserCredentialsContainer>
