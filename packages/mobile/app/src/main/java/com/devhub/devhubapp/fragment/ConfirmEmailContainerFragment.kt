@@ -149,6 +149,7 @@ class ConfirmEmailContainerFragment : Fragment() {
 
         val color = ContextCompat.getColor(requireContext(), R.color.success)
         title.setTextColour(color)
+        title.setTitleText("Success")
 
         binding.result.setTextColor(color)
         binding.result.text = "Your email was successfully confirmed!"
@@ -174,6 +175,7 @@ class ConfirmEmailContainerFragment : Fragment() {
 
         val color = ContextCompat.getColor(requireContext(), R.color.wrong)
         title.setTextColour(color)
+        title.setTitleText("Wrong")
 
         binding.result.setTextColor(color)
         binding.result.text = "Something went wrong, please try again"
