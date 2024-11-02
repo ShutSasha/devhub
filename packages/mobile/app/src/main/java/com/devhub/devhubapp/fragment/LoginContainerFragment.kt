@@ -211,7 +211,7 @@ class LoginContainerFragment : Fragment() {
                 val errorResponse = gson.fromJson(errorJson, ErrorResponse::class.java)
 
                 errorResponse.errors?.let { errors ->
-                    errors.loginError?.let { loginErrors ->
+                    errors.LoginError?.let { loginErrors ->
                         loginError.setErrorText(loginErrors.joinToString("\n"))
                         binding.loginErrorTextView.visibility = View.VISIBLE
                     }
