@@ -27,12 +27,10 @@ export const HeaderImage = styled.div<{ $image: string }>`
 
   background: ${({ $image }) => ($image ? `url(${$image})` : '')};
   background-repeat: no-repeat;
-
-  background-size: 100% 155%;
-  background-position: top;
+  background-size: 100% 800px;
+  background-position: center 00px;
   box-sizing: border-box;
   border-radius: 8px;
-
   margin-bottom: 18px;
 `
 
