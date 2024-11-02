@@ -10,8 +10,13 @@ android:layout_marginHorizontal="15dp">
         <FrameLayout
             android:id="@+id/title"
             android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:id="@+id/result"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="-6dp" />
+            android:layout_marginTop="19dp" />
 
         <FrameLayout
             android:id="@+id/codeInputContainer"
@@ -38,12 +43,7 @@ android:layout_marginHorizontal="15dp">
         <FrameLayout
             android:id="@+id/primary_button_container"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
-
-        <TextView
-            android:id="@+id/result"
-            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="19dp" />
+            android:layout_marginBottom="16dp"/>
 
 </LinearLayout>
