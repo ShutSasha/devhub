@@ -13,6 +13,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import com.devhub.devhubapp.dataClasses.ErrorResponse
 import com.devhub.devhubapp.R
+import com.devhub.devhubapp.activity.ConfirmEmailActivity
 import com.devhub.devhubapp.dataClasses.User
 import com.devhub.devhubapp.api.AuthAPI
 import com.devhub.devhubapp.dataClasses.UserRegistrationRequest
@@ -28,7 +29,6 @@ import okhttp3.ResponseBody
 
 class RegistrationContainerFragment : Fragment(){
 
-    private val baseURL = "http://10.0.2.2:5295/api/"
     private lateinit var authAPI: AuthAPI
 
     private lateinit var binding: FragmentRegistrationContainerBinding
@@ -37,6 +37,7 @@ class RegistrationContainerFragment : Fragment(){
     val emailError = ErrorFragment()
     val passwordError = ErrorFragment()
     val repeatPasswordError = ErrorFragment()
+    val registrationError = ErrorFragment()
 
     private var usernameInput: String = ""
     private var emailInput: String = ""
@@ -60,6 +61,7 @@ class RegistrationContainerFragment : Fragment(){
         binding.usernameErrorTextView.visibility = View.GONE
         binding.passwordErrorTextView.visibility = View.GONE
         binding.repeatPasswordErrorTextView.visibility = View.GONE
+        binding.registrationErrorTextView.visibility = View.GONE
 
         val fragmentManager : FragmentManager = childFragmentManager
         val fragmentTransaction : FragmentTransaction = fragmentManager.beginTransaction()
@@ -88,6 +90,7 @@ class RegistrationContainerFragment : Fragment(){
         fragmentTransaction.add(R.id.repeat_password_input_container, repeatPasswordInputFragment)
 
         fragmentTransaction.add(R.id.repeatPasswordErrorTextView, repeatPasswordError)
+        fragmentTransaction.add(R.id.registrationErrorTextView, registrationError)
 
         val primaryButtonFragment = PrimaryButtonFragment()
         primaryButtonFragment.setButtonText("Next")
@@ -145,10 +148,23 @@ class RegistrationContainerFragment : Fragment(){
         authAPI.register(user).enqueue(object : Callback<User> {
             override fun onResponse(call: Call<User>, response: Response<User>) {
                 if (response.isSuccessful) {
-                    Log.i("Registration", "Registration Successful")
-                    Log.d("Response", "Response received: ${response.code()}")
-                    val intent = Intent(requireContext(), WelcomeActivity::class.java)
-                    startActivity(intent)
+                    val registrationResponse = response.body()
+
+                    if(registrationResponse != null){
+                        val email = registrationResponse.email
+
+                        val bundle = Bundle()
+                        bundle.putString("email", email)
+                        val confirmEmailContainerFragment = ConfirmEmailContainerFragment()
+                        confirmEmailContainerFragment.arguments = bundle
+
+                        val intent = Intent(requireContext(), ConfirmEmailActivity::class.java)
+                        startActivity(intent)
+
+                        Log.i("Registration", "Registration Successful")
+                        Log.d("Response", "Response received: ${response.code()}")
+                    }
+
                 } else {
                     handleErrors(response.errorBody())
                     Log.e("Registration", "Registration Failed: ${response.message()}")
@@ -199,6 +215,10 @@ class RegistrationContainerFragment : Fragment(){
                     errors.RepeatPassword?.let { repeatPasswordErrors ->
                         repeatPasswordError.setErrorText(repeatPasswordErrors.joinToString("\n"))
                         binding.repeatPasswordErrorTextView.visibility = View.VISIBLE
+                    }
+                    errors.RegistrationError?.let { registrationErrors ->
+                        registrationError.setErrorText(registrationErrors.joinToString("\n"))
+                        binding.registrationErrorTextView.visibility = View.VISIBLE
                     }
                 }
             } catch (e: Exception) {
