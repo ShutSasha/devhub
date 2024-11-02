@@ -8,5 +8,8 @@ data class Errors(
     val Password: List<String>?,
     val RepeatPassword: List<String>?,
     @SerializedName("Login error")
-    val loginError: List<String>?
+    val LoginError: List<String>?,
+    @SerializedName("Registration error")
+    val RegistrationError: List<String>?,
+    val ActivationCode: List<String>?
 )
