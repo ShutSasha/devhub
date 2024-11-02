@@ -20,15 +20,13 @@ import com.devhub.devhubapp.classes.RetrofitClient
 import com.devhub.devhubapp.dataClasses.ErrorResponse
 import com.devhub.devhubapp.dataClasses.LoginResponse
 import com.devhub.devhubapp.dataClasses.User
-import com.devhub.devhubapp.dataClasses.UserLoginRequest
+import com.devhub.devhubapp.dataClasses.LoginRequest
 import com.devhub.devhubapp.databinding.FragmentLoginContainerBinding
 import com.google.gson.Gson
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.net.CookieManager
-import java.net.CookiePolicy
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -137,7 +135,7 @@ class LoginContainerFragment : Fragment() {
     }
 
     private fun Login() {
-        val user = UserLoginRequest(
+        val user = LoginRequest(
             username = usernameInput,
             password = passwordInput,
         )
