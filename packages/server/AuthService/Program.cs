@@ -1,9 +1,13 @@
+//using AuthService.Extensions;
+
 using AuthService.Extensions;
 using AuthService.Helpers.Jwt;
 using AuthService.Helpers.Security;
 using AuthService.Helpers.ThirdParty;
 using AuthService.Models;
 using AuthService.Services;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 
@@ -16,17 +20,21 @@ builder.Services.AddCors(options =>
     {
         policy.WithHeaders().AllowAnyHeader();
         policy.WithHeaders().AllowCredentials();
-        policy.WithOrigins("http://localhost:5295","http://localhost:3000","http://10.0.2.2:3000") 
+        policy.WithOrigins("http://localhost:5295", "http://localhost:3000", "http://10.0.2.2:3000")
             .AllowAnyMethod()
             .AllowAnyHeader();
     });
 });
 
-builder.Services.AddAuthentication().AddGoogle(googleOptions =>
+
+builder.Services.AddSession(options =>
 {
-    googleOptions.ClientId = configuration["Authentication:Google:ClientId"];
-    googleOptions.ClientSecret = configuration["Authentication:Google:ClientSecret"];
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
 });
+
+builder.Services.AddDistributedMemoryCache();
 
 builder.Services.Configure<GoogleAuthOptions>(configuration.GetSection("GoogleAuthOptions"));
 
@@ -76,6 +84,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 
+app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
 

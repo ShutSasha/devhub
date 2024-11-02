@@ -2,6 +2,7 @@ using AuthService.Contracts.Email;
 using AuthService.Contracts.User;
 using AuthService.Helpers.Response;
 using AuthService.Helpers.ThirdParty;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -194,5 +195,42 @@ public class AuthController : ControllerBase
       {
          return ErrorResponseHelper.CreateErrorResponse(400, "Google auth error", e.Message);
       }
+   }
+
+   [HttpGet("github-login")]
+   public async Task<IActionResult> GitHubLogin()
+   {
+      try
+      {
+         var redirectUrl = Url.Action(nameof(GitHubCallback), "Auth");
+         
+         var properties = new AuthenticationProperties { RedirectUri = redirectUrl };
+
+         return Challenge(authenticationSchemes: "github");
+      }
+      catch (Exception e)
+      {
+         // Обработка ошибок (можно логировать или вернуть сообщение пользователю)
+         return StatusCode(500, "An error occurred while attempting to log in.");
+      }
+   }
+   [HttpGet("signin-github")]
+   public async Task<IActionResult> GitHubCallback(string code)
+   {
+      var authenticateResult = await HttpContext.AuthenticateAsync("github");
+
+      if (!authenticateResult.Succeeded)
+      {
+         return BadRequest("Auth error");
+      }
+      
+      var claims = authenticateResult.Principal?.Identities.FirstOrDefault()?.Claims;
+      var userInfo = new
+      {
+         Name = claims?.FirstOrDefault(c => c.Type == "name")?.Value,
+         Email = claims?.FirstOrDefault(c => c.Type == "email")?.Value
+      };
+      
+      return Ok(new { Message = "Successful login", UserInfo = userInfo });
    }
 }
