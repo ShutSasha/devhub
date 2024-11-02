@@ -6,6 +6,7 @@ import (
 	"log/slog"
 	"net/http"
 
+	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/domain/interfaces"
 	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/storage"
 
 	resp "github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/lib/api/response"
@@ -13,17 +14,6 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/render"
 )
-
-// PostSearcher is an interface that defines the method for retrieving a posts by query.
-// Search takes a context, sorting method, search query, tags and returns the posts array or an error.
-type PostSearcher interface {
-	Search(
-		ctx context.Context,
-		sortBy string,
-		query string,
-		tags []string,
-	) ([]storage.PostModel, error)
-}
 
 // New is a handler function that processes the HTTP request to retrieve posts by query.
 // It extracts the query, tags and sort method from the URL, validates it, and calls the PostSearcher to get the post.
@@ -36,7 +26,7 @@ type PostSearcher interface {
 // @Failure 404 {object} map[string]interface{} "Posts not found"
 // @Failure 500 {object} map[string]interface{} "Internal server error"
 // @Router /api/posts/search [get]
-func New(log *slog.Logger, postSearcher PostSearcher) http.HandlerFunc {
+func New(log *slog.Logger, postSearcher interfaces.PostSearcher, fileProvider interfaces.FileProvider) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		const op = "handlers.post.search.New"
 
@@ -54,6 +44,7 @@ func New(log *slog.Logger, postSearcher PostSearcher) http.HandlerFunc {
 			sortBy,
 			query,
 			tags,
+			fileProvider,
 		)
 		if errors.Is(err, storage.ErrPostsNotFound) {
 			log.Error(storage.ErrPostsNotFound.Error())
