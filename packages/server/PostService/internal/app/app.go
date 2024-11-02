@@ -18,7 +18,7 @@ type App struct {
 }
 
 func New(
-	userSevicePort int,
+	userServicePort int,
 	storagePath string,
 	log *slog.Logger,
 	awsRegion string,
@@ -29,7 +29,7 @@ func New(
 	timeout time.Duration,
 ) *App {
 	conn, err := grpc.NewClient(
-		fmt.Sprintf("localhost:%d", userSevicePort),
+		fmt.Sprintf("localhost:%d", userServicePort),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	)
 	if err != nil {
