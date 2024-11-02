@@ -19,7 +19,9 @@ export const Container = styled.div`
   align-items: center;
 `
 
-export const Logo = styled.img``
+export const Logo = styled.img`
+  cursor: pointer;
+`
 
 export const NavList = styled.nav`
   display: flex;
