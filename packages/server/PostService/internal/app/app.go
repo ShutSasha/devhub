@@ -8,6 +8,7 @@ import (
 	pb "github.com/ShutSasha/devhub/tree/main/packages/server/PostService/gen/go/user"
 	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/app/httpapp"
 	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/storage/mongodb"
+	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/storage/s3"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -17,26 +18,40 @@ type App struct {
 }
 
 func New(
-	log *slog.Logger,
-	storagePath string,
-	httpPort int,
 	userSevicePort int,
+	storagePath string,
+	log *slog.Logger,
+	awsRegion string,
+	accessKey string,
+	secretKey string,
+	bucket string,
+	httpPort int,
 	timeout time.Duration,
 ) *App {
-	conn, err := grpc.NewClient(fmt.Sprintf("localhost:%d", userSevicePort), grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient(
+		fmt.Sprintf("localhost:%d", userSevicePort),
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	)
 	if err != nil {
 		panic("failed to connect to gRPC server")
 	}
-	grpcUserClient := pb.NewUserServiceClient(conn)
 
-	storage, err := mongodb.New(storagePath)
+	dbStorage, err := mongodb.New(storagePath)
 	if err != nil {
 		panic(err)
 	}
 
+	fileStorage, err := s3.New(awsRegion, accessKey, secretKey, bucket)
+	if err != nil {
+		panic(err)
+	}
+
+	grpcUserClient := pb.NewUserServiceClient(conn)
+
 	httpApp := httpapp.New(
 		log,
-		storage,
+		dbStorage,
+		fileStorage,
 		grpcUserClient,
 		httpPort,
 		timeout,
