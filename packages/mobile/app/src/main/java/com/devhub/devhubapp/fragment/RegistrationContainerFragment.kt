@@ -16,10 +16,11 @@ import com.devhub.devhubapp.R
 import com.devhub.devhubapp.activity.ConfirmEmailActivity
 import com.devhub.devhubapp.dataClasses.User
 import com.devhub.devhubapp.api.AuthAPI
-import com.devhub.devhubapp.dataClasses.UserRegistrationRequest
+import com.devhub.devhubapp.dataClasses.RegistrationRequest
 import com.devhub.devhubapp.activity.LogInActivity
-import com.devhub.devhubapp.activity.WelcomeActivity
+import com.devhub.devhubapp.classes.EncryptedPreferencesManager
 import com.devhub.devhubapp.classes.RetrofitClient
+import com.devhub.devhubapp.dataClasses.RegistrationResponse
 import com.devhub.devhubapp.databinding.FragmentRegistrationContainerBinding
 import com.google.gson.Gson
 import retrofit2.Call
@@ -28,7 +29,7 @@ import retrofit2.Response
 import okhttp3.ResponseBody
 
 class RegistrationContainerFragment : Fragment(){
-
+    private lateinit var encryptedPreferencesManager: EncryptedPreferencesManager
     private lateinit var authAPI: AuthAPI
 
     private lateinit var binding: FragmentRegistrationContainerBinding
@@ -48,6 +49,7 @@ class RegistrationContainerFragment : Fragment(){
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        encryptedPreferencesManager = EncryptedPreferencesManager(requireContext())
         authAPI = RetrofitClient.getInstance(requireContext()).getRetrofit().create(AuthAPI::class.java)
         binding = FragmentRegistrationContainerBinding.inflate(layoutInflater, container, false)
 
@@ -138,26 +140,20 @@ class RegistrationContainerFragment : Fragment(){
     }
 
     private fun Register() {
-        val user = UserRegistrationRequest(
+        val user = RegistrationRequest(
             username = usernameInput,
-            email = emailInput,
             password = passwordInput,
-            repeatPassword = repeatPasswordInput
+            repeatPassword = repeatPasswordInput,
+            email = emailInput
         )
 
-        authAPI.register(user).enqueue(object : Callback<User> {
-            override fun onResponse(call: Call<User>, response: Response<User>) {
+        authAPI.register(user).enqueue(object : Callback<RegistrationResponse> {
+            override fun onResponse(call: Call<RegistrationResponse>, response: Response<RegistrationResponse>) {
                 if (response.isSuccessful) {
                     val registrationResponse = response.body()
 
                     if(registrationResponse != null){
-                        val email = registrationResponse.email
-
-                        val bundle = Bundle()
-                        bundle.putString("email", email)
-                        val confirmEmailContainerFragment = ConfirmEmailContainerFragment()
-                        confirmEmailContainerFragment.arguments = bundle
-
+                        encryptedPreferencesManager.saveData("email", registrationResponse.email)
                         val intent = Intent(requireContext(), ConfirmEmailActivity::class.java)
                         startActivity(intent)
 
@@ -171,7 +167,7 @@ class RegistrationContainerFragment : Fragment(){
                 }
             }
 
-            override fun onFailure(call: Call<User>, t: Throwable) {
+            override fun onFailure(call: Call<RegistrationResponse>, t: Throwable) {
                 Toast.makeText(requireContext(), "Request Failed: ${t.message}", Toast.LENGTH_SHORT).show()
                 Log.e("Registration", "Failed: ${t.message}")
             }
