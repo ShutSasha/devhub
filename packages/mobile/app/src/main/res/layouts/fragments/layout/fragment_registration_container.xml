@@ -65,6 +65,14 @@
         android:textColor="@color/wrong" />
 
     <FrameLayout
+        android:id="@+id/registrationErrorTextView"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:textSize="14sp"
+        android:fontFamily="@font/montserrat_semibold_font"
+        android:textColor="@color/wrong" />
+
+    <FrameLayout
         android:id="@+id/primary_button_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
