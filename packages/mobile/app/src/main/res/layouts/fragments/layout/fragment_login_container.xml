@@ -18,7 +18,7 @@
         android:layout_marginBottom="31dp"/>
 
     <FrameLayout
-        android:id="@+id/username_and_email_input_container"
+        android:id="@+id/email_input_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 

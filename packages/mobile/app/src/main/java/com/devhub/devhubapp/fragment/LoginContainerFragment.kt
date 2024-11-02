@@ -78,8 +78,8 @@ class LoginContainerFragment : Fragment() {
         title.setTitleText("Log In")
         fragmentTransaction.add(R.id.title_container, title)
 
-        val usernameOrEmailInputFragment = createInputFragment("username", InputType.TYPE_CLASS_TEXT, "Enter your email or username")
-        fragmentTransaction.add(R.id.username_and_email_input_container, usernameOrEmailInputFragment)
+        val usernameOrEmailInputFragment = createInputFragment("email", InputType.TYPE_CLASS_TEXT, "Enter your email")
+        fragmentTransaction.add(R.id.email_input_container, usernameOrEmailInputFragment)
 
         fragmentTransaction.add(R.id.usernameErrorTextView, usernameError)
 
