@@ -107,7 +107,7 @@ func New(
 			return
 		}
 
-		log.Info("post successfully added", slog.Any("id", id))
+		log.Info("post successfully added")
 		render.JSON(w, r, map[string]interface{}{"_id": id})
 	}
 }
