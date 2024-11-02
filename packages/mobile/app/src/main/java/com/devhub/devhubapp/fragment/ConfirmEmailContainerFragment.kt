@@ -16,6 +16,7 @@ import com.devhub.devhubapp.databinding.FragmentLoginContainerBinding
 class ConfirmEmailContainerFragment : Fragment() {
 
     private lateinit var binding: FragmentConfirmEmailContainerBinding
+    private var codeInput: String = ""
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -28,7 +29,7 @@ class ConfirmEmailContainerFragment : Fragment() {
         return binding.root
     }
 
-    fun setUpFragment(){
+    private fun setUpFragment(){
         val fragmentManager : FragmentManager = childFragmentManager
         val fragmentTransaction : FragmentTransaction = fragmentManager.beginTransaction()
 
@@ -37,9 +38,15 @@ class ConfirmEmailContainerFragment : Fragment() {
         title.setTitleText("Confirming email")
         fragmentTransaction.add(R.id.title, title)
 
-        val codeInputFragment = InputFragment()
-        codeInputFragment.setInputType(InputType.TYPE_CLASS_NUMBER)
-        codeInputFragment.setInputHint("Enter 6-digit code from email")
+        val codeInputFragment = InputFragment().apply {
+            setInputType(InputType.TYPE_CLASS_NUMBER)
+            setInputHint("Enter 6-digit code from email")
+            setTextWatcher(object : InputTextListener {
+                override fun onTextInputChanged(text: String) {
+                    codeInput = text
+                }
+            })
+        }
         fragmentTransaction.add(R.id.code_input_container, codeInputFragment)
 
         val primaryButtonFragment = PrimaryButtonFragment()
