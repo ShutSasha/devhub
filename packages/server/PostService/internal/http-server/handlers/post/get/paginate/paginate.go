@@ -6,9 +6,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/http-server/handlers/post/get"
-	resp "github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/lib/api/response"
-	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/lib/logger/sl"
+	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/domain/interfaces"
+	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/http-server/utils"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/render"
 )
@@ -23,7 +22,7 @@ import (
 // @Success      200    {array}  storage.PostModel  "List of paginated posts"
 // @Failure      500    {object}  error        "Internal Server Error"
 // @Router       /api/posts [get]
-func New(log *slog.Logger, postProvider get.PostProvider) http.HandlerFunc {
+func New(log *slog.Logger, postProvider interfaces.PostProvider, fileProvider interfaces.FileProvider) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		const op = "handlers.post.get.paginate.New"
 
@@ -44,12 +43,9 @@ func New(log *slog.Logger, postProvider get.PostProvider) http.HandlerFunc {
 			page = 1
 		}
 
-		posts, err := postProvider.GetPaginated(context.TODO(), limit, page)
+		posts, err := postProvider.GetPaginated(context.TODO(), limit, page, fileProvider)
 		if err != nil {
-			log.Error("failed to get paginated posts", sl.Err(err))
-			render.JSON(w, r, resp.Error(map[string][]string{
-				"posts": {err.Error()},
-			}, http.StatusInternalServerError))
+			utils.HandleError(log, w, r, "failed to get paginated posts", err, http.StatusInternalServerError, "posts", err.Error())
 			return
 		}
 

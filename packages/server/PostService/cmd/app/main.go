@@ -25,7 +25,17 @@ func main() {
 
 	log := setupLogger(cfg.Env)
 
-	application := app.New(log, cfg.StoragePath, cfg.Http.Port, cfg.Grpc.UserServicePort, cfg.Http.Timeout)
+	application := app.New(
+		cfg.Grpc.UserServicePort,
+		cfg.StoragePath,
+		log,
+		cfg.Aws.Region,
+		cfg.Aws.AccessKey,
+		cfg.Aws.SecretKey,
+		cfg.Aws.Bucket,
+		cfg.Http.Port,
+		cfg.Http.Timeout,
+	)
 	done := make(chan os.Signal, 1)
 	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 

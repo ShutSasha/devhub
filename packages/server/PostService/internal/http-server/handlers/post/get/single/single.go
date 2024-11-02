@@ -6,11 +6,10 @@ import (
 	"log/slog"
 	"net/http"
 
-	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/http-server/handlers/post/get"
+	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/domain/interfaces"
+	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/http-server/utils"
 	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/storage"
 
-	resp "github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/lib/api/response"
-	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/lib/logger/sl"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/render"
@@ -30,7 +29,7 @@ import (
 // @Failure 404 {object} map[string]interface{} "Post not found"
 // @Failure 500 {object} map[string]interface{} "Internal server error"
 // @Router /api/posts/{id} [get]
-func New(log *slog.Logger, postProvider get.PostProvider) http.HandlerFunc {
+func New(log *slog.Logger, postProvider interfaces.PostProvider, fileProvider interfaces.FileProvider) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		const op = "handlers.post.get.single.New"
 
@@ -43,34 +42,17 @@ func New(log *slog.Logger, postProvider get.PostProvider) http.HandlerFunc {
 
 		postId, err := primitive.ObjectIDFromHex(id)
 		if err != nil {
-			log.Error("failed to create objectId from postId", sl.Err(err))
-
-			render.JSON(w, r, resp.Error(
-				map[string][]string{"postId": {"Invalid postId format"}},
-				http.StatusBadRequest,
-			))
-
+			utils.HandleError(log, w, r, "failed to create objectId from postId", err, http.StatusBadRequest, "postId", "Invalid postId format")
 			return
 		}
 
-		post, err := postProvider.GetById(
-			context.TODO(),
-			postId,
-		)
+		post, err := postProvider.GetById(context.TODO(), postId, fileProvider)
 		if errors.Is(err, storage.ErrPostNotFound) {
-			log.Error(storage.ErrPostNotFound.Error(), slog.Any("post", postId))
-
-			render.JSON(w, r, resp.Error(map[string][]string{
-				"post": {storage.ErrPostNotFound.Error()},
-			}, http.StatusNotFound))
+			utils.HandleError(log, w, r, storage.ErrPostNotFound.Error(), nil, http.StatusNotFound, "post", storage.ErrPostNotFound.Error())
 			return
 		}
 		if err != nil {
-			log.Error("can not get post", sl.Err(err))
-
-			render.JSON(w, r, resp.Error(map[string][]string{
-				"post": {err.Error()},
-			}, http.StatusInternalServerError))
+			utils.HandleError(log, w, r, "can not get post", err, http.StatusInternalServerError, "post", err.Error())
 			return
 		}
 
