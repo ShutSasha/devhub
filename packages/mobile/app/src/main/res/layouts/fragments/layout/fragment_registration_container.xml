@@ -10,7 +10,8 @@
     <FrameLayout
         android:id="@+id/title"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="31dp"/>
 
     <FrameLayout
         android:id="@+id/username_input_container"
@@ -58,6 +59,14 @@
 
     <FrameLayout
         android:id="@+id/repeatPasswordErrorTextView"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:textSize="14sp"
+        android:fontFamily="@font/montserrat_semibold_font"
+        android:textColor="@color/wrong" />
+
+    <FrameLayout
+        android:id="@+id/registrationErrorTextView"
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
         android:textSize="14sp"

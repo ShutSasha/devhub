@@ -1,8 +1,6 @@
 package com.devhub.devhubapp.dataClasses
 
-data class UserRegistrationRequest(
+data class LoginRequest(
     val username: String,
-    val email: String,
     val password: String,
-    val repeatPassword: String
 )

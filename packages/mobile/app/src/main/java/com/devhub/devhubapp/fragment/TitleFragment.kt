@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.TextView
 import com.devhub.devhubapp.R
+import com.devhub.devhubapp.databinding.FragmentTitleBinding
 
 
 class TitleFragment : Fragment() {
@@ -15,24 +16,24 @@ class TitleFragment : Fragment() {
     private var showBackArrow: Boolean = false
     private var titleText: String? = null
 
+    private lateinit var binding: FragmentTitleBinding
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_title, container, false)
+
+        binding = FragmentTitleBinding.inflate(layoutInflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val backArrow: ImageButton = view.findViewById(R.id.back_arrow)
+        binding.backArrow.visibility = if (showBackArrow) View.VISIBLE else View.GONE
+        binding.title.text = titleText
 
-        backArrow.visibility = if (showBackArrow) View.VISIBLE else View.GONE
-
-        val title: TextView = view.findViewById(R.id.title)
-        title.text = titleText
-
-        backArrow.setOnClickListener {
+        binding.backArrow.setOnClickListener {
             requireActivity().onBackPressedDispatcher.onBackPressed()
         }
     }
@@ -43,6 +44,10 @@ class TitleFragment : Fragment() {
 
     fun setTitleText(text: String) {
         titleText = text
+    }
+
+    fun setTextColour(color: Int) {
+        binding.title.setTextColor(color)
     }
     
 }
