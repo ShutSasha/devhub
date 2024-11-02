@@ -10,13 +10,19 @@ android:layout_marginHorizontal="15dp">
         <FrameLayout
             android:id="@+id/title"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="31dp"/>
 
         <TextView
             android:id="@+id/result"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="19dp" />
+            android:layout_marginTop="15dp"
+            android:layout_marginBottom="20dp"
+            android:layout_marginStart="10dp"
+            android:fontFamily="@font/montserrat_semibold_font"
+            android:textSize="14sp"
+            android:alpha="0.6"/>
 
         <FrameLayout
             android:id="@+id/codeInputContainer"
