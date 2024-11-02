@@ -102,6 +102,11 @@ public class AuthService
          throw new Exception("User wasn't found");
       }
 
+      if (!candidate.IsActivated)
+      {
+         throw new Exception("User account isn't activated");
+      }
+      
       var passwordVerifyResult = _passwordHasher.VerifyPassword(password, candidate.Password);
 
       if (!passwordVerifyResult)
