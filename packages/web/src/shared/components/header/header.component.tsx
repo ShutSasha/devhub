@@ -73,6 +73,7 @@ const AuthDisplay = () => {
 export const Header = () => {
   const loadingFromState = useAppSelector(state => state.userSlice.loading)
 
+  const navigate = useNavigate()
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
@@ -83,10 +84,14 @@ export const Header = () => {
     return () => clearTimeout(timer)
   }, [loadingFromState])
 
+  const handleLogoClick = () => {
+    navigate(ROUTES.HOME)
+  }
+
   return (
     <Wrapper>
       <Container>
-        <Logo src={logo} />
+        <Logo src={logo} onClick={handleLogoClick} />
         <NavList>
           {navElements.map(el => (
             <NavItem key={el.title} icon={el.icon} navTitle={el.title} />
