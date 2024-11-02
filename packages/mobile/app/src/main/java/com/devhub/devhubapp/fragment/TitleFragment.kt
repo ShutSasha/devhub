@@ -5,16 +5,15 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageButton
-import android.widget.TextView
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import com.devhub.devhubapp.R
 import com.devhub.devhubapp.databinding.FragmentTitleBinding
-
 
 class TitleFragment : Fragment() {
 
     private var showBackArrow: Boolean = false
-    private var titleText: String? = null
+    private val titleText = MutableLiveData<String>()
 
     private lateinit var binding: FragmentTitleBinding
 
@@ -22,7 +21,6 @@ class TitleFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
         binding = FragmentTitleBinding.inflate(layoutInflater, container, false)
         return binding.root
     }
@@ -31,7 +29,10 @@ class TitleFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.backArrow.visibility = if (showBackArrow) View.VISIBLE else View.GONE
-        binding.title.text = titleText
+
+        titleText.observe(viewLifecycleOwner, Observer { newText ->
+            binding.title.text = newText
+        })
 
         binding.backArrow.setOnClickListener {
             requireActivity().onBackPressedDispatcher.onBackPressed()
@@ -43,11 +44,10 @@ class TitleFragment : Fragment() {
     }
 
     fun setTitleText(text: String) {
-        titleText = text
+        titleText.value = text
     }
 
     fun setTextColour(color: Int) {
         binding.title.setTextColor(color)
     }
-    
 }
