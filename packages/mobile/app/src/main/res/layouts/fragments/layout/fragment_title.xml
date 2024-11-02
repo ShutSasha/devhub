@@ -6,7 +6,7 @@
     android:layout_marginBottom="31dp">
 
     <ImageButton
-        android:id="@+id/back_arrow"
+        android:id="@+id/backArrow"
         android:contentDescription="@string/back_arrow"
         android:src="@drawable/ic_back_arrow"
         android:background="@android:color/transparent"
