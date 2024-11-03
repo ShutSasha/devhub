@@ -5,6 +5,7 @@ namespace AuthService.Dtos;
 
 public class UserDto
 {
+   [JsonProperty("_id")]
    public string Id { get; set; }
    public string Name { get; set; }
    [JsonProperty("username")]

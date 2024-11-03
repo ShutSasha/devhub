@@ -1,8 +1,13 @@
+//using AuthService.Extensions;
+
 using AuthService.Extensions;
 using AuthService.Helpers.Jwt;
 using AuthService.Helpers.Security;
+using AuthService.Helpers.ThirdParty;
 using AuthService.Models;
 using AuthService.Services;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 
@@ -11,15 +16,15 @@ var configuration = builder.Configuration;
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAPIGateway", policy =>
-    {
-        policy.WithHeaders().AllowAnyHeader();
-        policy.WithHeaders().AllowCredentials();
-        policy.WithOrigins("http://localhost:5295","http://localhost:3000","http://10.0.2.2:3000") 
-            .AllowAnyMethod()
-            .AllowAnyHeader();
-    });
-});
+    //TODO: Change Cors policies
+    options.AddPolicy("AllowAll",  
+        builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());  
+}); 
+
+
+builder.Services.AddDistributedMemoryCache();
+
+builder.Services.Configure<GoogleAuthOptions>(configuration.GetSection("GoogleAuthOptions"));
 
 builder.Services.Configure<JwtOptions>(configuration.GetSection(nameof(JwtOptions)));
 builder.Services.AddApiAuthentication(builder.Configuration);
@@ -28,8 +33,8 @@ builder.Services.AddAuthorization();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
 builder.Services.AddHttpClient();
+
 builder.Services.Configure<MongoDbSettings>(configuration.GetSection("MongoDbSettings"));
 builder.Services.Configure<SenderDataSettings>(configuration.GetSection("SenderData"));
 builder.Services.AddSingleton<IMongoClient>(sp =>
@@ -37,6 +42,7 @@ builder.Services.AddSingleton<IMongoClient>(sp =>
     var settings = sp.GetRequiredService<IOptions<MongoDbSettings>>().Value;
     return new MongoClient(settings.ConnectionUri);
 });
+
 builder.Services.AddSingleton<IMongoDatabase>(sp =>
 {
     var mongoClient = sp.GetRequiredService<IMongoClient>();
@@ -53,7 +59,7 @@ builder.Services.AddScoped<AuthService.Services.AuthService>();
 
 var app = builder.Build();
 
-app.UseCors("AllowAPIGateway");
+app.UseCors("AllowAll");
 
 if (app.Environment.IsDevelopment())
 {
@@ -62,6 +68,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseStaticFiles();
+app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();

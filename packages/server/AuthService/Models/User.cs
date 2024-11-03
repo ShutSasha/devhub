@@ -10,8 +10,8 @@ public class User
 {
    [BsonId]
    [BsonRepresentation(BsonType.ObjectId)]
-   [BsonElement("id")] 
-   [JsonPropertyName("id")]
+   [BsonElement("_id")] 
+   [JsonPropertyName("_id")]
    public string Id { get; set; }
    
    [BsonElement("name")] 
