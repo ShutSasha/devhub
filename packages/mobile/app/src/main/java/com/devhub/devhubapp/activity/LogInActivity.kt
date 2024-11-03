@@ -174,8 +174,10 @@ class LogInActivity : AppCompatActivity() {
                         encryptedPreferencesManager.saveUserData(user)
                         encryptedPreferencesManager.saveTokens(accessToken, refreshToken)
 
-                        val intent = Intent(this@LogInActivity, WelcomeActivity::class.java)
+                        val intent = Intent(this@LogInActivity, MainActivity::class.java)
+                        intent.putExtra("USER_AVATAR", user.avatar)
                         startActivity(intent)
+                        finish()
 
                         Log.i("Login", "Login Successful")
                         Log.d("Response", "Response received: ${response.code()}")
