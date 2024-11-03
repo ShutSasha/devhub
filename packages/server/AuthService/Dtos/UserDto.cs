@@ -1,8 +1,11 @@
 using AuthService.Models.Enums;
+using Newtonsoft.Json;
+
 namespace AuthService.Dtos;
 
 public class UserDto
 {
+   [JsonProperty("_id")]
    public string Id { get; set; }
    public string Name { get; set; }
    public string UserName { get; set; }
