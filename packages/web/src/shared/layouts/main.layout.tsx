@@ -4,7 +4,7 @@ import { Header } from '@shared/components/header/header.component'
 import { colors } from '@shared/consts/colors.const'
 import { Footer } from '@shared/components/footer/footer.component'
 
-const Wrapper = styled.div`
+export const Wrapper = styled.div`
   min-height: 100vh;
   display: flex;
   flex-direction: column;

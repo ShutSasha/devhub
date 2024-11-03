@@ -1,7 +1,8 @@
-import { colors } from '@shared/consts/colors.const'
-import { FONTS } from '@shared/consts/fonts.enum'
 import { Link } from 'react-router-dom'
 import styled from 'styled-components'
+import { colors } from '@shared/consts/colors.const'
+import { FONTS } from '@shared/consts/fonts.enum'
+import logoutIcon from '@assets/images/header/logout.svg'
 
 export const Wrapper = styled.div`
   background-color: ${colors.background};
@@ -18,7 +19,9 @@ export const Container = styled.div`
   align-items: center;
 `
 
-export const Logo = styled.img``
+export const Logo = styled.img`
+  cursor: pointer;
+`
 
 export const NavList = styled.nav`
   display: flex;
@@ -116,4 +119,15 @@ export const UserAvatar = styled.img`
 
   cursor: pointer;
   object-fit: cover;
+`
+
+export const Logout = styled.button`
+  background: transparent;
+  background-image: url(${logoutIcon});
+  border: none;
+  height: 34px;
+  width: 44px;
+
+  object-fit: cover;
+  cursor: pointer;
 `

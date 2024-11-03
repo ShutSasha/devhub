@@ -11,11 +11,13 @@ interface PostProps {
 export const Post: FC<PostProps> = ({ post }) => {
   return (
     <S.Container>
-      {post.headerImage && <S.HeaderImage src={post.headerImage} />}
+      {post.headerImage && (
+        <S.HeaderImage src={'https://mydevhubimagebucket.s3.eu-west-3.amazonaws.com/' + post.headerImage} />
+      )}
       <S.PostHeader>
         <S.StyledUserCredentialsContainer>
           <S.StyledAvatar src={post.user.avatar} />
-          <S.Username>{post.user.userName}</S.Username>
+          <S.Username>{post.user.username}</S.Username>
         </S.StyledUserCredentialsContainer>
         <S.StyledStar $isSaved={false} />
       </S.PostHeader>

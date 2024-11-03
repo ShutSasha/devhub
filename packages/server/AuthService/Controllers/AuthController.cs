@@ -82,7 +82,12 @@ public class AuthController : ControllerBase
    {
       try
       {
-         var refreshToken = HttpContext.Request.Cookies["refreshToken"];
+         var refreshToken = HttpContext.Request.Headers["X-Refresh-Token"].FirstOrDefault();
+        
+         if (string.IsNullOrEmpty(refreshToken))
+         {
+            refreshToken = HttpContext.Request.Cookies["refreshToken"];
+         }
 
          var refreshResult = await _authService.RefreshTokens(refreshToken);
 
@@ -94,7 +99,7 @@ public class AuthController : ControllerBase
             Expires = DateTime.UtcNow.AddDays(30)
          });
 
-         return Ok(new { Message = "Tokens updated", AccesssToken = refreshResult.AccessToken, RefreshToken = refreshResult.RefreshToken,  User = refreshResult.UserData });
+         return Ok(new { Message = "Tokens updated", AccessToken = refreshResult.AccessToken, RefreshToken = refreshResult.RefreshToken,  User = refreshResult.UserData });
       }
       catch (Exception e)
       {

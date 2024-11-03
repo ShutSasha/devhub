@@ -23,12 +23,14 @@ export const Container = styled.div`
 `
 
 export const HeaderImage = styled.img`
-  height: 250px;
+  max-height: 600px;
+  height: 100%;
   width: 100%;
 
   object-fit: cover;
+  object-position: 50% 0%;
+  box-sizing: border-box;
   border-radius: 8px;
-
   margin-bottom: 18px;
 `
 

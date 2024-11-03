@@ -9,7 +9,6 @@ import android.widget.Button
 import android.widget.TextView
 import com.devhub.devhubapp.R
 import com.devhub.devhubapp.databinding.FragmentErrorBinding
-import com.devhub.devhubapp.databinding.FragmentRegistrationContainerBinding
 import org.w3c.dom.Text
 
 class ErrorFragment : Fragment() {

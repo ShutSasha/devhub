@@ -69,7 +69,41 @@ namespace AuthService.Extensions
                         status = 401,
                         errors = new Dictionary<string, List<string>>
                         {
-                           { "Authorization error", new List<string> { "User is unauthorized" } }
+                            var authorizationHeader = context.Request.Headers["Authorization"].ToString();
+                            if (!string.IsNullOrEmpty(authorizationHeader) && 
+                                authorizationHeader.StartsWith("Bearer "))
+                            {
+                                context.Token = authorizationHeader.Substring("Bearer ".Length).Trim();
+                            }
+                            else
+                            {
+                                context.Token = context.Request.Cookies["refreshToken"];
+
+                                if (string.IsNullOrEmpty(context.Token))
+                                {
+                                    context.Token = context.Request.Headers["X-Refresh-Token"];
+                                }
+                            }
+
+                            return Task.CompletedTask;
+                        },
+                        
+                        OnChallenge = context =>
+                        {
+                            context.HandleResponse();
+
+                            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                            context.Response.ContentType = "application/json";
+                            var response = new
+                            {
+                                status = 401,
+                                errors = new Dictionary<string, List<string>>
+                                {
+                                    { "Authorization error", new List<string> { "User is unauthorized" } }
+                                }
+                            };
+
+                            return context.Response.WriteAsync(JsonConvert.SerializeObject(response));
                         }
                      };
 

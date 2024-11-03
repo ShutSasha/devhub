@@ -52,7 +52,7 @@
             "post": {
                 "description": "This endpoint allows a user to save a new post with a title, content, and optional tags.",
                 "consumes": [
-                    "application/json"
+                    "multipart/form-data"
                 ],
                 "produces": [
                     "application/json"
@@ -63,13 +63,37 @@
                 "summary": "Save a new post",
                 "parameters": [
                     {
-                        "description": "Post save request body",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/save.Request"
-                        }
+                        "type": "string",
+                        "description": "User ID of the user creating the post",
+                        "name": "userId",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Title of the post",
+                        "name": "title",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Content of the post",
+                        "name": "content",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "Header image for the post",
+                        "name": "headerImage",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "array",
+                        "description": "Optional tags associated with the post",
+                        "name": "tags",
+                        "in": "formData"
                     }
                 ],
                 "responses": {
@@ -280,10 +304,10 @@
         "models.Comment": {
             "type": "object",
             "properties": {
-                "comment_text": {
+                "commentText": {
                     "type": "string"
                 },
-                "created_at": {
+                "createdAt": {
                     "type": "string"
                 },
                 "likes": {
@@ -306,13 +330,13 @@
                 "content": {
                     "type": "string"
                 },
-                "created_at": {
+                "createdAt": {
                     "type": "string"
                 },
                 "dislikes": {
                     "type": "integer"
                 },
-                "header_image": {
+                "headerImage": {
                     "type": "string"
                 },
                 "likes": {
@@ -332,47 +356,16 @@
                 }
             }
         },
-        "save.Request": {
-            "type": "object",
-            "required": [
-                "content",
-                "title",
-                "user"
-            ],
-            "properties": {
-                "content": {
-                    "type": "string",
-                    "maxLength": 62792
-                },
-                "header_image": {
-                    "type": "string"
-                },
-                "tags": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "title": {
-                    "type": "string",
-                    "maxLength": 128,
-                    "minLength": 1
-                },
-                "user": {
-                    "type": "string"
-                }
-            }
-        },
         "storage.CommentModel": {
             "type": "object",
             "properties": {
                 "_id": {
                     "type": "string"
                 },
-                "comment_text": {
+                "commentText": {
                     "type": "string"
                 },
-                "created_at": {
+                "createdAt": {
                     "type": "string"
                 },
                 "likes": {
@@ -398,13 +391,13 @@
                 "content": {
                     "type": "string"
                 },
-                "created_at": {
+                "createdAt": {
                     "type": "string"
                 },
                 "dislikes": {
                     "type": "integer"
                 },
-                "header_image": {
+                "headerImage": {
                     "type": "string"
                 },
                 "likes": {
@@ -420,6 +413,26 @@
                     "type": "string"
                 },
                 "user": {
+                    "$ref": "#/definitions/storage.UserModel"
+                }
+            }
+        },
+        "storage.UserModel": {
+            "type": "object",
+            "properties": {
+                "_id": {
+                    "type": "string"
+                },
+                "avatar": {
+                    "type": "string"
+                },
+                "devPoints": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "username": {
                     "type": "string"
                 }
             }
@@ -432,7 +445,7 @@
                     "maxLength": 62792,
                     "minLength": 1
                 },
-                "header_image": {
+                "headerImage": {
                     "type": "string"
                 },
                 "tags": {
