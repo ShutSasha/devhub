@@ -36,7 +36,7 @@ class InputFragment : Fragment() {
         binding.editText.inputType = inputType
         binding.editText.hint = hintText
 
-        if(inputType == InputType.TYPE_TEXT_VARIATION_PASSWORD){
+        if(binding.editText.inputType == InputType.TYPE_TEXT_VARIATION_PASSWORD){
             binding.editText.transformationMethod = PasswordTransformationMethod.getInstance()
         }
 
@@ -59,6 +59,13 @@ class InputFragment : Fragment() {
         hintText = text
     }
 
+    fun clearInputText() {
+        binding.editText.text.clear()
+    }
+
+    fun setInputHintByBinding(text: String) {
+        binding.editText.hint = text
+    }
 }
 
 interface InputTextListener {
