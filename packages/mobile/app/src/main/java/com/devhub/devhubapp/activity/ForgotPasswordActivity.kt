@@ -12,26 +12,22 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.marginBottom
-import androidx.core.view.marginTop
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import com.devhub.devhubapp.R
 import com.devhub.devhubapp.api.AuthAPI
 import com.devhub.devhubapp.classes.EncryptedPreferencesManager
+import com.devhub.devhubapp.classes.ErrorHandler
 import com.devhub.devhubapp.classes.RetrofitClient
 import com.devhub.devhubapp.dataClasses.ChangePasswordRequest
-import com.devhub.devhubapp.dataClasses.ErrorResponse
 import com.devhub.devhubapp.dataClasses.PasswordVerificationRequest
 import com.devhub.devhubapp.dataClasses.VerifyEmailRequest
 import com.devhub.devhubapp.databinding.ActivityForgotPasswordBinding
-import com.devhub.devhubapp.databinding.FragmentLoginContainerBinding
 import com.devhub.devhubapp.fragment.ErrorFragment
 import com.devhub.devhubapp.fragment.InputFragment
 import com.devhub.devhubapp.fragment.InputTextListener
 import com.devhub.devhubapp.fragment.PrimaryButtonFragment
 import com.devhub.devhubapp.fragment.TitleFragment
-import com.google.gson.Gson
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
@@ -127,8 +123,6 @@ class ForgotPasswordActivity : AppCompatActivity() {
             activationCode = codeInput
         )
 
-        Log.i("VerifyEmail", "${emailInput}")
-        Log.i("VerifyEmail", "${codeInput}")
         authAPI.verifyEmail(verifyEmailRequest).enqueue(object : Callback<ResponseBody> {
             override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
                 if (response.isSuccessful) {
@@ -207,7 +201,7 @@ class ForgotPasswordActivity : AppCompatActivity() {
         binding.verificationCodeErrorTextView.visibility = View.GONE
         binding.passwordErrorTextView.visibility = View.GONE
         binding.repeatPasswordErrorTextView.visibility = View.GONE
-        binding.message.visibility = View.GONE
+        binding.activationCodeErrorTextView.visibility = View.GONE
         binding.codeInputContainer.visibility = View.GONE
         binding.passwordInputContainer.visibility = View.GONE
         binding.repeatPasswordInputContainer.visibility = View.GONE
@@ -257,7 +251,7 @@ class ForgotPasswordActivity : AppCompatActivity() {
 
         fragmentTransaction.add(R.id.emailErrorTextView, emailError)
         fragmentTransaction.add(R.id.verificationCodeErrorTextView, verificationCodeError)
-        fragmentTransaction.add(R.id.message, message)
+        fragmentTransaction.add(R.id.activationCodeErrorTextView, message)
         fragmentTransaction.add(R.id.passwordErrorTextView, passwordError)
         fragmentTransaction.add(R.id.repeatPasswordErrorTextView, repeatPasswordError)
 
@@ -271,7 +265,7 @@ class ForgotPasswordActivity : AppCompatActivity() {
         binding.emailErrorTextView.visibility = View.GONE
         binding.verificationCodeErrorTextView.visibility = View.GONE
         binding.tvSubtitle.visibility = View.GONE
-        binding.message.visibility = View.GONE
+        binding.activationCodeErrorTextView.visibility = View.GONE
         binding.emailInputContainer.visibility = View.GONE
         binding.codeInputContainer.visibility = View.VISIBLE
         binding.repeatPasswordInputContainer.visibility = View.GONE
@@ -285,7 +279,7 @@ class ForgotPasswordActivity : AppCompatActivity() {
         binding.emailErrorTextView.visibility = View.GONE
         binding.verificationCodeErrorTextView.visibility = View.GONE
         binding.tvSubtitle.visibility = View.GONE
-        binding.message.visibility = View.GONE
+        binding.activationCodeErrorTextView.visibility = View.GONE
         binding.emailInputContainer.visibility = View.GONE
         binding.codeInputContainer.visibility = View.GONE
         binding.passwordInputContainer.visibility = View.VISIBLE
@@ -302,7 +296,7 @@ class ForgotPasswordActivity : AppCompatActivity() {
         binding.emailErrorTextView.visibility = View.GONE
         binding.verificationCodeErrorTextView.visibility = View.GONE
         binding.tvSubtitle.visibility = View.GONE
-        binding.message.visibility = View.GONE
+        binding.activationCodeErrorTextView.visibility = View.GONE
         binding.emailInputContainer.visibility = View.GONE
         binding.codeInputContainer.visibility = View.GONE
         binding.passwordInputContainer.visibility = View.GONE
@@ -331,7 +325,7 @@ class ForgotPasswordActivity : AppCompatActivity() {
         binding.emailErrorTextView.visibility = View.GONE
         binding.verificationCodeErrorTextView.visibility = View.GONE
         binding.tvSubtitle.visibility = View.GONE
-        binding.message.visibility = View.GONE
+        binding.activationCodeErrorTextView.visibility = View.GONE
         binding.emailInputContainer.visibility = View.GONE
         binding.codeInputContainer.visibility = View.GONE
         binding.passwordInputContainer.visibility = View.GONE
@@ -357,56 +351,22 @@ class ForgotPasswordActivity : AppCompatActivity() {
     }
 
     private fun handleErrors(errorBody: ResponseBody?) {
-        emailError.setErrorText("")
-        binding.emailErrorTextView.visibility = View.GONE
+        val errorFragments = mapOf(
+            "verification" to verificationCodeError,
+            "email" to emailError,
+            "activationCode" to message,
+            "password" to passwordError,
+            "repeatPassword" to repeatPasswordError
+        )
 
-        verificationCodeError.setErrorText("")
-        binding.verificationCodeErrorTextView.visibility = View.GONE
+        val errorViews = mapOf(
+            "verification" to binding.verificationCodeErrorTextView,
+            "email" to binding.emailErrorTextView,
+            "activationCode" to binding.activationCodeErrorTextView,
+            "password" to binding.passwordErrorTextView,
+            "repeatPassword" to binding.repeatPasswordErrorTextView
+        )
 
-        message.setErrorText("")
-        binding.message.visibility = View.GONE
-
-        passwordError.setErrorText("")
-        binding.passwordErrorTextView.visibility = View.GONE
-
-        repeatPasswordError.setErrorText("")
-        binding.repeatPasswordErrorTextView.visibility = View.GONE
-
-        errorBody?.let {
-            try {
-                val errorJson = it.string()
-                val gson = Gson()
-                val errorResponse = gson.fromJson(errorJson, ErrorResponse::class.java)
-
-                errorResponse.errors?.let { errors ->
-                    errors.VerificationError?.let { verificationErrors ->
-                        emailError.setErrorText(verificationErrors.joinToString("\n"))
-                        binding.emailErrorTextView.visibility = View.VISIBLE
-                    }
-
-                    errors.Email?.let { emailErrors ->
-                        emailError.setErrorText(emailErrors.joinToString("\n"))
-                        binding.emailErrorTextView.visibility = View.VISIBLE
-                    }
-
-                    errors.ActivationCode?.let { activationCodeErrors ->
-                        message.setErrorText(activationCodeErrors.joinToString("\n"))
-                        binding.message.visibility = View.VISIBLE
-                    }
-
-                    errors.Password?.let { passwordErrors ->
-                        passwordError.setErrorText(passwordErrors.joinToString("\n"))
-                        binding.passwordErrorTextView.visibility = View.VISIBLE
-                    }
-
-                    errors.RepeatPassword?.let { repeatPasswordErrors ->
-                        repeatPasswordError.setErrorText(repeatPasswordErrors.joinToString("\n"))
-                        binding.repeatPasswordErrorTextView.visibility = View.VISIBLE
-                    }
-                }
-            } catch (e: Exception) {
-                Log.e("Error Parsing", "Error parsing error response: ${e.message}")
-            }
-        }
+        ErrorHandler.handleErrors(errorBody, errorFragments, errorViews)
     }
 }
