@@ -16,23 +16,11 @@ var configuration = builder.Configuration;
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAPIGateway", policy =>
-    {
-        policy.WithHeaders().AllowAnyHeader();
-        policy.WithHeaders().AllowCredentials();
-        policy.WithOrigins("http://localhost:5295", "http://localhost:3000", "http://10.0.2.2:3000")
-            .AllowAnyMethod()
-            .AllowAnyHeader();
-    });
-});
+    //TODO: Change Cors policies
+    options.AddPolicy("AllowAll",  
+        builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());  
+}); 
 
-
-builder.Services.AddSession(options =>
-{
-    options.IdleTimeout = TimeSpan.FromMinutes(30);
-    options.Cookie.HttpOnly = true;
-    options.Cookie.IsEssential = true;
-});
 
 builder.Services.AddDistributedMemoryCache();
 
@@ -71,7 +59,7 @@ builder.Services.AddScoped<AuthService.Services.AuthService>();
 
 var app = builder.Build();
 
-app.UseCors("AllowAPIGateway");
+app.UseCors("AllowAll");
 
 if (app.Environment.IsDevelopment())
 {
@@ -84,7 +72,6 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 
-app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
 

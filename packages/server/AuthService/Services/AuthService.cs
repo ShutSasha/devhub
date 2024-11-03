@@ -257,10 +257,10 @@ public class AuthService
       }
 
       var jsonResponse = await response.Content.ReadAsStringAsync();
-      return JsonConvert.DeserializeObject<UserInfo>(jsonResponse);
+      return JsonConvert.DeserializeObject<UserInfo>(jsonResponse)!;
    }
 
-   public async Task<LoginUserResponse> GoogleSignInOrSignUp(UserInfo userInfo)
+   public async Task<LoginUserResponse> SignInOrSignUp(UserInfo userInfo)
    {
       var existingUser = await _userCollection.Find(u => u.Email == userInfo.email).FirstOrDefaultAsync();
 
@@ -281,7 +281,7 @@ public class AuthService
          {
             UserName = userInfo.name,
             Email = userInfo.email,
-            Avatar = userInfo.picture,
+            Avatar = userInfo.picture ?? userInfo.avatar,
             IsActivated = true,
             Password = null
          };

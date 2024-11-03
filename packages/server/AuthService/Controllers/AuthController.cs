@@ -6,6 +6,10 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using MongoDB.Bson;
+using MongoDB.Bson.IO;
+using Newtonsoft.Json;
+using JsonConvert = Newtonsoft.Json.JsonConvert;
 
 namespace AuthService.Controllers;
 
@@ -14,11 +18,13 @@ namespace AuthService.Controllers;
 public class AuthController : ControllerBase
 {
    private readonly Services.AuthService _authService;
+   private readonly IConfiguration _configuration;
    private readonly GoogleAuthOptions _googleAuthOptions;
 
-   public AuthController(Services.AuthService authService, IOptions<GoogleAuthOptions> googleAuthOptions)
+   public AuthController(Services.AuthService authService, IOptions<GoogleAuthOptions> googleAuthOptions, IConfiguration configuration)
    {
       _authService = authService;
+      _configuration = configuration;
       _googleAuthOptions = googleAuthOptions.Value;
    }
 
@@ -192,8 +198,9 @@ public class AuthController : ControllerBase
          var tokenResponse = await _authService.ExchangeCodeForTokensAsync(code);
          var userInfo = await _authService.GetGoogleUserInfoAsync(tokenResponse.access_token);
 
-         var userResult = await _authService.GoogleSignInOrSignUp(userInfo);
-
+         var userResult = await _authService.SignInOrSignUp(userInfo);
+         
+         HttpContext.Response.Cookies.Append("refreshToken", userResult.RefreshToken);
          return Ok(new { Token = userResult.AccessToken, User = userResult.UserData });
       }
       catch (Exception e)
@@ -201,26 +208,26 @@ public class AuthController : ControllerBase
          return ErrorResponseHelper.CreateErrorResponse(400, "Google auth error", e.Message);
       }
    }
-
+   
    [HttpGet("github-login")]
    public async Task<IActionResult> GitHubLogin()
    {
       try
       {
-         var redirectUrl = Url.Action(nameof(GitHubCallback), "Auth");
+         var redirectUrl = Url.Action(nameof(GitHubCallback), "Auth",null,Request.Scheme);
          
          var properties = new AuthenticationProperties { RedirectUri = redirectUrl };
 
-         return Challenge(authenticationSchemes: "github");
+         return Challenge(properties,"github");
       }
       catch (Exception e)
       {
-         // Обработка ошибок (можно логировать или вернуть сообщение пользователю)
          return StatusCode(500, "An error occurred while attempting to log in.");
       }
    }
+   
    [HttpGet("signin-github")]
-   public async Task<IActionResult> GitHubCallback(string code)
+   public async Task<IActionResult> GitHubCallback()
    {
       var authenticateResult = await HttpContext.AuthenticateAsync("github");
 
@@ -233,9 +240,16 @@ public class AuthController : ControllerBase
       var userInfo = new
       {
          Name = claims?.FirstOrDefault(c => c.Type == "name")?.Value,
-         Email = claims?.FirstOrDefault(c => c.Type == "email")?.Value
-      };
+         Email = claims?.FirstOrDefault(c => c.Type == "email")?.Value,
+         Avatar = claims?.FirstOrDefault(c => c.Type == "avatar_url")?.Value,
+      }.ToJson();
+
+      var user = JsonConvert.DeserializeObject<UserInfo>(userInfo);
+
+      var userResult = await _authService.SignInOrSignUp(user);
+
+      HttpContext.Response.Cookies.Append("refreshToken", userResult.RefreshToken);
       
-      return Ok(new { Message = "Successful login", UserInfo = userInfo });
+      return Ok(new { AccessToken = userResult.AccessToken, RefreshToken = userResult.RefreshToken, User = userResult.UserData });
    }
 }
