@@ -7,7 +7,7 @@ import { ChangeEvent, useState } from 'react'
 import { AuthBtn } from '@shared/components/auth/btn/btn.component'
 import { EmphasizeLine } from '@shared/components/auth/emphasize-line/emphasize-line.component'
 import googleImage from '@assets/images/auth/devicon_google.svg'
-import githubImage from '@assets/images/auth/mdi_github.svg'
+// import githubImage from '@assets/images/auth/mdi_github.svg'
 import { Text } from '@shared/components/text/text.component'
 import { FONTS } from '@shared/consts/fonts.enum'
 import { AuthIcon, ImgContainer } from '@pages/auth/sign-up/sign-up.style'
@@ -61,13 +61,15 @@ export const Login = () => {
     }
   }
 
-  const handleGithubAuth = async () => {
-    try {
-      console.log('response')
-    } catch (e) {
-      console.error(e)
-    }
-  }
+  // const handleGithubAuth = async () => {
+  //   try {
+  //     const response = await githubAuth()
+
+  //     console.log(response)
+  //   } catch (e) {
+  //     console.error(e)
+  //   }
+  // }
 
   const errors: string[] | undefined = handleServerException(loginError as ErrorException)
 
@@ -100,7 +102,7 @@ export const Login = () => {
       />
       <ImgContainer>
         <AuthIcon $image={googleImage} onClick={handleGoogleAuth} />
-        <AuthIcon $image={githubImage} onClick={handleGithubAuth} />
+        {/* <AuthIcon $image={githubImage} onClick={handleGithubAuth} /> */}
       </ImgContainer>
     </AuthLayout>
   )
