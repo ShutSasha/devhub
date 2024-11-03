@@ -5,15 +5,18 @@ import retrofit2.converter.gson.GsonConverterFactory
 import okhttp3.OkHttpClient
 import android.content.Context
 import com.devhub.devhubapp.api.AuthAPI
+import com.devhub.devhubapp.api.PostAPI
 import com.devhub.devhubapp.interceptors.AuthInterceptor
 import com.google.gson.GsonBuilder
 import java.util.Date
 
 class RetrofitClient private constructor(context: Context) {
     private val BASE_URL = "http://10.0.2.2:5295/api/"
+
     private var retrofit: Retrofit
     private val encryptedPreferencesManager = EncryptedPreferencesManager(context)
     private val authAPI: AuthAPI
+    val postAPI: PostAPI
 
     init {
         val gson = GsonBuilder()
@@ -26,6 +29,7 @@ class RetrofitClient private constructor(context: Context) {
             .build()
 
         authAPI = retrofit.create(AuthAPI::class.java)
+        postAPI = retrofit.create(PostAPI::class.java)
 
         val client = OkHttpClient.Builder()
             .addInterceptor(AuthInterceptor(authAPI, encryptedPreferencesManager))
