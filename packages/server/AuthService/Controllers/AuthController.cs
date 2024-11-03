@@ -201,7 +201,7 @@ public class AuthController : ControllerBase
          var userResult = await _authService.SignInOrSignUp(userInfo);
          
          HttpContext.Response.Cookies.Append("refreshToken", userResult.RefreshToken);
-         return Ok(new { Token = userResult.AccessToken, User = userResult.UserData });
+         return Ok(new { AccessToken = userResult.AccessToken, RefreshToken = userResult.RefreshToken, User = userResult.UserData });
       }
       catch (Exception e)
       {
@@ -222,7 +222,7 @@ public class AuthController : ControllerBase
       }
       catch (Exception e)
       {
-         return StatusCode(500, "An error occurred while attempting to log in.");
+         return ErrorResponseHelper.CreateErrorResponse(400, "GitHub auth error", "Error while redirect callback");
       }
    }
    
