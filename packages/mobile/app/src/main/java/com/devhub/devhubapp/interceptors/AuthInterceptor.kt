@@ -63,7 +63,7 @@ class AuthInterceptor(
                         val user = User(
                             id = userResponse.id,
                             name = userResponse.name ?: "",
-                            userName = userResponse.userName,
+                            username = userResponse.username,
                             avatar = userResponse.avatar,
                             email = userResponse.email,
                             createdAt = userResponse.createdAt.toString().toDate(),
