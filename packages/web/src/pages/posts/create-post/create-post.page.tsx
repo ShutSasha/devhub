@@ -1,4 +1,4 @@
-import { ChangeEvent, useRef, useState } from 'react'
+import { ChangeEvent, useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import { CreatePostLayout } from '@shared/layouts/posts/create-post.layout'
@@ -25,15 +25,36 @@ export const CreatePost = () => {
   const user = useAppSelector(state => state.userSlice.user)
   const [headerImage, setHeaderImage] = useState<File>()
   const [headerImageUrl, setHeaderImageUrl] = useState<string | null>(null)
-  const [title, setTitle] = useState<string>('')
+  const [headerImageWidth, setHeaderImageWidth] = useState<string>('100%')
+  const [headerImageHeight, setHeaderImageHeight] = useState<string>('420px')
 
+  const [title, setTitle] = useState<string>('')
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (file) {
       setHeaderImage(file)
+
       const reader = new FileReader()
       reader.onloadend = () => {
-        setHeaderImageUrl(reader.result as string)
+        const imageUrl = reader.result as string
+        setHeaderImageUrl(imageUrl)
+
+        const img = new Image()
+        img.src = imageUrl
+
+        img.onload = () => {
+          if (img.width < 1400) {
+            setHeaderImageWidth(`${img.width}px`)
+          } else {
+            setHeaderImageWidth('100%')
+          }
+
+          if (img.height < 800) {
+            setHeaderImageHeight(`${img.height}px`)
+          } else {
+            setHeaderImageHeight('600px')
+          }
+        }
       }
       reader.readAsDataURL(file)
     }
@@ -84,7 +105,7 @@ export const CreatePost = () => {
           <StyledAvatar style={{ height: '60px', width: '60px' }} src={user?.avatar} />
           <Username style={{ fontSize: '26px', lineHeight: '36px', fontWeight: '500' }}>{user?.username}</Username>
         </StyledUserCredentialsContainer>
-        <S.UploadImageContainer $image={headerImageUrl || ''}>
+        <S.UploadImageContainer $image={headerImageUrl || ''} $width={headerImageWidth} $height={headerImageHeight}>
           {!headerImage && (
             <>
               <S.UploadImage src={uploadSvg} />
