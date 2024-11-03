@@ -26,18 +26,24 @@ export const EmphasizeLine = styled.hr`
   margin-bottom: 20px;
 `
 
-export const UploadImageContainer = styled.div`
+export const UploadImageContainer = styled.div<{ $image: string | undefined }>`
   display: flex;
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  height: 215px;
+  height: 420px;
   margin-bottom: 20px;
 
   cursor: pointer;
   border-radius: 10px;
   border: 1px dashed ${colors.textSecondary};
 
+  background: ${({ $image }) => ($image ? `url(${$image})` : '')};
+  background-repeat: no-repeat;
+
+  background-size: 100% 155%;
+  background-position: top;
+  box-sizing: border-box;
   position: relative;
 `
 
@@ -61,6 +67,7 @@ export const UploadImage = styled.img`
 
 export const PostTitleInput = styled.input`
   display: block;
+  width: 100%;
   background: transparent;
 
   font-family: ${FONTS.MONTSERRAT};
