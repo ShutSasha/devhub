@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
+	"regexp"
 	"strings"
 
 	pb "github.com/ShutSasha/devhub/tree/main/packages/server/PostService/gen/go/user"
@@ -72,10 +73,19 @@ func New(
 		tagsString := r.FormValue("tags")
 
 		cleanedString := strings.Trim(tagsString, "[]")
+
+		re := regexp.MustCompile(`[^\w\s,]`)
+		cleanedString = re.ReplaceAllString(cleanedString, "")
 		tagsArray := strings.Split(cleanedString, ",")
 
 		for i := range tagsArray {
 			tagsArray[i] = strings.TrimSpace(tagsArray[i])
+		}
+
+		if len(tagsArray) > 4 {
+			utils.HandleError(log, w, r, "the number of tags should be less than 4", fmt.Errorf("%v: too many tags", op),
+				http.StatusBadRequest, "body", "the number of tags should be less than 4")
+			return
 		}
 
 		req := Request{
