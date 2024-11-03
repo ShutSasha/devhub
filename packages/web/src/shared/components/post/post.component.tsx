@@ -17,7 +17,7 @@ export const Post: FC<PostProps> = ({ post }) => {
       <S.PostHeader>
         <S.StyledUserCredentialsContainer>
           <S.StyledAvatar src={post.user.avatar} />
-          <S.Username>{post.user.userName}</S.Username>
+          <S.Username>{post.user.username}</S.Username>
         </S.StyledUserCredentialsContainer>
         <S.StyledStar $isSaved={false} />
       </S.PostHeader>
