@@ -82,7 +82,7 @@ export const CreatePost = () => {
       <S.CreatePostContainer>
         <StyledUserCredentialsContainer style={{ marginLeft: '20px', marginBottom: '20px' }}>
           <StyledAvatar style={{ height: '60px', width: '60px' }} src={user?.avatar} />
-          <Username style={{ fontSize: '26px', lineHeight: '36px', fontWeight: '500' }}>{user?.userName}</Username>
+          <Username style={{ fontSize: '26px', lineHeight: '36px', fontWeight: '500' }}>{user?.username}</Username>
         </StyledUserCredentialsContainer>
         <S.UploadImageContainer $image={headerImageUrl || ''}>
           {!headerImage && (

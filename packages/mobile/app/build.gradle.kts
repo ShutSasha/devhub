@@ -42,7 +42,7 @@ android {
             res {
                 srcDirs("src\\main\\res", "src\\main\\res\\layouts\\activities",
                     "src\\main\\res",
-                    "src\\main\\res\\layouts\\fragments", "src\\main\\res", "src\\main\\res\\layouts\\activitie"
+                    "src\\main\\res\\layouts\\fragments", "src\\main\\res", "src\\main\\res\\layouts\\activities"
                 )
             }
         }
@@ -62,11 +62,14 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     implementation ("com.squareup.retrofit2:retrofit:2.11.0")
     implementation ("com.squareup.retrofit2:converter-gson:2.11.0")
-    implementation("com.squareup.okhttp3:okhttp:4.10.0")
-    implementation("com.squareup.okhttp3:logging-interceptor:4.10.0")
-    implementation("com.google.code.gson:gson:2.11.0")
+    implementation ("com.squareup.okhttp3:okhttp:4.10.0")
+    implementation ("com.squareup.okhttp3:logging-interceptor:4.10.0")
+    implementation ("com.google.code.gson:gson:2.11.0")
     implementation ("androidx.security:security-crypto:1.1.0-alpha03")
-    implementation("androidx.security:security-crypto-ktx:1.1.0-alpha03")
-
+    implementation ("androidx.security:security-crypto-ktx:1.1.0-alpha03")
+    implementation ("com.google.android.flexbox:flexbox:3.0.0")
+    implementation ("com.squareup.picasso:picasso:2.8")
+    implementation ("com.github.bumptech.glide:glide:4.15.0")
+    annotationProcessor ("com.github.bumptech.glide:compiler:4.15.0")
 
 }

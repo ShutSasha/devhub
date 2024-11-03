@@ -33,6 +33,9 @@ class PrimaryButtonFragment : Fragment() {
 
     fun setButtonText(text: String) {
         this.text = text
+        if (::button.isInitialized) {
+            button.text = text
+        }
     }
 
     fun setButtonAction(action: () -> Unit) {

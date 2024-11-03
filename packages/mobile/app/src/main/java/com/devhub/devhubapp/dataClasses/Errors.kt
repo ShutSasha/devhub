@@ -11,5 +11,7 @@ data class Errors(
     val LoginError: List<String>?,
     @SerializedName("Registration error")
     val RegistrationError: List<String>?,
+    @SerializedName("Send Verification error")
+    val VerificationError: List<String>?,
     val ActivationCode: List<String>?
 )
