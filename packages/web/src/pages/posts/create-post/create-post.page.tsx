@@ -1,4 +1,4 @@
-import { ChangeEvent, useEffect, useRef, useState } from 'react'
+import { ChangeEvent, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import { CreatePostLayout } from '@shared/layouts/posts/create-post.layout'
@@ -28,7 +28,9 @@ export const CreatePost = () => {
   const [headerImageWidth, setHeaderImageWidth] = useState<string>('100%')
   const [headerImageHeight, setHeaderImageHeight] = useState<string>('420px')
 
+  const [tags, setTags] = useState<string>('')
   const [title, setTitle] = useState<string>('')
+
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (file) {
@@ -64,6 +66,10 @@ export const CreatePost = () => {
     setTitle(e.target.value)
   }
 
+  const handleChangeTags = (e: ChangeEvent<HTMLInputElement>) => {
+    setTags(e.target.value)
+  }
+
   const createFormData = (postDto: PostDto): FormData => {
     const formData = new FormData()
     formData.append('content', postDto.content)
@@ -81,7 +87,10 @@ export const CreatePost = () => {
         content: content.current?.textContent || '',
         title,
         userId: user?.id || '',
-        tags: ['1', '2'],
+        tags: tags
+          .trim()
+          .split(',')
+          .map(tag => tag.trim()),
         headerImage: headerImage || '',
       }
 
@@ -122,7 +131,7 @@ export const CreatePost = () => {
           <S.UploadInput type="file" onChange={handleFileUpload} />
         </S.UploadImageContainer>
         <S.PostTitleInput placeholder="Title here" value={title} onChange={handleChangeTitle} />
-        <S.TagInput type="text" placeholder="Add tags here" />
+        <S.TagInput type="text" placeholder="Add tags here" value={tags} onChange={handleChangeTags} />
         <InputContainer ref={content} />
         <S.EmphasizeLine />
         <S.BtnContainer>
