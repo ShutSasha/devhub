@@ -1,17 +1,14 @@
 package com.devhub.devhubapp.dataClasses
 
-import java.util.Date
-
-data class User(
+data class UserResponse(
     val id: String,
-    val name: String,
+    val name: String?,
     val username: String,
     val avatar: String,
     val email: String,
-    val createdAt: Date,
+    val createdAt: String,
     val devPoints: Int,
     val activationCode: String,
     val isActivated: Boolean,
-    val roles: Array<String>
-) {
-}
+    val userRole: Array<String>
+)

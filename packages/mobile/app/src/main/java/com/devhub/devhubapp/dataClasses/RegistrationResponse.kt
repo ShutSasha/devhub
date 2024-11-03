@@ -5,7 +5,7 @@ import java.util.Date
 data class RegistrationResponse(
     val id: String,
     val name: String,
-    val userName: String,
+    val username: String,
     val password: String,
     val avatar: String,
     val email: String,

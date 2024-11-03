@@ -37,7 +37,7 @@ class EncryptedPreferencesManager(context: Context) {
     fun saveUserData(userData: User) {
         saveData("user_id", userData.id)
         saveData("name", userData.name ?: "")
-        saveData("username", userData.userName ?: "")
+        saveData("username", userData.username ?: "")
         saveData("email", userData.email ?: "")
         saveData("avatar", userData.avatar ?: "")
         saveData("createdAt", userData.createdAt?.toString() ?: "")
@@ -55,7 +55,7 @@ class EncryptedPreferencesManager(context: Context) {
         return User(
             id = sharedPreferences.getString("user_id", "") ?: "",
             name = sharedPreferences.getString("name", "") ?: "",
-            userName = sharedPreferences.getString("username", "") ?: "",
+            username = sharedPreferences.getString("username", "") ?: "",
             email = sharedPreferences.getString("email", "") ?: "",
             avatar = sharedPreferences.getString("avatar", "") ?: "",
             createdAt = createdAt,
