@@ -86,7 +86,7 @@ export const CreatePost = () => {
       const postData: PostDto = {
         content: content.current?.textContent || '',
         title,
-        userId: user?.id || '',
+        userId: user?._id || '',
         tags: tags
           .trim()
           .split(',')
