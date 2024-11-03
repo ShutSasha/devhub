@@ -171,20 +171,6 @@ public class AuthController : ControllerBase
       return ErrorResponseHelper.CreateErrorResponse(401, "Fetch error", "Can't fetch");
    }
 
-   [HttpGet("google-login")]
-   public async Task<IActionResult> GoogleLogin()
-   {
-      var authorizationUrl = $"https://accounts.google.com/o/oauth2/v2/auth?" +
-                             $"client_id={_googleAuthOptions.ClientId}" +
-                             $"&response_type=code" +
-                             $"&scope=email%20profile" +
-                             $"&redirect_uri={_googleAuthOptions.RedirectionUri}" +
-                             $"&access_type=offline";
-
-      return Redirect(authorizationUrl);
-   }
-
-
    [HttpGet("signin-google")]
    public async Task<IActionResult> GoogleCallback(string code)
    {
@@ -201,7 +187,7 @@ public class AuthController : ControllerBase
          var userResult = await _authService.SignInOrSignUp(userInfo);
          
          HttpContext.Response.Cookies.Append("refreshToken", userResult.RefreshToken);
-         return Ok(new { AccessToken = userResult.AccessToken, RefreshToken = userResult.RefreshToken, User = userResult.UserData });
+         return Redirect("http://localhost:3000");
       }
       catch (Exception e)
       {

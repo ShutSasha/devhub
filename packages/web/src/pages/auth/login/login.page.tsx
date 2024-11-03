@@ -11,7 +11,7 @@ import githubImage from '@assets/images/auth/mdi_github.svg'
 import { Text } from '@shared/components/text/text.component'
 import { FONTS } from '@shared/consts/fonts.enum'
 import { AuthIcon, ImgContainer } from '@pages/auth/sign-up/sign-up.style'
-import { useLazyGithubAuthQuery, useLazyGoogleAuthQuery, useLoginMutation } from '@api/auth.api'
+import { useLoginMutation } from '@api/auth.api'
 import { useAppDispatch } from '@app/store/store'
 import { setAccessToken, setUser } from '@features/user/user.slice'
 import { ROUTES } from '@pages/router/routes.enum'
@@ -25,8 +25,6 @@ import { ErrorException } from '~types/error/error.type'
 
 export const Login = () => {
   const [login, { error: loginError }] = useLoginMutation()
-  const [githubAuth] = useLazyGithubAuthQuery()
-  const [googleAuth] = useLazyGoogleAuthQuery()
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
 
@@ -53,10 +51,11 @@ export const Login = () => {
     }
   }
 
-  const handleGoogleAuth = async () => {
+  const handleGoogleAuth = () => {
     try {
-      const response = await googleAuth().unwrap()
-      console.log(response)
+      const googleAuthUrl = `${process.env.REACT_APP_GOOGLE_AUTH_API}`
+
+      window.location.href = googleAuthUrl
     } catch (e) {
       console.error(e)
     }
@@ -64,8 +63,7 @@ export const Login = () => {
 
   const handleGithubAuth = async () => {
     try {
-      const response = await githubAuth().unwrap()
-      console.log(response)
+      console.log('response')
     } catch (e) {
       console.error(e)
     }
