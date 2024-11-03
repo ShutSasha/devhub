@@ -23,8 +23,6 @@ import (
 // - Content: The content of the post (required, max 62792 characters).
 // - HeaderImage: The image at the top of the post.
 // - Tags: Optional tags associated with the post.
-
-// TODO Make validation for max 4 tags
 type Request struct {
 	UserId      string   `json:"userId" validate:"required"`
 	Title       string   `json:"title" validate:"required,max=128,min=1"`

@@ -293,7 +293,7 @@ func (s *Storage) GetPaginated(ctx context.Context, limit, page int, fileProvide
 			}},
 		},
 		bson.D{
-			{Key: "$sort", Value: bson.D{{Key: "created_at", Value: -1}}},
+			{Key: "$sort", Value: bson.D{{Key: "createdAt", Value: -1}}},
 		},
 		bson.D{
 			{Key: "$skip", Value: int64((page - 1) * limit)},
