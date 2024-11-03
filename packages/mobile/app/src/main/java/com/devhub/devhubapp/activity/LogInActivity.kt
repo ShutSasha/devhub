@@ -176,6 +176,7 @@ class LogInActivity : AppCompatActivity() {
 
                         val intent = Intent(this@LogInActivity, MainActivity::class.java)
                         intent.putExtra("USER_AVATAR", user.avatar)
+                        intent.putExtra("USERNAME", user.username)
                         startActivity(intent)
                         finish()
 

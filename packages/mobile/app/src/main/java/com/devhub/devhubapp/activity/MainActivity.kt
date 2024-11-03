@@ -37,12 +37,14 @@ class MainActivity : AppCompatActivity() {
         val fragmentTransaction : FragmentTransaction = fragmentManager.beginTransaction()
 
         val userAvatar = intent.getStringExtra("USER_AVATAR")
+        val username = intent.getStringExtra("USERNAME")
 
         if (savedInstanceState == null) {
             val headerFragment = HeaderFragment()
 
             val args = Bundle()
             args.putString("USER_AVATAR", userAvatar)
+            args.putString("USERNAME", username)
             headerFragment.arguments = args
 
             fragmentTransaction.replace(R.id.header_container, headerFragment)
