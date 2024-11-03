@@ -73,7 +73,7 @@ func New(
 
 	router.Route("/api/posts", func(r chi.Router) {
 		r.Get("/{id}", single.New(log, postStorage, fileStorage))
-		r.Post("/", save.New(log, postStorage, postStorage, fileStorage, fileStorage, grpcClient))
+		r.Post("/", save.New(log, postStorage, postStorage, postStorage, fileStorage, fileStorage, fileStorage, grpcClient))
 		r.Get("/", paginate.New(log, postStorage, fileStorage))
 		r.Delete("/{id}", delete.New(log, postStorage, postStorage, fileStorage, fileStorage, grpcClient))
 		r.Patch("/{id}", update.New(log, postStorage, postStorage, fileStorage, fileStorage, fileStorage))

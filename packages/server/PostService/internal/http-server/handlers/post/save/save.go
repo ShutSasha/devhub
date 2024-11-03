@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
+	"strings"
 
 	pb "github.com/ShutSasha/devhub/tree/main/packages/server/PostService/gen/go/user"
 	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/domain/interfaces"
@@ -31,11 +32,8 @@ type Request struct {
 	Tags        []string `json:"tags,omitempty"`
 }
 
-// New is a handler function that processes the HTTP request for saving a post.
-// It validates the incoming request body, checks for errors, and if valid,
-// calls the SavePost method of the PostSaver interface to persist the post.
 // @Summary Save a new post
-// @Description This endpoint allows a user to save a new post with a title, content, and optional tags.
+// @Description This endpoint allows a user to save a new post with a title, content, optional header image, and tags.
 // @Tags posts
 // @Accept multipart/form-data
 // @Produce json
@@ -43,15 +41,18 @@ type Request struct {
 // @Param title formData string true "Title of the post"
 // @Param content formData string true "Content of the post"
 // @Param headerImage formData file false "Header image for the post"
-// @Param tags formData array false "Optional tags associated with the post"
-// @Success 200 {object} map[string]interface{} "Returns the ID of the newly created post"
-// @Failure 400 {object} map[string]interface{} "Validation errors or request decoding failures"
+// @Param tags formData string false "Optional tags associated with the post (e.g., [tag1,tag2])"
+// @Success 200 {object} map[string]interface{} "Returns the details of the newly created post, including post ID, title, content, header image key, and tags"
+// @Failure 400 {object} map[string]interface{} "Validation errors, request decoding failures, or file upload errors"
+// @Failure 500 {object} map[string]interface{} "Internal server error"
 // @Router /api/posts [post]
 func New(
 	log *slog.Logger,
 	postSaver interfaces.PostSaver,
+	postProvider interfaces.PostProvider,
 	postRemover interfaces.PostRemover,
 	fileSaver interfaces.FileSaver,
+	fileProvider interfaces.FileProvider,
 	fileRemover interfaces.FileRemover,
 	grpcClient pb.UserServiceClient,
 ) http.HandlerFunc {
@@ -68,11 +69,20 @@ func New(
 			return
 		}
 
+		tagsString := r.FormValue("tags")
+
+		cleanedString := strings.Trim(tagsString, "[]")
+		tagsArray := strings.Split(cleanedString, ",")
+
+		for i := range tagsArray {
+			tagsArray[i] = strings.TrimSpace(tagsArray[i])
+		}
+
 		req := Request{
 			UserId:  r.FormValue("userId"),
 			Title:   r.FormValue("title"),
 			Content: r.FormValue("content"),
-			Tags:    r.Form["tags"],
+			Tags:    tagsArray,
 		}
 		if err := validator.New().Struct(req); err != nil {
 			validateErr := err.(validator.ValidationErrors)
@@ -109,8 +119,14 @@ func New(
 			return
 		}
 
+		post, err := postProvider.GetById(context.TODO(), id, fileProvider)
+		if err != nil {
+			utils.HandleError(log, w, r, "failed to retrieve post", err, http.StatusInternalServerError, "postId", "Failed to retrieve the newly created post")
+			return
+		}
+
 		log.Info("post successfully added")
-		render.JSON(w, r, map[string]interface{}{"_id": id})
+		render.JSON(w, r, post)
 	}
 }
 

@@ -38,7 +38,7 @@ type Request struct {
 // @Produce json
 // @Param id path string true "Post ID"
 // @Param request body Request true "Update post request body"
-// @Success 200 {object} map[string]interface{} "Success message"
+// @Success 200 {object} map[string]interface{} "Model of the updated post"
 // @Failure 400 {object} map[string]interface{} "Validation errors or request decoding failures"
 // @Router /api/posts/{id} [patch]
 func New(log *slog.Logger, postUpdater interfaces.PostUpdater, postProvider interfaces.PostProvider,
@@ -141,11 +141,14 @@ func New(log *slog.Logger, postUpdater interfaces.PostUpdater, postProvider inte
 			return
 		}
 
+		updatedPost, err := postProvider.GetById(context.TODO(), postId, fileProvider)
+		if err != nil {
+			utils.HandleError(log, w, r, "failed to retrieve post", err, http.StatusInternalServerError, "postId", "Failed to retrieve the updated post")
+			return
+		}
+
 		log.Info("post updated", slog.Any("id", id))
 
-		render.JSON(w, r, map[string]interface{}{
-			"Status":  http.StatusOK,
-			"Message": "Successfully updated",
-		})
+		render.JSON(w, r, updatedPost)
 	}
 }
