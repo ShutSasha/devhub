@@ -63,7 +63,7 @@ const docTemplate = `{
             "post": {
                 "description": "This endpoint allows a user to save a new post with a title, content, and optional tags.",
                 "consumes": [
-                    "application/json"
+                    "multipart/form-data"
                 ],
                 "produces": [
                     "application/json"
@@ -74,13 +74,37 @@ const docTemplate = `{
                 "summary": "Save a new post",
                 "parameters": [
                     {
-                        "description": "Post save request body",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/save.Request"
-                        }
+                        "type": "string",
+                        "description": "User ID of the user creating the post",
+                        "name": "userId",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Title of the post",
+                        "name": "title",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Content of the post",
+                        "name": "content",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "Header image for the post",
+                        "name": "headerImage",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "array",
+                        "description": "Optional tags associated with the post",
+                        "name": "tags",
+                        "in": "formData"
                     }
                 ],
                 "responses": {
@@ -339,37 +363,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "user": {
-                    "type": "string"
-                }
-            }
-        },
-        "save.Request": {
-            "type": "object",
-            "required": [
-                "content",
-                "title",
-                "userId"
-            ],
-            "properties": {
-                "content": {
-                    "type": "string",
-                    "maxLength": 62792
-                },
-                "headerImage": {
-                    "type": "string"
-                },
-                "tags": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "title": {
-                    "type": "string",
-                    "maxLength": 128,
-                    "minLength": 1
-                },
-                "userId": {
                     "type": "string"
                 }
             }

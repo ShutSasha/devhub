@@ -37,9 +37,13 @@ type Request struct {
 // @Summary Save a new post
 // @Description This endpoint allows a user to save a new post with a title, content, and optional tags.
 // @Tags posts
-// @Accept json
+// @Accept multipart/form-data
 // @Produce json
-// @Param request body Request true "Post save request body"
+// @Param userId formData string true "User ID of the user creating the post"
+// @Param title formData string true "Title of the post"
+// @Param content formData string true "Content of the post"
+// @Param headerImage formData file false "Header image for the post"
+// @Param tags formData array false "Optional tags associated with the post"
 // @Success 200 {object} map[string]interface{} "Returns the ID of the newly created post"
 // @Failure 400 {object} map[string]interface{} "Validation errors or request decoding failures"
 // @Router /api/posts [post]
