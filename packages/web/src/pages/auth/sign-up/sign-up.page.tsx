@@ -11,7 +11,7 @@ import { AuthDevhubTitle } from '@shared/components/auth/devhub-title/auth-devhu
 import { useAppDispatch, useAppSelector } from '@app/store/store'
 import { setEmail, setPassword, setRepeatPassword, setUsername } from '@features/auth/auth.slice'
 import googleImage from '@assets/images/auth/devicon_google.svg'
-import githubImage from '@assets/images/auth/mdi_github.svg'
+// import githubImage from '@assets/images/auth/mdi_github.svg'
 import { useRegisterMutation } from '@api/auth.api'
 import { handleServerException } from '@utils/handleServerException.util'
 import { ErrorSpan } from '@shared/components/errors/error-span.component'
@@ -55,6 +55,16 @@ export const SignUp: FC = () => {
       await register({ username, password, repeatPassword, email }).unwrap()
 
       navigate(`${ROUTES.SIGN_UP}${ROUTES.CONFIRM_EMAIL}`)
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
+  const handleGoogleAuth = () => {
+    try {
+      const googleAuthUrl = `${process.env.REACT_APP_GOOGLE_AUTH_API}`
+
+      window.location.href = googleAuthUrl
     } catch (e) {
       console.error(e)
     }
@@ -105,8 +115,8 @@ export const SignUp: FC = () => {
           style={{ textAlign: 'center', marginBottom: '16px' }}
         />
         <ImgContainer>
-          <AuthIcon $image={googleImage} />
-          <AuthIcon $image={githubImage} />
+          <AuthIcon $image={googleImage} onClick={handleGoogleAuth} />
+          {/* <AuthIcon $image={githubImage} /> */}
         </ImgContainer>
       </div>
     </AuthLayout>
