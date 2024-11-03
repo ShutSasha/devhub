@@ -61,7 +61,7 @@ const docTemplate = `{
                 }
             },
             "post": {
-                "description": "This endpoint allows a user to save a new post with a title, content, and optional tags.",
+                "description": "This endpoint allows a user to save a new post with a title, content, optional header image, and tags.",
                 "consumes": [
                     "multipart/form-data"
                 ],
@@ -101,22 +101,29 @@ const docTemplate = `{
                         "in": "formData"
                     },
                     {
-                        "type": "array",
-                        "description": "Optional tags associated with the post",
+                        "type": "string",
+                        "description": "Optional tags associated with the post (e.g., [tag1,tag2])",
                         "name": "tags",
                         "in": "formData"
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Returns the ID of the newly created post",
+                        "description": "Returns the details of the newly created post, including post ID, title, content, header image key, and tags",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
                         }
                     },
                     "400": {
-                        "description": "Validation errors or request decoding failures",
+                        "description": "Validation errors, request decoding failures, or file upload errors",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
