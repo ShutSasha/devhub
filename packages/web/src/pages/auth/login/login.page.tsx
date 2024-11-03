@@ -11,7 +11,7 @@ import githubImage from '@assets/images/auth/mdi_github.svg'
 import { Text } from '@shared/components/text/text.component'
 import { FONTS } from '@shared/consts/fonts.enum'
 import { AuthIcon, ImgContainer } from '@pages/auth/sign-up/sign-up.style'
-import { useLoginMutation } from '@api/auth.api'
+import { useLazyGithubAuthQuery, useLazyGoogleAuthQuery, useLoginMutation } from '@api/auth.api'
 import { useAppDispatch } from '@app/store/store'
 import { setAccessToken, setUser } from '@features/user/user.slice'
 import { ROUTES } from '@pages/router/routes.enum'
@@ -25,6 +25,8 @@ import { ErrorException } from '~types/error/error.type'
 
 export const Login = () => {
   const [login, { error: loginError }] = useLoginMutation()
+  const [githubAuth] = useLazyGithubAuthQuery()
+  const [googleAuth] = useLazyGoogleAuthQuery()
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
 
@@ -46,6 +48,24 @@ export const Login = () => {
       dispatch(setUser(user))
 
       navigate(ROUTES.HOME)
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
+  const handleGoogleAuth = async () => {
+    try {
+      const response = await googleAuth().unwrap()
+      console.log(response)
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
+  const handleGithubAuth = async () => {
+    try {
+      const response = await githubAuth().unwrap()
+      console.log(response)
     } catch (e) {
       console.error(e)
     }
@@ -81,8 +101,8 @@ export const Login = () => {
         style={{ marginBottom: '16px' }}
       />
       <ImgContainer>
-        <AuthIcon src={googleImage} alt="GoogleAuth" />
-        <AuthIcon src={githubImage} alt="GithubAuth" />
+        <AuthIcon $image={googleImage} onClick={handleGoogleAuth} />
+        <AuthIcon $image={githubImage} onClick={handleGithubAuth} />
       </ImgContainer>
     </AuthLayout>
   )

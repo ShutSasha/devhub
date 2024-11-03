@@ -44,8 +44,12 @@ export const ImgContainer = styled.div`
   align-items: center;
 `
 
-export const AuthIcon = styled.img`
+export const AuthIcon = styled.button<{ $image: string }>`
   height: 36px;
   width: 36px;
   cursor: pointer;
+
+  background: ${({ $image }) => `url(${$image})`};
+  background-size: cover;
+  border: none;
 `

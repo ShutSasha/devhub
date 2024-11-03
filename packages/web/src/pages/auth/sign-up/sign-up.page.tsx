@@ -105,8 +105,8 @@ export const SignUp: FC = () => {
           style={{ textAlign: 'center', marginBottom: '16px' }}
         />
         <ImgContainer>
-          <AuthIcon src={googleImage} alt="GoogleAuth" />
-          <AuthIcon src={githubImage} alt="GithubAuth" />
+          <AuthIcon $image={googleImage} />
+          <AuthIcon $image={githubImage} />
         </ImgContainer>
       </div>
     </AuthLayout>
