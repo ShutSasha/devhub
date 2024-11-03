@@ -41,7 +41,7 @@ func main() {
 
 	go func() {
 		if err := application.HttpApp.Run(); err != nil {
-			log.Error("failed to start server")
+			log.Error("failed to start server", err.Error())
 		}
 	}()
 
