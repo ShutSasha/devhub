@@ -55,6 +55,18 @@ export const api = createApi({
         body,
       }),
     }),
+    googleAuth: builder.query<void, void>({
+      query: () => ({
+        url: 'auth/google-login',
+        method: 'GET',
+      }),
+    }),
+    githubAuth: builder.query<void, void>({
+      query: () => ({
+        url: 'auth/github-login',
+        method: 'GET',
+      }),
+    }),
   }),
 })
 
@@ -65,4 +77,6 @@ export const {
   usePasswordVerificationCodeMutation,
   useChangePasswordMutation,
   useLogoutMutation,
+  useLazyGoogleAuthQuery,
+  useLazyGithubAuthQuery,
 } = api
