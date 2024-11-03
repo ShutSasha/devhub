@@ -24,7 +24,7 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddDistributedMemoryCache();
 
-builder.Services.Configure<GoogleAuthOptions>(configuration.GetSection("GoogleAuthOptions"));
+builder.Services.Configure<GoogleAuthOptions>(configuration.GetSection("GoogleOAuth"));
 
 builder.Services.Configure<JwtOptions>(configuration.GetSection(nameof(JwtOptions)));
 builder.Services.AddApiAuthentication(builder.Configuration);

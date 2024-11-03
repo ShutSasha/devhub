@@ -88,9 +88,9 @@ namespace AuthService.Extensions
             .AddOAuth("github", options =>
             {
                options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-               options.ClientId = configuration["Authentication:GitHub:ClientId"]!;
-               options.ClientSecret = configuration["Authentication:GitHub:ClientSecret"]!;
-               options.CallbackPath = "/api/auth/signin-github/";
+               options.ClientId = configuration["GitHubOAuth:ClientId"]!;
+               options.ClientSecret = configuration["GitHubOAuth:ClientSecret"]!;
+               options.CallbackPath = configuration["GitHubOAuth:CallbackUri"];
                options.AuthorizationEndpoint = "https://github.com/login/oauth/authorize";
                options.TokenEndpoint = "https://github.com/login/oauth/access_token";
                options.UserInformationEndpoint = "https://api.github.com/user";
