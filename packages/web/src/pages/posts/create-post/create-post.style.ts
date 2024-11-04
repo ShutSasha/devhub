@@ -37,7 +37,7 @@ export const UploadImageContainer = styled.div<{ $image: string | undefined; $wi
 
   cursor: pointer;
   border-radius: 10px;
-  border: 1px dashed ${colors.textSecondary};
+  border: ${({ $image }) => ($image ? `none` : `1px dashed ${colors.textSecondary}`)};
 
   background: ${({ $image }) => ($image ? `url(${$image})` : '')};
   background-repeat: no-repeat;
