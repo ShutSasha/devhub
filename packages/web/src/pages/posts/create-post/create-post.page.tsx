@@ -27,6 +27,7 @@ export const CreatePost = () => {
   const [headerImageUrl, setHeaderImageUrl] = useState<string | null>(null)
   const [headerImageWidth, setHeaderImageWidth] = useState<string>('100%')
   const [headerImageHeight, setHeaderImageHeight] = useState<string>('420px')
+  const [isDisableBtn, setIsDisableBtn] = useState<boolean>(false)
 
   const [tags, setTags] = useState<string>('')
   const [title, setTitle] = useState<string>('')
@@ -83,6 +84,8 @@ export const CreatePost = () => {
 
   const handlePublish = async () => {
     try {
+      setIsDisableBtn(true)
+
       const postData: PostDto = {
         content: content.current?.textContent || '',
         title,
@@ -102,6 +105,8 @@ export const CreatePost = () => {
     } catch (e) {
       console.error(e)
       toast.error(handleServerException(e as ErrorException)?.join(', '))
+    } finally {
+      setIsDisableBtn(false)
     }
   }
 
@@ -144,7 +149,9 @@ export const CreatePost = () => {
         <InputContainer ref={content} />
         <S.EmphasizeLine />
         <S.BtnContainer>
-          <S.PublishBtn onClick={handlePublish}>Publish</S.PublishBtn>
+          <S.PublishBtn onClick={handlePublish} disabled={isDisableBtn}>
+            Publish
+          </S.PublishBtn>
         </S.BtnContainer>
       </S.CreatePostContainer>
     </CreatePostLayout>
