@@ -101,7 +101,6 @@ export const TagInput = styled.input`
   border-radius: 10px;
 
   padding: 0 10px;
-  margin-bottom: 30px;
 `
 
 export const BtnContainer = styled.div`

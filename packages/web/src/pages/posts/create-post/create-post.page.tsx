@@ -131,7 +131,16 @@ export const CreatePost = () => {
           <S.UploadInput type="file" onChange={handleFileUpload} />
         </S.UploadImageContainer>
         <S.PostTitleInput placeholder="Title here" value={title} onChange={handleChangeTitle} />
-        <S.TagInput type="text" placeholder="Add tags here" value={tags} onChange={handleChangeTags} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '30px' }}>
+          <S.TagInput type="text" placeholder="Add tags here" value={tags} onChange={handleChangeTags} />
+          <Text
+            text="maximum 4 tags (tags are separated by commas)"
+            color={colors.black600}
+            fontSize="20px"
+            fontWeight="500"
+            $lineHeight="24px"
+          />
+        </div>
         <InputContainer ref={content} />
         <S.EmphasizeLine />
         <S.BtnContainer>

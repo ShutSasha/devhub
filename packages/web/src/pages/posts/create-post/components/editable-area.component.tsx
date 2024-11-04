@@ -1,3 +1,4 @@
+import { FONTS } from '@shared/consts/fonts.enum'
 import { ForwardedRef, forwardRef, useState } from 'react'
 import styled from 'styled-components'
 
@@ -11,6 +12,7 @@ const EditableDiv = styled.span<{ $isPlaceholderVisible: boolean }>`
   white-space: pre-wrap;
   word-break: break-word;
   padding-bottom: 20px;
+  font-family: ${FONTS.MANROPE};
 
   &::before {
     content: ${({ $isPlaceholderVisible }) => ($isPlaceholderVisible ? '"Enter your text here..."' : '""')};
