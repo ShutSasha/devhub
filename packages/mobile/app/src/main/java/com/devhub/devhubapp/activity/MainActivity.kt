@@ -1,6 +1,7 @@
 package com.devhub.devhubapp.activity
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.LinearLayout
@@ -11,6 +12,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import com.devhub.devhubapp.R
+import com.devhub.devhubapp.classes.EncryptedPreferencesManager
 import com.devhub.devhubapp.classes.RetrofitClient
 import com.devhub.devhubapp.dataClasses.Post
 import com.devhub.devhubapp.fragment.FooterFragment
@@ -27,6 +29,17 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
+
+        val encryptedPreferencesManager = EncryptedPreferencesManager(this)
+        val user = encryptedPreferencesManager.getUserData()
+
+        if (user.id.isEmpty()) {
+            val intent = Intent(this, WelcomeActivity::class.java)
+            startActivity(intent)
+            finish()
+            return
+        }
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
@@ -53,6 +66,19 @@ class MainActivity : AppCompatActivity() {
         }
 
         fetchPostsAndDisplay()
+        if (intent.getBooleanExtra("UPDATE_POSTS", false)) {
+            refreshPosts()
+        } else {
+            fetchPostsAndDisplay()
+        }
+    }
+
+    private fun refreshPosts() {
+        val fragmentManager = supportFragmentManager
+        val container = findViewById<LinearLayout>(R.id.posts_container)
+        container.removeAllViews()
+
+        fetchPostsAndDisplay()
     }
 
     private fun fetchPostsAndDisplay() {
@@ -63,8 +89,6 @@ class MainActivity : AppCompatActivity() {
                 }
                 if (posts.isNotEmpty()) {
                     displayPosts(posts)
-                } else {
-                    Log.d("MainActivity", "No posts received.")
                 }
             } catch (e: Exception) {
                 Log.e("MainActivity", "Error fetching posts: ${e.message}", e)
