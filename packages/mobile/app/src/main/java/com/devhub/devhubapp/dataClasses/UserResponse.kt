@@ -1,7 +1,7 @@
 package com.devhub.devhubapp.dataClasses
 
 data class UserResponse(
-    val id: String,
+    val _id: String,
     val name: String?,
     val username: String,
     val avatar: String,

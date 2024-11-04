@@ -159,7 +159,7 @@ class LogInActivity : AppCompatActivity() {
                         val refreshToken = loginResponse.refreshToken
 
                         val user = User(
-                            id = userResponse.id,
+                            _id = userResponse._id,
                             name = userResponse.name ?: "",
                             username = userResponse.username,
                             avatar = userResponse.avatar,

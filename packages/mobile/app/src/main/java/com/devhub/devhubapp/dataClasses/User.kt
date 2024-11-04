@@ -3,7 +3,7 @@ package com.devhub.devhubapp.dataClasses
 import java.util.Date
 
 data class User(
-    val id: String,
+    val _id: String,
     val name: String,
     val username: String,
     val avatar: String,

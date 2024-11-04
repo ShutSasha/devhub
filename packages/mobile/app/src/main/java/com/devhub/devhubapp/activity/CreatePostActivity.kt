@@ -67,7 +67,7 @@ class CreatePostActivity : AppCompatActivity() {
 
         createPostButton.setOnClickListener {
             createNewPost(
-                userId = encryptedPreferencesManager.getUserData()?.id ?: "",
+                userId = encryptedPreferencesManager.getUserData()?._id ?: "",
                 title = postTitle.text.toString(),
                 content = postContent.text.toString(),
                 tags = postTags.text.toString().split(",").map { it.trim() },

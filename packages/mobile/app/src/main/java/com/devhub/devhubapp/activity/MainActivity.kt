@@ -33,7 +33,7 @@ class MainActivity : AppCompatActivity() {
         val encryptedPreferencesManager = EncryptedPreferencesManager(this)
         val user = encryptedPreferencesManager.getUserData()
 
-        if (user.id.isEmpty()) {
+        if (user._id.isEmpty()) {
             val intent = Intent(this, WelcomeActivity::class.java)
             startActivity(intent)
             finish()

@@ -35,7 +35,7 @@ class EncryptedPreferencesManager(context: Context) {
     }
 
     fun saveUserData(userData: User) {
-        saveData("user_id", userData.id)
+        saveData("user_id", userData._id)
         saveData("name", userData.name ?: "")
         saveData("username", userData.username ?: "")
         saveData("email", userData.email ?: "")
@@ -53,7 +53,7 @@ class EncryptedPreferencesManager(context: Context) {
         val createdAt = Date(createdAtLong)
 
         return User(
-            id = sharedPreferences.getString("user_id", "") ?: "",
+            _id = sharedPreferences.getString("user_id", "") ?: "",
             name = sharedPreferences.getString("name", "") ?: "",
             username = sharedPreferences.getString("username", "") ?: "",
             email = sharedPreferences.getString("email", "") ?: "",

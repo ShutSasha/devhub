@@ -61,7 +61,7 @@ class AuthInterceptor(
                         val newRefreshToken = body.refreshToken
 
                         val user = User(
-                            id = userResponse.id,
+                            _id = userResponse._id,
                             name = userResponse.name ?: "",
                             username = userResponse.username,
                             avatar = userResponse.avatar,
