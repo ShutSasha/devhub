@@ -42,7 +42,7 @@
     "build": "yarn run craco build",
     "test": "yarn run craco test",
     "lint": "eslint .",
-    "prettier": "prettier",
+    "prettier": "prettier --config .prettierrc --write \"src/**/*.{js,jsx,ts,tsx}\"",
     "eject": "yarn run craco eject"
   },
   "jest": {
