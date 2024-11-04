@@ -11,7 +11,7 @@ import { AuthDevhubTitle } from '@shared/components/auth/devhub-title/auth-devhu
 import { useAppDispatch, useAppSelector } from '@app/store/store'
 import { setEmail, setPassword, setRepeatPassword, setUsername } from '@features/auth/auth.slice'
 import googleImage from '@assets/images/auth/devicon_google.svg'
-import githubImage from '@assets/images/auth/mdi_github.svg'
+// import githubImage from '@assets/images/auth/mdi_github.svg'
 import { useRegisterMutation } from '@api/auth.api'
 import { handleServerException } from '@utils/handleServerException.util'
 import { ErrorSpan } from '@shared/components/errors/error-span.component'
@@ -72,7 +72,6 @@ export const SignUp: FC = () => {
   const handleGithubAuth = async () => {
     try{
       const redirectUrl = `${process.env.REACT_APP_GITHUB_AUTH_API}`
-
       window.location.href = redirectUrl;
     } catch (e) {
       console.error(e)
