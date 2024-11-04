@@ -72,20 +72,31 @@ func New(
 
 		tagsString := r.FormValue("tags")
 
-		cleanedString := strings.Trim(tagsString, "[]")
+		tagsArray := []string{}
+		if strings.TrimSpace(tagsString) != "" && tagsString != "[]" {
+			cleanedString := strings.Trim(tagsString, "[]")
 
-		re := regexp.MustCompile(`[^\w\s,]`)
-		cleanedString = re.ReplaceAllString(cleanedString, "")
-		tagsArray := strings.Split(cleanedString, ",")
+			re := regexp.MustCompile(`[^#\+\w\s,]`)
+			cleanedString = re.ReplaceAllString(cleanedString, "")
+			tagsArray = strings.Split(cleanedString, ",")
 
-		for i := range tagsArray {
-			tagsArray[i] = strings.TrimSpace(tagsArray[i])
-		}
+			for i := range tagsArray {
+				tagsArray[i] = strings.TrimSpace(tagsArray[i])
+			}
 
-		if len(tagsArray) > 4 {
-			utils.HandleError(log, w, r, "the number of tags should be less than 4", fmt.Errorf("%v: too many tags", op),
-				http.StatusBadRequest, "body", "the number of tags should be less than 4")
-			return
+			var nonEmptyTags []string
+			for _, tag := range tagsArray {
+				if tag != "" {
+					nonEmptyTags = append(nonEmptyTags, tag)
+				}
+			}
+			tagsArray = nonEmptyTags
+
+			if len(tagsArray) > 4 {
+				utils.HandleError(log, w, r, "the number of tags should be less than 4", fmt.Errorf("%v: too many tags", op),
+					http.StatusBadRequest, "body", "the number of tags should be less than 4")
+				return
+			}
 		}
 
 		req := Request{
