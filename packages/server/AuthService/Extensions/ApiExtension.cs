@@ -98,7 +98,8 @@ namespace AuthService.Extensions
                options.TokenEndpoint = "https://github.com/login/oauth/access_token";
                options.UserInformationEndpoint = "https://api.github.com/user";
                options.SaveTokens = true;
-
+               options.Scope.Add("user:email");
+               
                options.Events = new OAuthEvents
                {
                   OnCreatingTicket = async context =>
@@ -118,9 +119,36 @@ namespace AuthService.Extensions
                         context!.Identity!.AddClaim(new Claim("name", login.GetString()!));
                      }
 
+                     string? emailValue = null;
                      if (json.RootElement.TryGetProperty("email", out var email))
                      {
-                        context!.Identity!.AddClaim(new Claim("email", email.GetString()!));
+                        emailValue = email.GetString();
+                     }
+                     
+                     if (string.IsNullOrEmpty(emailValue))
+                     {
+                        var emailRequest = new HttpRequestMessage(HttpMethod.Get, "https://api.github.com/user/emails");
+                        emailRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", context.AccessToken);
+                        emailRequest.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                        var emailResponse = await context.Backchannel.SendAsync(emailRequest,
+                           HttpCompletionOption.ResponseHeadersRead, context.HttpContext.RequestAborted);
+                        emailResponse.EnsureSuccessStatusCode();
+
+                        var emailJson = JsonDocument.Parse(await emailResponse.Content.ReadAsStringAsync());
+                        foreach (var emailElement in emailJson.RootElement.EnumerateArray())
+                        {
+                           if (emailElement.GetProperty("primary").GetBoolean())
+                           {
+                              emailValue = emailElement.GetProperty("email").GetString();
+                              break;
+                           }
+                        }
+                     }
+                     
+                     if (!string.IsNullOrEmpty(emailValue))
+                     {
+                        context!.Identity!.AddClaim(new Claim("email", emailValue));
                      }
 
                      if (json.RootElement.TryGetProperty("avatar_url", out var avatarUrl))
