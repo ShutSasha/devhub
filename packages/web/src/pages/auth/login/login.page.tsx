@@ -53,17 +53,18 @@ export const Login = () => {
 
   const handleGoogleAuth = () => {
     try {
-      const googleAuthUrl = `${process.env.REACT_APP_GOOGLE_AUTH_API}`
-
-      window.location.href = googleAuthUrl
+        const redirectUrl = `${process.env.REACT_APP_GOOGLE_AUTH_API}`
+      window.location.href = redirectUrl
     } catch (e) {
       console.error(e)
     }
   }
 
   const handleGithubAuth = async () => {
-    try {
-      console.log('response')
+    try{
+      const redirectUrl = `${process.env.REACT_APP_GITHUB_AUTH_API}`
+
+      window.location.href = redirectUrl;
     } catch (e) {
       console.error(e)
     }
