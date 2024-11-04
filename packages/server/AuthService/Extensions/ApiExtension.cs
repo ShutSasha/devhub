@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Diagnostics;
 using System.Net.Http.Headers;
 using System.Security.Claims;
@@ -12,6 +13,7 @@ using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using JsonSerializer = System.Text.Json.JsonSerializer;
+using PathString = Microsoft.AspNetCore.Http.PathString;
 
 namespace AuthService.Extensions
 {
@@ -29,6 +31,7 @@ namespace AuthService.Extensions
                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
                options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+               options.DefaultChallengeScheme = "google";
                options.DefaultChallengeScheme = "github";
             })
             .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
@@ -144,6 +147,64 @@ namespace AuthService.Extensions
                         );
                      }
 
+                     return Task.CompletedTask;
+                  }
+               };
+            })
+            .AddOAuth("google", options =>
+            {
+               options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+               options.ClientId = configuration["GoogleOAuth:ClientId"]!;
+               options.ClientSecret = configuration["GoogleOAuth:ClientSecret"]!;
+               options.CallbackPath = "/api/auth/signin-google/";
+               options.AuthorizationEndpoint =
+                  "https://accounts.google.com/o/oauth2/auth";
+               options.TokenEndpoint = "https://oauth2.googleapis.com/token";
+               options.UserInformationEndpoint =
+                  "https://www.googleapis.com/oauth2/v3/userinfo";
+               options.SaveTokens = true;
+               options.Scope.Add("profile");
+               options.Scope.Add("email");
+
+               options.Events = new OAuthEvents
+               {
+                  OnCreatingTicket = async context =>
+                  {
+                     var request = new HttpRequestMessage(HttpMethod.Get, context.Options.UserInformationEndpoint);
+                     request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", context.AccessToken);
+                     request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                     var response = await context.Backchannel.SendAsync(request,
+                        HttpCompletionOption.ResponseHeadersRead, context.HttpContext.RequestAborted);
+                     response.EnsureSuccessStatusCode();
+
+                     var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+                     
+                     if (json.RootElement.TryGetProperty("name", out var name))
+                     {
+                        context.Identity!.AddClaim(new Claim("name", name.GetString()!));
+                     }
+
+                     if (json.RootElement.TryGetProperty("email", out var email))
+                     {
+                        context.Identity!.AddClaim(new Claim("email", email.GetString()!));
+                     }
+
+                     if (json.RootElement.TryGetProperty("picture", out var avatarUrl)) ;
+                     {
+                        context.Identity!.AddClaim(new Claim("avatar_url", avatarUrl.GetString()!));
+                     }
+                  },
+
+                  OnRedirectToAuthorizationEndpoint = context =>
+                  {
+                     context.Response.Redirect(context.RedirectUri);
+                     return Task.CompletedTask;
+                  },
+
+                  OnRemoteFailure = context =>
+                  {
+                     Console.WriteLine("OAuth error: " + context.Failure?.Message);
                      return Task.CompletedTask;
                   }
                };
