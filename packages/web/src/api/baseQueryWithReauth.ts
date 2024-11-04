@@ -13,9 +13,8 @@ const baseUrl = `${process.env.REACT_APP_API_URL}`
 const baseQuery = fetchBaseQuery({
   baseUrl,
   prepareHeaders: (headers, { getState }) => {
-    headers.set('Content-Type', 'application/json')
-
     const token = (getState() as RootState).userSlice.accessToken
+
     // If we have a token set in state, let's assume that we should be passing it.
     if (token) {
       headers.set('authorization', `Bearer ${token}`)
@@ -47,10 +46,10 @@ const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQue
           extraOptions,
         )) as { data: RefreshResponse }
 
-        api.dispatch(setAccessToken(refreshResult.data.token))
+        api.dispatch(setAccessToken(refreshResult.data.accessToken))
         api.dispatch(setUser(refreshResult.data.user))
 
-        if (refreshResult.data.token) {
+        if (refreshResult.data.accessToken) {
           // retry the initial query
           result = await baseQuery(args, api, extraOptions)
         } else {

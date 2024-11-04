@@ -72,6 +72,54 @@
          "UpstreamPathTemplate": "/api/auth/change-password",
          "UpstreamHttpMethod": ["PATCH"]
       },
+      {
+         "DownstreamPathTemplate": "/api/auth/testinfo",
+         "DownstreamScheme": "http",
+         "DownstreamHostAndPorts": [
+            {
+               "Host": "localhost",
+               "Port": 5279
+            }
+         ],
+         "UpstreamPathTemplate": "/api/auth/testinfo",
+         "UpstreamHttpMethod": ["GET"]
+      },
+      {
+         "DownstreamPathTemplate": "/api/auth/logout",
+         "DownstreamScheme": "http",
+         "DownstreamHostAndPorts": [
+            {
+               "Host": "localhost",
+               "Port": 5279
+            }
+         ],
+         "UpstreamPathTemplate": "/api/auth/logout",
+         "UpstreamHttpMethod": ["POST"]
+      },
+      {
+         "DownstreamPathTemplate": "/api/auth/google-login",
+         "DownstreamScheme": "http",
+         "DownstreamHostAndPorts": [
+            {
+               "Host": "localhost",
+               "Port": 5279
+            }
+         ],
+         "UpstreamPathTemplate": "/api/auth/google-login",
+         "UpstreamHttpMethod": ["GET"]
+      },
+      {
+         "DownstreamPathTemplate": "/api/auth/github-login",
+         "DownstreamScheme": "http",
+         "DownstreamHostAndPorts": [
+            {
+               "Host": "localhost",
+               "Port": 5279
+            }
+         ],
+         "UpstreamPathTemplate": "/api/auth/github-login",
+         "UpstreamHttpMethod": ["GET"]
+      },
       
       {
          "DownstreamPathTemplate": "/api/posts",

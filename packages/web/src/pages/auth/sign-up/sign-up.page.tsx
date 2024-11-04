@@ -60,6 +60,26 @@ export const SignUp: FC = () => {
     }
   }
 
+  const handleGoogleAuth = () => {
+    try {
+      const redirectUrl = `${process.env.REACT_APP_GOOGLE_AUTH_API}`
+
+      window.location.href = redirectUrl
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
+  const handleGithubAuth = async () => {
+    try {
+      const redirectUrl = `${process.env.REACT_APP_GITHUB_AUTH_API}`
+
+      window.location.href = redirectUrl
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
   const errors: string[] | undefined = handleServerException(signUpError as ErrorException)
 
   return (
@@ -105,8 +125,8 @@ export const SignUp: FC = () => {
           style={{ textAlign: 'center', marginBottom: '16px' }}
         />
         <ImgContainer>
-          <AuthIcon src={googleImage} alt="GoogleAuth" />
-          <AuthIcon src={githubImage} alt="GithubAuth" />
+          <AuthIcon $image={googleImage} onClick={handleGoogleAuth} />
+          <AuthIcon $image={githubImage} onClick={handleGithubAuth} />
         </ImgContainer>
       </div>
     </AuthLayout>

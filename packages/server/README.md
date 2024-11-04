@@ -69,6 +69,11 @@ http:
   timeout: 10s
 grpc:
   user_service_port: 5228
+aws:
+  region: "eu-west-3"
+  access_key: ""
+  secret_key: ""
+  bucket: ""
 ```
 
 

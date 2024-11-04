@@ -10,8 +10,8 @@ import (
 
 	_ "github.com/ShutSasha/devhub/tree/main/packages/server/PostService/docs"
 	pb "github.com/ShutSasha/devhub/tree/main/packages/server/PostService/gen/go/user"
+	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/domain/interfaces"
 	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/http-server/handlers/post/delete"
-	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/http-server/handlers/post/get"
 	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/http-server/handlers/post/get/paginate"
 	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/http-server/handlers/post/get/single"
 	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/http-server/handlers/post/save"
@@ -31,16 +31,23 @@ type App struct {
 }
 
 type PostStorage interface {
-	save.PostSaver
-	get.PostProvider
-	delete.PostRemover
-	update.PostUpdater
-	search.PostSearcher
+	interfaces.PostSaver
+	interfaces.PostProvider
+	interfaces.PostRemover
+	interfaces.PostUpdater
+	interfaces.PostSearcher
+}
+
+type FileStorage interface {
+	interfaces.FileSaver
+	interfaces.FileRemover
+	interfaces.FileProvider
 }
 
 func New(
 	log *slog.Logger,
 	postStorage PostStorage,
+	fileStorage FileStorage,
 	grpcClient pb.UserServiceClient,
 	port int,
 	timout time.Duration,
@@ -65,13 +72,13 @@ func New(
 	))
 
 	router.Route("/api/posts", func(r chi.Router) {
-		r.Get("/{id}", single.New(log, postStorage))
-		r.Post("/", save.New(log, postStorage, postStorage, grpcClient))
-		r.Get("/", paginate.New(log, postStorage))
-		r.Delete("/{id}", delete.New(log, postStorage, postStorage, grpcClient))
-		r.Patch("/{id}", update.New(log, postStorage))
+		r.Get("/{id}", single.New(log, postStorage, fileStorage))
+		r.Post("/", save.New(log, postStorage, postStorage, postStorage, fileStorage, fileStorage, fileStorage, grpcClient))
+		r.Get("/", paginate.New(log, postStorage, fileStorage))
+		r.Delete("/{id}", delete.New(log, postStorage, postStorage, fileStorage, fileStorage, grpcClient))
+		r.Patch("/{id}", update.New(log, postStorage, postStorage, fileStorage, fileStorage, fileStorage))
 
-		r.Get("/search", search.New(log, postStorage))
+		r.Get("/search", search.New(log, postStorage, fileStorage))
 	})
 
 	httpServer := &http.Server{

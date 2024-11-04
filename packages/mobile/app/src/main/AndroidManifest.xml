@@ -2,7 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"
@@ -13,16 +14,13 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.DevHubApp"
-        tools:targetApi="31"
-        android:usesCleartextTraffic="true">
+        android:usesCleartextTraffic="true"
+        tools:targetApi="31">
         <activity
             android:name=".activity.SplashActivity"
             android:exported="false" />
         <activity
             android:name=".activity.WelcomeActivity"
-            android:exported="true" />
-        <activity
-            android:name=".activity.LogInActivity"
             android:exported="true" />
         <activity
             android:name=".activity.RegistrationActivity"
@@ -31,13 +29,16 @@
             android:name=".activity.ConfirmEmailActivity"
             android:exported="true" />
         <activity
+            android:name=".activity.LogInActivity"
+            android:exported="true" />
+        <activity
             android:name=".activity.ForgotPasswordActivity"
             android:exported="true" />
         <activity
-            android:name=".activity.ConfirmPasswordChangeActivity"
+            android:name=".activity.PostActivity"
             android:exported="true" />
         <activity
-            android:name=".activity.NewPasswordActivity"
+            android:name=".activity.CreatePostActivity"
             android:exported="true" />
         <activity
             android:name=".activity.MainActivity"

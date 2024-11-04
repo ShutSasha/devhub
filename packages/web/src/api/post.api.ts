@@ -14,7 +14,14 @@ export const api = createApi({
         method: 'GET',
       }),
     }),
+    createPost: builder.mutation<IPost, FormData>({
+      query: body => ({
+        url: 'posts',
+        method: 'POST',
+        body,
+      }),
+    }),
   }),
 })
 
-export const { useGetPostsQuery } = api
+export const { useGetPostsQuery, useCreatePostMutation } = api

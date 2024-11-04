@@ -5,34 +5,36 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageButton
-import android.widget.TextView
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import com.devhub.devhubapp.R
-
+import com.devhub.devhubapp.databinding.FragmentTitleBinding
 
 class TitleFragment : Fragment() {
 
     private var showBackArrow: Boolean = false
-    private var titleText: String? = null
+    private val titleText = MutableLiveData<String>()
+
+    private lateinit var binding: FragmentTitleBinding
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_title, container, false)
+        binding = FragmentTitleBinding.inflate(layoutInflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val backArrow: ImageButton = view.findViewById(R.id.back_arrow)
+        binding.backArrow.visibility = if (showBackArrow) View.VISIBLE else View.GONE
 
-        backArrow.visibility = if (showBackArrow) View.VISIBLE else View.GONE
+        titleText.observe(viewLifecycleOwner, Observer { newText ->
+            binding.title.text = newText
+        })
 
-        val title: TextView = view.findViewById(R.id.title)
-        title.text = titleText
-
-        backArrow.setOnClickListener {
+        binding.backArrow.setOnClickListener {
             requireActivity().onBackPressedDispatcher.onBackPressed()
         }
     }
@@ -42,7 +44,10 @@ class TitleFragment : Fragment() {
     }
 
     fun setTitleText(text: String) {
-        titleText = text
+        titleText.value = text
     }
-    
+
+    fun setTextColour(color: Int) {
+        binding.title.setTextColor(color)
+    }
 }

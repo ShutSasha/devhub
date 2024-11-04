@@ -11,6 +11,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
+	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/domain/interfaces"
 	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/domain/models"
 	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/storage"
 )
@@ -74,6 +75,7 @@ func (s *Storage) Save(
 func (s *Storage) GetById(
 	ctx context.Context,
 	postId primitive.ObjectID,
+	fileProvider interfaces.FileProvider,
 ) (*storage.PostModel, error) {
 	const op = "storage.mongodb.GetById"
 
@@ -117,7 +119,7 @@ func (s *Storage) GetById(
 	return post, nil
 }
 
-func (s *Storage) Delete(
+func (s *Storage) Remove(
 	ctx context.Context,
 	postId primitive.ObjectID,
 ) error {
@@ -187,12 +189,8 @@ func (s *Storage) Update(
 	return nil
 }
 
-func (s *Storage) Search(
-	ctx context.Context,
-	sortBy string,
-	query string,
-	tags []string,
-) ([]storage.PostModel, error) {
+func (s *Storage) Search(ctx context.Context, sortBy string, query string,
+	tags []string, fileProvider interfaces.FileProvider) ([]storage.PostModel, error) {
 	const op = "storage.mongodb.Search"
 
 	collection := s.db.Database("DevHubDB").Collection("posts")
@@ -274,7 +272,7 @@ func (s *Storage) Search(
 	return posts, nil
 }
 
-func (s *Storage) GetPaginated(ctx context.Context, limit, page int) ([]storage.PostModel, error) {
+func (s *Storage) GetPaginated(ctx context.Context, limit, page int, fileProvider interfaces.FileProvider) ([]storage.PostModel, error) {
 	const op = "storage.mongodb.GetPaginated"
 
 	collection := s.db.Database("DevHubDB").Collection("posts")
@@ -295,7 +293,7 @@ func (s *Storage) GetPaginated(ctx context.Context, limit, page int) ([]storage.
 			}},
 		},
 		bson.D{
-			{Key: "$sort", Value: bson.D{{Key: "created_at", Value: -1}}},
+			{Key: "$sort", Value: bson.D{{Key: "createdAt", Value: -1}}},
 		},
 		bson.D{
 			{Key: "$skip", Value: int64((page - 1) * limit)},

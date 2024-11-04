@@ -2,11 +2,8 @@ package update
 
 import (
 	"context"
-	"errors"
-	"io"
 	"log/slog"
 	"net/http"
-	"regexp"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -14,6 +11,8 @@ import (
 	"github.com/go-playground/validator/v10"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 
+	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/domain/interfaces"
+	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/http-server/utils"
 	resp "github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/lib/api/response"
 	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/lib/logger/sl"
 )
@@ -26,33 +25,8 @@ import (
 type Request struct {
 	Title       string   `json:"title,omitempty" validate:"omitempty,max=128,min=1"`
 	Content     string   `json:"content,omitempty" validate:"omitempty,min=1,max=62792"`
-	HeaderImage string   `json:"header_image,omitempty"`
+	HeaderImage string   `json:"headerImage,omitempty"`
 	Tags        []string `json:"tags,omitempty"`
-}
-
-var URLRegex = regexp.MustCompile(`^(https?://[^\s/$.?#].[^\s]*)$`)
-
-// PostUpdater is an interface that defines the method for updating a post.
-// Update takes a context, postId, title, content, header image, and tags, and returns an error if the update fails.
-type PostUpdater interface {
-	Update(
-		ctx context.Context,
-		postId primitive.ObjectID,
-		title string,
-		content string,
-		headerImage string,
-		tags []string,
-	) error
-}
-
-func urlIfContentNotEmpty(fl validator.FieldLevel) bool {
-	headerImage := fl.Field().String()
-	content := fl.Parent().FieldByName("Content").String()
-
-	if content != "" {
-		return URLRegex.MatchString(headerImage)
-	}
-	return true
 }
 
 // New is a handler function that processes the HTTP request for updating a post.
@@ -64,10 +38,11 @@ func urlIfContentNotEmpty(fl validator.FieldLevel) bool {
 // @Produce json
 // @Param id path string true "Post ID"
 // @Param request body Request true "Update post request body"
-// @Success 200 {object} map[string]interface{} "Success message"
+// @Success 200 {object} map[string]interface{} "Model of the updated post"
 // @Failure 400 {object} map[string]interface{} "Validation errors or request decoding failures"
 // @Router /api/posts/{id} [patch]
-func New(log *slog.Logger, postUpdater PostUpdater) http.HandlerFunc {
+func New(log *slog.Logger, postUpdater interfaces.PostUpdater, postProvider interfaces.PostProvider,
+	fileSaver interfaces.FileSaver, fileRemover interfaces.FileRemover, fileProvider interfaces.FileProvider) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		const op = "handlers.post.update.New"
 
@@ -76,68 +51,77 @@ func New(log *slog.Logger, postUpdater PostUpdater) http.HandlerFunc {
 			slog.String("request_id", middleware.GetReqID(r.Context())),
 		)
 
+		if err := r.ParseMultipartForm(10 << 20); err != nil {
+			utils.HandleError(log, w, r, "failed to parse multipart form", err, http.StatusInternalServerError, "headerImage", "Failed to parse multipart form")
+			return
+		}
+
 		id := chi.URLParam(r, "id")
-		var req Request
-
-		err := render.DecodeJSON(r.Body, &req)
-		if errors.Is(err, io.EOF) {
-			log.Error("request body is empty")
-
-			render.JSON(w, r, resp.Error(
-				map[string][]string{"body": {"Empty request"}},
-				http.StatusBadRequest,
-			))
-			return
-		}
-		if err != nil {
-			log.Error("failed to decode request body", sl.Err(err))
-
-			render.JSON(w, r, resp.Error(
-				map[string][]string{"body": {"Failed to decode request"}},
-				http.StatusBadRequest,
-			))
-
-			return
-		}
-
-		log.Info("request body decoded", slog.Any("request", req))
-
-		if req.Title == "" && req.Content == "" && req.HeaderImage == "" && len(req.Tags) == 0 {
-			log.Error("no fields provided for update")
-
-			render.JSON(w, r, resp.Error(
-				map[string][]string{"body": {"At least one field must be provided"}},
-				http.StatusBadRequest,
-			))
-			return
-		}
-
-		validate := validator.New()
-		validate.RegisterValidation("url_if_content_not_empty", urlIfContentNotEmpty)
-		if err := validator.New().Struct(req); err != nil {
-			validateErr := err.(validator.ValidationErrors)
-
-			log.Error("invalid request", sl.Err(err))
-
-			render.JSON(w, r, resp.ValidationError(
-				validateErr,
-				http.StatusBadRequest,
-			))
-
-			return
-		}
-
 		postId, err := primitive.ObjectIDFromHex(id)
 		if err != nil {
-			log.Error("failed to create objectId from postId", sl.Err(err))
-
-			render.JSON(w, r, resp.Error(
-				map[string][]string{"postId": {"Invalid postId format"}},
-				http.StatusBadRequest,
-			))
+			utils.HandleError(log, w, r, "failed to create objectId from postId", err, http.StatusBadRequest, "postId", "Invalid postId format")
 			return
 		}
 
+		req := Request{
+			Title:   r.FormValue("title"),
+			Content: r.FormValue("content"),
+			Tags:    r.Form["tags"],
+		}
+		if err := validator.New().Struct(req); err != nil {
+			validateErr := err.(validator.ValidationErrors)
+			utils.HandleValidatorError(log, w, r, "invalid request", err, validateErr, http.StatusBadRequest)
+			return
+		}
+
+		post, err := postProvider.GetById(context.TODO(), postId, fileProvider)
+		if err != nil {
+			utils.HandleError(log, w, r, "failed to get post by id", err, http.StatusInternalServerError, "post", err.Error())
+			return
+		}
+
+		if _, _, err := r.FormFile("headerImage"); err == nil {
+			fileRemoveErr := fileRemover.Remove(context.TODO(), post.HeaderImage)
+			if fileRemoveErr != nil {
+				log.Error("failed to delete post image from aws", sl.Err(fileRemoveErr))
+			} else {
+				log.Info("header image successfuly deleted from aws")
+			}
+		} else if err != http.ErrMissingFile {
+			utils.HandleError(log, w, r, "error retrieving file", err, http.StatusBadRequest, "headerImage", "Failed to retrieve file")
+			return
+		}
+
+		_, _, err = r.FormFile("headerImage")
+		if err != nil {
+			if err != http.ErrMissingFile {
+				utils.HandleError(log, w, r, "failed to retrieve file", err, http.StatusBadRequest, "headerImage", "Failed to retrieve file")
+				return
+			}
+		} else {
+			newImageKey, err := utils.HandleFileUpload(log, r, post.User.Id, fileSaver)
+			if err != nil {
+				utils.HandleError(log, w, r, "file upload error", err, http.StatusBadRequest, "headerImage", "Failed to retrieve or save file")
+				return
+			}
+			log.Info("new post image successfuly saved to aws")
+
+			err = fileRemover.Remove(context.TODO(), post.HeaderImage)
+			if err != nil {
+				log.Error("failed to delete previous post image from aws", sl.Err(err))
+			} else {
+				log.Info("previous post image successfuly deleted from aws")
+			}
+
+			req.HeaderImage = newImageKey
+		}
+
+		if req.Title == "" && req.Content == "" && len(req.Tags) == 0 && req.HeaderImage == "" {
+			utils.HandleError(log, w, r, "no fields provided for update", nil, http.StatusBadRequest, "body", "At least one field must be provided")
+			return
+		}
+
+		//Todo proceed case when not updated (upload back old header image)
 		err = postUpdater.Update(
 			context.TODO(),
 			postId,
@@ -157,11 +141,14 @@ func New(log *slog.Logger, postUpdater PostUpdater) http.HandlerFunc {
 			return
 		}
 
+		updatedPost, err := postProvider.GetById(context.TODO(), postId, fileProvider)
+		if err != nil {
+			utils.HandleError(log, w, r, "failed to retrieve post", err, http.StatusInternalServerError, "postId", "Failed to retrieve the updated post")
+			return
+		}
+
 		log.Info("post updated", slog.Any("id", id))
 
-		render.JSON(w, r, map[string]interface{}{
-			"Status":  http.StatusOK,
-			"Message": "Successfully updated",
-		})
+		render.JSON(w, r, updatedPost)
 	}
 }

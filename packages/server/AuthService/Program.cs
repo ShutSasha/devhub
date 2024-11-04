@@ -1,8 +1,13 @@
+//using AuthService.Extensions;
+
 using AuthService.Extensions;
 using AuthService.Helpers.Jwt;
 using AuthService.Helpers.Security;
+using AuthService.Helpers.ThirdParty;
 using AuthService.Models;
 using AuthService.Services;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 
@@ -21,6 +26,11 @@ builder.Services.AddCors(options =>
     });
 });
 
+
+builder.Services.AddDistributedMemoryCache();
+
+builder.Services.Configure<GoogleAuthOptions>(configuration.GetSection("GoogleOAuth"));
+
 builder.Services.Configure<JwtOptions>(configuration.GetSection(nameof(JwtOptions)));
 builder.Services.AddApiAuthentication(builder.Configuration);
 builder.Services.AddAuthorization();
@@ -28,8 +38,8 @@ builder.Services.AddAuthorization();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
 builder.Services.AddHttpClient();
+
 builder.Services.Configure<MongoDbSettings>(configuration.GetSection("MongoDbSettings"));
 builder.Services.Configure<SenderDataSettings>(configuration.GetSection("SenderData"));
 builder.Services.AddSingleton<IMongoClient>(sp =>
@@ -37,6 +47,7 @@ builder.Services.AddSingleton<IMongoClient>(sp =>
     var settings = sp.GetRequiredService<IOptions<MongoDbSettings>>().Value;
     return new MongoClient(settings.ConnectionUri);
 });
+
 builder.Services.AddSingleton<IMongoDatabase>(sp =>
 {
     var mongoClient = sp.GetRequiredService<IMongoClient>();
@@ -62,6 +73,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseStaticFiles();
+app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();

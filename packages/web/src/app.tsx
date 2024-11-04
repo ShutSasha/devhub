@@ -4,6 +4,8 @@ import GlobalStyle from '@app/styles/global.styles'
 import { setAccessToken, setLoading, setUser } from '@features/user/user.slice'
 import router from '@pages/router'
 import { useEffect } from 'react'
+import { ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
 import { RefreshResponse } from '~types/auth/refresh-response.type'
 
@@ -23,9 +25,9 @@ export const App = () => {
           credentials: 'include',
         })
 
-        const { token, user }: RefreshResponse = await response.json()
+        const { accessToken, user }: RefreshResponse = await response.json()
 
-        dispatch(setAccessToken(token))
+        dispatch(setAccessToken(accessToken))
         dispatch(setUser(user))
       } catch (e) {
         console.error(e)
@@ -40,6 +42,7 @@ export const App = () => {
   return (
     <>
       <GlobalStyle />
+      <ToastContainer />
       <RouterProvider router={router} />
     </>
   )

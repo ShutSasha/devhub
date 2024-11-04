@@ -35,6 +35,12 @@ export const api = createApi({
         body,
       }),
     }),
+    logout: builder.mutation<void, void>({
+      query: () => ({
+        url: 'auth/logout',
+        method: 'POST',
+      }),
+    }),
     passwordVerificationCode: builder.mutation<{ message: string }, ForgetPasswordRequest>({
       query: body => ({
         url: 'auth/password-verification-code',
@@ -58,4 +64,5 @@ export const {
   useLoginMutation,
   usePasswordVerificationCodeMutation,
   useChangePasswordMutation,
+  useLogoutMutation,
 } = api

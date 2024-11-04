@@ -1,8 +1,15 @@
 using AuthService.Contracts.Email;
 using AuthService.Contracts.User;
 using AuthService.Helpers.Response;
+using AuthService.Helpers.ThirdParty;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
+using MongoDB.Bson;
+using MongoDB.Bson.IO;
+using Newtonsoft.Json;
+using JsonConvert = Newtonsoft.Json.JsonConvert;
 
 namespace AuthService.Controllers;
 
@@ -11,10 +18,14 @@ namespace AuthService.Controllers;
 public class AuthController : ControllerBase
 {
    private readonly Services.AuthService _authService;
+   private readonly IConfiguration _configuration;
+   private readonly GoogleAuthOptions _googleAuthOptions;
 
-   public AuthController(Services.AuthService authService)
+   public AuthController(Services.AuthService authService, IOptions<GoogleAuthOptions> googleAuthOptions, IConfiguration configuration)
    {
       _authService = authService;
+      _configuration = configuration;
+      _googleAuthOptions = googleAuthOptions.Value;
    }
 
    [HttpPost("register")]
@@ -32,14 +43,7 @@ public class AuthController : ControllerBase
       }
       catch (Exception e)
       {
-         return BadRequest(new
-         {
-            status = 400,
-            errors = new Dictionary<string, List<string>>
-            {
-               { "Registration error", new List<string> { e.Message } }
-            }
-         });
+         return ErrorResponseHelper.CreateErrorResponse(400, $"{nameof(Register)} error", e.Message);
       }
    }
 
@@ -57,39 +61,26 @@ public class AuthController : ControllerBase
             SameSite = SameSiteMode.Strict,
             Expires = DateTime.Now.AddSeconds(30)
          });
-         return Ok(new { Token = loginResult.AccessToken, User = loginResult.UserData });
+         return Ok(new { AccessToken = loginResult.AccessToken, RefreshToken = loginResult.RefreshToken, User = loginResult.UserData });
       }
       catch (Exception e)
       {
-         return BadRequest(new
-         {
-            status = 400,
-            errors = new Dictionary<string, List<string>>
-            {
-               { "Login error", new List<string> { e.Message } }
-            }
-         });
+         return ErrorResponseHelper.CreateErrorResponse(400, "Login error", e.Message);
       }
    }
 
    [HttpPost("verify-email")]
    public async Task<IActionResult> VerifyEmail([FromBody] VerifyEmailRequest request)
    {
-      var result = await _authService.VerifyEmail(request.Email, request.ActivationCode);
-
-      if (result)
+      try
       {
+         await _authService.VerifyEmail(request.Email, request.ActivationCode);
          return Ok(new { message = "Email successfully verified" });
       }
-
-      return BadRequest(new
+      catch (Exception e)
       {
-         status = 400,
-         errors = new Dictionary<string, List<string>>
-         {
-            { "ActivationCode", new List<string> { "Invalid email or activation code" } }
-         }
-      });
+         return ErrorResponseHelper.CreateErrorResponse(400, "Activation code error", e.Message);
+      }
    }
 
    [HttpPost("refresh")]
@@ -97,7 +88,12 @@ public class AuthController : ControllerBase
    {
       try
       {
-         var refreshToken = HttpContext.Request.Cookies["refreshToken"];
+         var refreshToken = HttpContext.Request.Headers["X-Refresh-Token"].FirstOrDefault();
+        
+         if (string.IsNullOrEmpty(refreshToken))
+         {
+            refreshToken = HttpContext.Request.Cookies["refreshToken"];
+         }
 
          var refreshResult = await _authService.RefreshTokens(refreshToken);
 
@@ -109,18 +105,11 @@ public class AuthController : ControllerBase
             Expires = DateTime.UtcNow.AddDays(30)
          });
 
-         return Ok(new { Message = "Tokens updated", Token = refreshResult.AccessToken, User = refreshResult.UserData });
+         return Ok(new { Message = "Tokens updated", AccessToken = refreshResult.AccessToken, RefreshToken = refreshResult.RefreshToken,  User = refreshResult.UserData });
       }
       catch (Exception e)
       {
-         return Unauthorized(new
-         {
-            status = 401,
-            errors = new Dictionary<string, List<string>>
-            {
-               { "Refresh error", new List<string> { e.Message } }
-            }
-         });
+         return ErrorResponseHelper.CreateErrorResponse(401, "Refresh error", e.Message);
       }
    }
 
@@ -158,13 +147,12 @@ public class AuthController : ControllerBase
       try
       {
          HttpContext.Response.Cookies.Delete("refreshToken");
-         return Ok(new {Message = "Successfully logout"});
+         return Ok(new { Message = "Successfully logout" });
       }
-      catch  (Exception e)
+      catch (Exception e)
       {
-        return ErrorResponseHelper.CreateErrorResponse(500, "Logout error", "Something went wrong");
+         return ErrorResponseHelper.CreateErrorResponse(500, "Logout error", "Something went wrong");
       }
-      
    }
 
    [Authorize]
@@ -180,13 +168,109 @@ public class AuthController : ControllerBase
          return Ok(data);
       }
 
-      return Unauthorized(new
+      return ErrorResponseHelper.CreateErrorResponse(401, "Fetch error", "Can't fetch");
+   }
+   
+   [HttpGet("google-login")]
+   public async Task<IActionResult> GoogleLogin()
+   {
+      try
       {
-         status = 401,
-         errors = new Dictionary<string, List<string>>
-         {
-            { "Fetch Error", new List<string> { "Cannot fetch" } }
-         }
+         var redirectUrl = Url.Action(nameof(GoogleCallback), "Auth",null,Request.Scheme);
+         
+         var properties = new AuthenticationProperties { RedirectUri = redirectUrl };
+
+         return Challenge(properties,"google");
+      }
+      catch (Exception e)
+      {
+         return ErrorResponseHelper.CreateErrorResponse(
+            400, 
+            "Google auth error",
+            "Error while redirect callback");
+      }
+   }
+   
+
+   [HttpGet("signin-google")]
+   public async Task<IActionResult> GoogleCallback()
+   {
+      var authenticateResult = await HttpContext.AuthenticateAsync("google");
+
+      if (!authenticateResult.Succeeded)
+      {
+         return BadRequest("Auth error");
+      }
+      
+      var claims = authenticateResult.Principal?.Identities.FirstOrDefault()?.Claims;
+      var userInfo = new
+      {
+         Name = claims?.FirstOrDefault(c => c.Type == "name")?.Value,
+         Email = claims?.FirstOrDefault(c => c.Type == "email")?.Value,
+         Avatar = claims?.FirstOrDefault(c => c.Type == "avatar_url")?.Value,
+      }.ToJson();
+
+      var user = JsonConvert.DeserializeObject<UserInfo>(userInfo);
+
+      var userResult = await _authService.SignInOrSignUp(user);
+
+      HttpContext.Response.Cookies.Append("refreshToken", userResult.RefreshToken, new CookieOptions
+      {
+         HttpOnly = true,
+         Secure = true, 
+         SameSite = SameSiteMode.Strict 
       });
+
+      return Redirect("http://localhost:3000");
+   }
+   
+   [HttpGet("github-login")]
+   public async Task<IActionResult> GitHubLogin()
+   {
+      try
+      {
+         var redirectUrl = Url.Action(nameof(GitHubCallback), "Auth",null,Request.Scheme);
+         
+         var properties = new AuthenticationProperties { RedirectUri = redirectUrl };
+
+         return Challenge(properties,"github");
+      }
+      catch (Exception e)
+      {
+         return ErrorResponseHelper.CreateErrorResponse(400, "GitHub auth error", "Error while redirect callback");
+      }
+   }
+   
+   [HttpGet("signin-github")]
+   public async Task<IActionResult> GitHubCallback()
+   {
+      var authenticateResult = await HttpContext.AuthenticateAsync("github");
+
+      if (!authenticateResult.Succeeded)
+      {
+         return BadRequest("Auth error");
+      }
+      
+      var claims = authenticateResult.Principal?.Identities.FirstOrDefault()?.Claims;
+      var userInfo = new
+      {
+         Name = claims?.FirstOrDefault(c => c.Type == "name")?.Value,
+         Email = claims?.FirstOrDefault(c => c.Type == "email")?.Value,
+         Avatar = claims?.FirstOrDefault(c => c.Type == "avatar_url")?.Value,
+      }.ToJson();
+
+      var user = JsonConvert.DeserializeObject<UserInfo>(userInfo);
+
+      var userResult = await _authService.SignInOrSignUp(user);
+
+      HttpContext.Response.Cookies.Append("refreshToken", userResult.RefreshToken, new CookieOptions
+      {
+         HttpOnly = true,
+         Secure = true, 
+         SameSite = SameSiteMode.Strict 
+      });
+
+      //return Ok(new { AccessToken = userResult.AccessToken, RefreshToken = userResult.RefreshToken, UserData = userResult.UserData});
+      return Redirect("http://localhost:3000");
    }
 }

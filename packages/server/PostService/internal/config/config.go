@@ -13,6 +13,7 @@ type Config struct {
 	StoragePath string     `yaml:"storage_path" env-required:"true"`
 	Http        HttpConfig `yaml:"http"`
 	Grpc        GrpcConfig `yaml:"grpc"`
+	Aws         AwsConfig  `yaml:"aws"`
 }
 
 type HttpConfig struct {
@@ -22,6 +23,13 @@ type HttpConfig struct {
 
 type GrpcConfig struct {
 	UserServicePort int `yaml:"user_service_port"`
+}
+
+type AwsConfig struct {
+	Region    string `yaml:"region"`
+	AccessKey string `yaml:"access_key"`
+	SecretKey string `yaml:"secret_key"`
+	Bucket    string `yaml:"bucket"`
 }
 
 func MustLoad() *Config {

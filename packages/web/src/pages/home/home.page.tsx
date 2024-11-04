@@ -18,7 +18,11 @@ export const Home = () => {
       <PostsContainer>
         <SearchInput placeholder="Search by post title..." />
         {isLoading && <p>Loading...</p>}
-        {posts && posts.map(post => <Post key={post._id} post={post} />)}
+        {Array.isArray(posts) && posts.length > 0 ? (
+          posts.map(post => <Post key={post._id} post={post} />)
+        ) : (
+          <p>No posts available.</p>
+        )}
       </PostsContainer>
       <div>
         Lorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis dicta sed ullam quidem dolorem et voluptates

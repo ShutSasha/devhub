@@ -2,36 +2,20 @@ package delete
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 	"net/http"
 
 	pb "github.com/ShutSasha/devhub/tree/main/packages/server/PostService/gen/go/user"
+	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/domain/interfaces"
+	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/http-server/utils"
 	resp "github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/lib/api/response"
 	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/lib/logger/sl"
-	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/storage"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/render"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
-
-// PostRemover is an interface that defines the method for deleting a post by its ID.
-// Delete takes a context and postId, and returns an error if the deletion fails.
-type PostRemover interface {
-	Delete(
-		ctx context.Context,
-		postId primitive.ObjectID,
-	) error
-}
-
-// PostProvider is an interface that defines the method for retrieving a post by its ID.
-// GetPostById takes a context and postId, and returns the post model or an error.
-type PostProvider interface {
-	GetById(
-		ctx context.Context,
-		postId primitive.ObjectID,
-	) (*storage.PostModel, error)
-}
 
 // New is a handler function that processes the HTTP request to delete a post by its ID.
 // It validates the post ID, checks for errors, and calls the PostRemover to delete the post.
@@ -47,8 +31,10 @@ type PostProvider interface {
 // @Router /api/posts/{id} [delete]
 func New(
 	log *slog.Logger,
-	postRemover PostRemover,
-	postProvider PostProvider,
+	postRemover interfaces.PostRemover,
+	postProvider interfaces.PostProvider,
+	fileRemover interfaces.FileRemover,
+	fileProvider interfaces.FileProvider,
 	grpcClient pb.UserServiceClient,
 ) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -64,70 +50,52 @@ func New(
 
 		postId, err := primitive.ObjectIDFromHex(id)
 		if err != nil {
-			log.Error("failed to create objectId from postId", sl.Err(err))
-
-			render.JSON(w, r, resp.Error(
-				map[string][]string{"postId": {"Invalid postId format"}},
-				http.StatusBadRequest,
-			))
-
+			utils.HandleError(log, w, r, "failed to create objectId from postId", err, http.StatusBadRequest, "postId", "Invalid postId format")
 			return
+		}
+
+		post, err := postProvider.GetById(context.TODO(), postId, fileProvider)
+		if err == nil && post.HeaderImage != "" {
+			fileRemoveErr := fileRemover.Remove(context.TODO(), post.HeaderImage)
+			if fileRemoveErr != nil {
+				log.Error("failed to delete post image from aws", sl.Err(fileRemoveErr))
+			} else {
+				log.Info("header image successfuly deleted from aws")
+			}
+		} else if err != nil {
+			log.Error("failed to get post by postId", sl.Err(err))
 		}
 
 		grpcDeleteResponse, err := grpcClient.DeletePostFromUser(context.TODO(), &pb.DeletePostRequest{
 			PostId: id,
 		})
 		if err != nil {
-			log.Error("failed to notify user service", sl.Err(err))
-
-			render.JSON(w, r, resp.Error(
-				map[string][]string{"userService": {"Failed to notify user service"}},
-				http.StatusInternalServerError,
-			))
+			utils.HandleError(log, w, r, "failed to notify user service", err, http.StatusInternalServerError, "userService", "Failed to notify user service")
 			return
 		}
 		if !grpcDeleteResponse.Success {
-			log.Error("user service returned failure", slog.String("message", grpcDeleteResponse.Message))
-
-			render.JSON(w, r, resp.Error(
-				map[string][]string{"userService": {"User service returned failure: " + grpcDeleteResponse.Message}},
-				http.StatusInternalServerError,
-			))
+			utils.HandleError(log, w, r, "user service returned failure", fmt.Errorf(grpcDeleteResponse.Message), http.StatusInternalServerError,
+				"userService", "User service returned failure: "+grpcDeleteResponse.Message)
 			return
 		}
 
 		log.Info("post succesfully removed from user")
 
-		err = postRemover.Delete(
+		err = postRemover.Remove(
 			context.TODO(),
 			postId,
 		)
 		if err != nil {
 			log.Error("can not delete post", sl.Err(err))
-
 			log.Info("rolling back post")
-			post, getByIdErr := postProvider.GetById(context.TODO(), postId)
-			if getByIdErr != nil {
-				log.Error("failed to retrieve post for rollback", sl.Err(getByIdErr))
-
-				render.JSON(w, r, resp.Error(map[string][]string{
-					"post": {"Failed to retrieve post for rollback: " + getByIdErr.Error()},
-				}, http.StatusInternalServerError))
-
-				return
-			}
 
 			_, rollbackErr := grpcClient.RestoreUserPost(context.TODO(), &pb.RestorePostRequest{
 				UserId: post.User.Id.Hex(),
 				PostId: postId.Hex(),
 			})
 			if rollbackErr != nil {
-				log.Error("failed to rollback post in user service", sl.Err(rollbackErr))
-
-				render.JSON(w, r, resp.Error(map[string][]string{
-					"rollback": {"Failed to rollback post in user service: " + rollbackErr.Error()},
-				}, http.StatusInternalServerError))
-
+				utils.HandleError(log, w, r, "failed to rollback post in user service", rollbackErr, http.StatusInternalServerError,
+					"rollback", "Failed to rollback post in user service: "+rollbackErr.Error())
 				return
 			}
 

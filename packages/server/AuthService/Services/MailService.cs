@@ -1,7 +1,8 @@
+using System.Net.Mail;
 using AuthService.Models;
-using MailKit.Net.Smtp;
 using Microsoft.Extensions.Options;
 using MimeKit;
+using SmtpClient = MailKit.Net.Smtp.SmtpClient;
 
 namespace AuthService.Services;
 

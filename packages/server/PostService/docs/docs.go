@@ -61,9 +61,9 @@ const docTemplate = `{
                 }
             },
             "post": {
-                "description": "This endpoint allows a user to save a new post with a title, content, and optional tags.",
+                "description": "This endpoint allows a user to save a new post with a title, content, optional header image, and tags.",
                 "consumes": [
-                    "application/json"
+                    "multipart/form-data"
                 ],
                 "produces": [
                     "application/json"
@@ -74,25 +74,56 @@ const docTemplate = `{
                 "summary": "Save a new post",
                 "parameters": [
                     {
-                        "description": "Post save request body",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/save.Request"
-                        }
+                        "type": "string",
+                        "description": "User ID of the user creating the post",
+                        "name": "userId",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Title of the post",
+                        "name": "title",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Content of the post",
+                        "name": "content",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "Header image for the post",
+                        "name": "headerImage",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Optional tags associated with the post (e.g., [tag1,tag2])",
+                        "name": "tags",
+                        "in": "formData"
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Returns the ID of the newly created post",
+                        "description": "Returns the details of the newly created post, including post ID, title, content, header image key, and tags",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
                         }
                     },
                     "400": {
-                        "description": "Validation errors or request decoding failures",
+                        "description": "Validation errors, request decoding failures, or file upload errors",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -291,10 +322,10 @@ const docTemplate = `{
         "models.Comment": {
             "type": "object",
             "properties": {
-                "comment_text": {
+                "commentText": {
                     "type": "string"
                 },
-                "created_at": {
+                "createdAt": {
                     "type": "string"
                 },
                 "likes": {
@@ -317,13 +348,13 @@ const docTemplate = `{
                 "content": {
                     "type": "string"
                 },
-                "created_at": {
+                "createdAt": {
                     "type": "string"
                 },
                 "dislikes": {
                     "type": "integer"
                 },
-                "header_image": {
+                "headerImage": {
                     "type": "string"
                 },
                 "likes": {
@@ -343,47 +374,16 @@ const docTemplate = `{
                 }
             }
         },
-        "save.Request": {
-            "type": "object",
-            "required": [
-                "content",
-                "title",
-                "user"
-            ],
-            "properties": {
-                "content": {
-                    "type": "string",
-                    "maxLength": 62792
-                },
-                "header_image": {
-                    "type": "string"
-                },
-                "tags": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "title": {
-                    "type": "string",
-                    "maxLength": 128,
-                    "minLength": 1
-                },
-                "user": {
-                    "type": "string"
-                }
-            }
-        },
         "storage.CommentModel": {
             "type": "object",
             "properties": {
                 "_id": {
                     "type": "string"
                 },
-                "comment_text": {
+                "commentText": {
                     "type": "string"
                 },
-                "created_at": {
+                "createdAt": {
                     "type": "string"
                 },
                 "likes": {
@@ -409,13 +409,13 @@ const docTemplate = `{
                 "content": {
                     "type": "string"
                 },
-                "created_at": {
+                "createdAt": {
                     "type": "string"
                 },
                 "dislikes": {
                     "type": "integer"
                 },
-                "header_image": {
+                "headerImage": {
                     "type": "string"
                 },
                 "likes": {
@@ -431,6 +431,26 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "user": {
+                    "$ref": "#/definitions/storage.UserModel"
+                }
+            }
+        },
+        "storage.UserModel": {
+            "type": "object",
+            "properties": {
+                "_id": {
+                    "type": "string"
+                },
+                "avatar": {
+                    "type": "string"
+                },
+                "devPoints": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "username": {
                     "type": "string"
                 }
             }
@@ -443,7 +463,7 @@ const docTemplate = `{
                     "maxLength": 62792,
                     "minLength": 1
                 },
-                "header_image": {
+                "headerImage": {
                     "type": "string"
                 },
                 "tags": {

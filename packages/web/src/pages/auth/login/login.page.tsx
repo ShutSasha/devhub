@@ -41,11 +41,31 @@ export const Login = () => {
 
   const handleLogin = async () => {
     try {
-      const { token, user } = await login({ username, password }).unwrap()
-      dispatch(setAccessToken(token))
+      const { accessToken, user } = await login({ username, password }).unwrap()
+      dispatch(setAccessToken(accessToken))
       dispatch(setUser(user))
 
       navigate(ROUTES.HOME)
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
+  const handleGoogleAuth = () => {
+    try {
+      const redirectUrl = `${process.env.REACT_APP_GOOGLE_AUTH_API}`
+
+      window.location.href = redirectUrl
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
+  const handleGithubAuth = async () => {
+    try {
+      const redirectUrl = `${process.env.REACT_APP_GITHUB_AUTH_API}`
+
+      window.location.href = redirectUrl
     } catch (e) {
       console.error(e)
     }
@@ -81,8 +101,8 @@ export const Login = () => {
         style={{ marginBottom: '16px' }}
       />
       <ImgContainer>
-        <AuthIcon src={googleImage} alt="GoogleAuth" />
-        <AuthIcon src={githubImage} alt="GithubAuth" />
+        <AuthIcon $image={googleImage} onClick={handleGoogleAuth} />
+        <AuthIcon $image={githubImage} onClick={handleGithubAuth} />
       </ImgContainer>
     </AuthLayout>
   )
