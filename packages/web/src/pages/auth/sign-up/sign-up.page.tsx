@@ -62,9 +62,17 @@ export const SignUp: FC = () => {
 
   const handleGoogleAuth = () => {
     try {
-      const googleAuthUrl = `${process.env.REACT_APP_GOOGLE_AUTH_API}`
+      const redirectUrl = `${process.env.REACT_APP_GOOGLE_AUTH_API}`
+      window.location.href = redirectUrl
+    } catch (e) {
+      console.error(e)
+    }
+  }
 
-      window.location.href = googleAuthUrl
+  const handleGithubAuth = async () => {
+    try{
+      const redirectUrl = `${process.env.REACT_APP_GITHUB_AUTH_API}`
+      window.location.href = redirectUrl;
     } catch (e) {
       console.error(e)
     }
@@ -116,7 +124,7 @@ export const SignUp: FC = () => {
         />
         <ImgContainer>
           <AuthIcon $image={googleImage} onClick={handleGoogleAuth} />
-          {/* <AuthIcon $image={githubImage} /> */}
+          <AuthIcon $image={githubImage} onClick={handleGithubAuth} />
         </ImgContainer>
       </div>
     </AuthLayout>

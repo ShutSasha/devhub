@@ -170,29 +170,58 @@ public class AuthController : ControllerBase
 
       return ErrorResponseHelper.CreateErrorResponse(401, "Fetch error", "Can't fetch");
    }
-
-   [HttpGet("signin-google")]
-   public async Task<IActionResult> GoogleCallback(string code)
+   
+   [HttpGet("google-login")]
+   public async Task<IActionResult> GoogleLogin()
    {
-      if (string.IsNullOrEmpty(code))
-      {
-         return BadRequest("Authorization code not provided");
-      }
-
       try
       {
-         var tokenResponse = await _authService.ExchangeCodeForTokensAsync(code);
-         var userInfo = await _authService.GetGoogleUserInfoAsync(tokenResponse.access_token);
-
-         var userResult = await _authService.SignInOrSignUp(userInfo);
+         var redirectUrl = Url.Action(nameof(GoogleCallback), "Auth",null,Request.Scheme);
          
-         HttpContext.Response.Cookies.Append("refreshToken", userResult.RefreshToken);
-         return Redirect("http://localhost:3000");
+         var properties = new AuthenticationProperties { RedirectUri = redirectUrl };
+
+         return Challenge(properties,"google");
       }
       catch (Exception e)
       {
-         return ErrorResponseHelper.CreateErrorResponse(400, "Google auth error", e.Message);
+         return ErrorResponseHelper.CreateErrorResponse(
+            400, 
+            "Google auth error",
+            "Error while redirect callback");
       }
+   }
+   
+
+   [HttpGet("signin-google")]
+   public async Task<IActionResult> GoogleCallback()
+   {
+      var authenticateResult = await HttpContext.AuthenticateAsync("google");
+
+      if (!authenticateResult.Succeeded)
+      {
+         return BadRequest("Auth error");
+      }
+      
+      var claims = authenticateResult.Principal?.Identities.FirstOrDefault()?.Claims;
+      var userInfo = new
+      {
+         Name = claims?.FirstOrDefault(c => c.Type == "name")?.Value,
+         Email = claims?.FirstOrDefault(c => c.Type == "email")?.Value,
+         Avatar = claims?.FirstOrDefault(c => c.Type == "avatar_url")?.Value,
+      }.ToJson();
+
+      var user = JsonConvert.DeserializeObject<UserInfo>(userInfo);
+
+      var userResult = await _authService.SignInOrSignUp(user);
+
+      HttpContext.Response.Cookies.Append("refreshToken", userResult.RefreshToken, new CookieOptions
+      {
+         HttpOnly = true,
+         Secure = true, 
+         SameSite = SameSiteMode.Strict 
+      });
+
+      return Redirect("http://localhost:3000");
    }
    
    [HttpGet("github-login")]
@@ -234,8 +263,14 @@ public class AuthController : ControllerBase
 
       var userResult = await _authService.SignInOrSignUp(user);
 
-      HttpContext.Response.Cookies.Append("refreshToken", userResult.RefreshToken);
-      
-      return Ok(new { AccessToken = userResult.AccessToken, RefreshToken = userResult.RefreshToken, User = userResult.UserData });
+      HttpContext.Response.Cookies.Append("refreshToken", userResult.RefreshToken, new CookieOptions
+      {
+         HttpOnly = true,
+         Secure = true, 
+         SameSite = SameSiteMode.Strict 
+      });
+
+      //return Ok(new { AccessToken = userResult.AccessToken, RefreshToken = userResult.RefreshToken, UserData = userResult.UserData});
+      return Redirect("http://localhost:3000");
    }
 }

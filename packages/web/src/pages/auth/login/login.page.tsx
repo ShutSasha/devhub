@@ -53,23 +53,22 @@ export const Login = () => {
 
   const handleGoogleAuth = () => {
     try {
-      const googleAuthUrl = `${process.env.REACT_APP_GOOGLE_AUTH_API}`
-
-      window.location.href = googleAuthUrl
+        const redirectUrl = `${process.env.REACT_APP_GOOGLE_AUTH_API}`
+      window.location.href = redirectUrl
     } catch (e) {
       console.error(e)
     }
   }
 
-  // const handleGithubAuth = async () => {
-  //   try {
-  //     const response = await githubAuth()
+  const handleGithubAuth = async () => {
+    try{
+      const redirectUrl = `${process.env.REACT_APP_GITHUB_AUTH_API}`
 
-  //     console.log(response)
-  //   } catch (e) {
-  //     console.error(e)
-  //   }
-  // }
+      window.location.href = redirectUrl;
+    } catch (e) {
+      console.error(e)
+    }
+  }
 
   const errors: string[] | undefined = handleServerException(loginError as ErrorException)
 
@@ -102,7 +101,7 @@ export const Login = () => {
       />
       <ImgContainer>
         <AuthIcon $image={googleImage} onClick={handleGoogleAuth} />
-        {/* <AuthIcon $image={githubImage} onClick={handleGithubAuth} /> */}
+        <AuthIcon $image={githubImage} onClick={handleGithubAuth} />
       </ImgContainer>
     </AuthLayout>
   )

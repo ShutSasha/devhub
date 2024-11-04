@@ -281,7 +281,7 @@ public class AuthService
          {
             UserName = userInfo.name,
             Email = userInfo.email,
-            Avatar = userInfo.picture ?? userInfo.avatar,
+            Avatar = userInfo.avatar,
             IsActivated = true,
             Password = null
          };
