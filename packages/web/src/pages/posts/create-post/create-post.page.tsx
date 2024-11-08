@@ -3,14 +3,15 @@ import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import { CreatePostLayout } from '@shared/layouts/posts/create-post.layout'
 import { StyledAvatar, StyledUserCredentialsContainer, Username } from '@shared/components/post/post.style'
-import { useAppSelector } from '@app/store/store'
+import { useAppDispatch, useAppSelector } from '@app/store/store'
 import { Text } from '@shared/components/text/text.component'
 import { FONTS } from '@shared/consts/fonts.enum'
 import { colors } from '@shared/consts/colors.const'
 import uploadSvg from '@assets/images/post/upload.svg'
-import { useCreatePostMutation } from '@api/post.api'
+import { useCreatePostMutation, useLazyGetPostsQuery } from '@api/post.api'
 import { ROUTES } from '@pages/router/routes.enum'
 import { handleServerException } from '@utils/handleServerException.util'
+import { setLoading, setPosts } from '@features/posts/posts.slice'
 
 import { InputContainer } from './components/editable-area.component'
 import * as S from './create-post.style'
@@ -22,6 +23,8 @@ export const CreatePost = () => {
   const navigate = useNavigate()
   const content = useRef<HTMLSpanElement>(null)
   const [createPost] = useCreatePostMutation()
+  const [getPosts] = useLazyGetPostsQuery()
+  const dispatch = useAppDispatch()
   const user = useAppSelector(state => state.userSlice.user)
   const [headerImage, setHeaderImage] = useState<File>()
   const [headerImageUrl, setHeaderImageUrl] = useState<string | null>(null)
@@ -98,7 +101,7 @@ export const CreatePost = () => {
       }
 
       const formData = createFormData(postData)
-
+      dispatch(setLoading(true))
       await createPost(formData).unwrap()
 
       navigate(ROUTES.HOME)
@@ -107,6 +110,9 @@ export const CreatePost = () => {
       toast.error(handleServerException(e as ErrorException)?.join(', '))
     } finally {
       setIsDisableBtn(false)
+      const { data } = await getPosts()
+      dispatch(setPosts(data || null))
+      dispatch(setLoading(false))
     }
   }
 

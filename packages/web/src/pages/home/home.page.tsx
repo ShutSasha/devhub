@@ -1,12 +1,33 @@
+import { useEffect } from 'react'
 import { Post } from '@shared/components/post/post.component'
 import { SearchInput } from '@shared/components/search-input/search-input.component'
 import { MainLayout } from '@shared/layouts/main.layout'
-import { useGetPostsQuery } from '@api/post.api'
+import { useLazyGetPostsQuery } from '@api/post.api'
+import { useAppDispatch, useAppSelector } from '@app/store/store'
+import { setLoading, setPosts } from '@features/posts/posts.slice'
 
 import { PostsContainer } from './home.style'
 
 export const Home = () => {
-  const { data: posts, isLoading } = useGetPostsQuery()
+  const posts = useAppSelector(state => state.postsSlice.posts)
+  const isLoading = useAppSelector(state => state.postsSlice.isLoading)
+  const dispatch = useAppDispatch()
+  const [getPosts] = useLazyGetPostsQuery()
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const { data } = await getPosts()
+        dispatch(setLoading(true))
+        dispatch(setPosts(data || null))
+      } catch (e) {
+        console.error(e)
+      } finally {
+        dispatch(setLoading(false))
+      }
+    }
+    fetchPosts()
+  }, [])
 
   return (
     <MainLayout>
