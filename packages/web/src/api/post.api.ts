@@ -8,10 +8,11 @@ export const api = createApi({
   reducerPath: 'postApi',
   baseQuery: baseQueryWithReauth,
   endpoints: builder => ({
-    getPosts: builder.query<IPost[], void>({
-      query: () => ({
+    getPosts: builder.query<IPost[], { page: number; limit: number }>({
+      query: ({ page, limit }) => ({
         url: 'posts',
         method: 'GET',
+        params: { page, limit },
       }),
     }),
     createPost: builder.mutation<IPost, FormData>({

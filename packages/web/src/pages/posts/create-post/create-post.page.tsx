@@ -105,12 +105,13 @@ export const CreatePost = () => {
       await createPost(formData).unwrap()
 
       navigate(ROUTES.HOME)
+      window.scrollTo(0, 0)
     } catch (e) {
       console.error(e)
       toast.error(handleServerException(e as ErrorException)?.join(', '))
     } finally {
       setIsDisableBtn(false)
-      const { data } = await getPosts()
+      const { data } = await getPosts({ page: 1, limit: 10 })
       dispatch(setPosts(data || null))
       dispatch(setLoading(false))
     }
