@@ -168,7 +168,21 @@
          ],
          "UpstreamPathTemplate": "/api/posts",
          "UpstreamHttpMethod": ["GET"]
-      }
+      },
+
+      {
+         "DownstreamPathTemplate": "/api/users",
+         "DownstreamScheme": "http",
+         "DownstreamHostAndPorts": [
+            {
+               "Host": "localhost",
+               "Port": 5229
+            }
+         ],
+         "UpstreamPathTemplate": "/api/users",
+         "UpstreamHttpMethod": ["PATCH"]
+      } 
+      
    ],
    "GlobalConfiguration": {
       "BaseUrl": "http://localhost:5295"
