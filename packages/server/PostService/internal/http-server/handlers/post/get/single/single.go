@@ -42,7 +42,7 @@ func New(log *slog.Logger, postProvider interfaces.PostProvider, fileProvider in
 
 		postId, err := primitive.ObjectIDFromHex(id)
 		if err != nil {
-			utils.HandleError(log, w, r, "failed to create objectId from postId", err, http.StatusBadRequest, "postId", "Invalid postId format")
+			utils.HandleError(log, w, r, "failed to create objectId from postId", err, http.StatusBadRequest, "post", storage.ErrPostNotFound.Error())
 			return
 		}
 
