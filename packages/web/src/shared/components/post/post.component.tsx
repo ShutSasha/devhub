@@ -1,4 +1,5 @@
 import { FC } from 'react'
+import { ROUTES } from '@pages/router/routes.enum'
 
 import * as S from './post.style'
 
@@ -10,7 +11,7 @@ interface PostProps {
 
 export const Post: FC<PostProps> = ({ post }) => {
   return (
-    <S.Container>
+    <S.Container to={`${ROUTES.POST_VIEW.replace(':id', post._id)}`}>
       {post.headerImage && (
         <S.HeaderImage src={'https://mydevhubimagebucket.s3.eu-west-3.amazonaws.com/' + post.headerImage} />
       )}

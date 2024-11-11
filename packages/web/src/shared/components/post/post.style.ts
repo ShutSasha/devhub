@@ -12,8 +12,9 @@ import dislikePressed from '@assets/images/post/dislikes/dislike-pressed.svg'
 import comment from '@assets/images/post/comments/comment.svg'
 import commentHover from '@assets/images/post/comments/comment-hover.svg'
 import { FONTS } from '@shared/consts/fonts.enum'
+import { Link } from 'react-router-dom'
 
-export const Container = styled.div`
+export const Container = styled(Link)`
   background-color: ${colors.background};
 
   margin-bottom: 10px;
