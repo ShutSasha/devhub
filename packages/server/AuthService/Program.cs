@@ -13,8 +13,9 @@ using MongoDB.Driver;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
+var services = builder.Services;
 
-builder.Services.AddCors(options =>
+services.AddCors(options =>
 {
     options.AddPolicy("AllowAPIGateway", policy =>
     {
@@ -27,40 +28,40 @@ builder.Services.AddCors(options =>
 });
 
 
-builder.Services.AddDistributedMemoryCache();
+services.AddDistributedMemoryCache();
 
-builder.Services.Configure<GoogleAuthOptions>(configuration.GetSection("GoogleOAuth"));
+services.Configure<GoogleAuthOptions>(configuration.GetSection("GoogleOAuth"));
 
-builder.Services.Configure<JwtOptions>(configuration.GetSection(nameof(JwtOptions)));
-builder.Services.AddApiAuthentication(builder.Configuration);
-builder.Services.AddAuthorization();
+services.Configure<JwtOptions>(configuration.GetSection(nameof(JwtOptions)));
+services.AddApiAuthentication(builder.Configuration);
+services.AddAuthorization();
 
-builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-builder.Services.AddHttpClient();
+services.AddControllers();
+services.AddEndpointsApiExplorer();
+services.AddSwaggerGen();
+services.AddHttpClient();
 
-builder.Services.Configure<MongoDbSettings>(configuration.GetSection("MongoDbSettings"));
-builder.Services.Configure<SenderDataSettings>(configuration.GetSection("SenderData"));
-builder.Services.AddSingleton<IMongoClient>(sp =>
+services.Configure<MongoDbSettings>(configuration.GetSection("MongoDbSettings"));
+services.Configure<SenderDataSettings>(configuration.GetSection("SenderData"));
+services.AddSingleton<IMongoClient>(sp =>
 {
     var settings = sp.GetRequiredService<IOptions<MongoDbSettings>>().Value;
     return new MongoClient(settings.ConnectionUri);
 });
 
-builder.Services.AddSingleton<IMongoDatabase>(sp =>
+services.AddSingleton<IMongoDatabase>(sp =>
 {
     var mongoClient = sp.GetRequiredService<IMongoClient>();
     var settings = sp.GetRequiredService<IOptions<MongoDbSettings>>().Value;
     return mongoClient.GetDatabase(settings.DatabaseName);
 });
 
-builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-builder.Services.AddScoped<MailService>();
-builder.Services.AddScoped<PasswordHasher>();
-builder.Services.AddScoped<JwtProvider>();
-builder.Services.AddScoped<TokenService>();
-builder.Services.AddScoped<AuthService.Services.AuthService>();
+services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+services.AddScoped<MailService>();
+services.AddScoped<PasswordHasher>();
+services.AddScoped<JwtProvider>();
+services.AddScoped<TokenService>();
+services.AddScoped<AuthService.Services.AuthService>();
 
 var app = builder.Build();
 
