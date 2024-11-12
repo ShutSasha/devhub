@@ -25,7 +25,7 @@
       "SenderEmail" : "devhubmailsystem@gmail.com"
    },
    "JwtOptions": {
-      "AccessSecretKey": "jwt_access_secret",
+      "AccessSecretKey": "jwt_access_secrets",
       "RefreshSecretKey": "jwt_refresh_secret",
       "ExpiresDuration": "1"
    }
