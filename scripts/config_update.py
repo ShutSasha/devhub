@@ -6,6 +6,7 @@ from dotenv import load_dotenv, set_key
 configs = [
     ".\\packages\\server\\CommentService\\config\\config.yaml.temp",
     ".\\packages\\server\\PostService\\config\\config.yaml.temp",
+    ".\\packages\\server\\AuthService\\appsettings.Development.json.temp",
     ]
 
 load_dotenv()

@@ -1,0 +1,32 @@
+{
+   "Logging": {
+      "LogLevel": {
+         "Default": "Information",
+         "Microsoft.AspNetCore": "Warning"
+      }
+   },
+   "MongoDbSettings":{
+      "ConnectionUri":"mongodb_connection",
+      "DatabaseName": "DevHubDB",
+      "CollectionName": "users"
+   },
+   "GitHubOAuth": {
+   "ClientId": "github_client_id",
+   "ClientSecret": "github_client_secret",
+   "CallbackUri": "/api/auth/signin-github/"
+},
+   "GoogleOAuth":{
+      "ClientId": "google_client_id",
+      "ClientSecret": "google_client_secret",
+      "RedirectionUri": "http://localhost:5279/api/auth/signin-google"
+   },
+   "SenderData": {
+      "SenderPassword": "sender_password",
+      "SenderEmail" : "devhubmailsystem@gmail.com"
+   },
+   "JwtOptions": {
+      "AccessSecretKey": "jwt_access_secret",
+      "RefreshSecretKey": "jwt_refresh_secret",
+      "ExpiresDuration": "1"
+   }
+}
