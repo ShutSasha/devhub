@@ -33,7 +33,8 @@ const GlobalStyle = createGlobalStyle`
   }
 
   button {
-  outline: none !important;
+    border: none;
+    outline: none !important;
   }
 
   input {

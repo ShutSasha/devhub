@@ -4,12 +4,30 @@ import { PostViewLayout } from '@shared/layouts/posts/post-view.layout'
 import { useParams } from 'react-router-dom'
 import { parseDate } from '@utils/parseDate.util'
 import { parseTagsToUI } from '@utils/parseTagsToUI.util'
+import { useRef } from 'react'
 
-import { ContentText, PostCreationData, PostImage, PostTag, PostTagsContainer, PostTitle } from './post-view.style'
+import {
+  ActionContainer,
+  ActionInnerContainer,
+  Comment,
+  ContentText,
+  Dislike,
+  GrayLine,
+  Like,
+  PostBtn,
+  PostCreationData,
+  PostImage,
+  PostTag,
+  PostTagsContainer,
+  PostTitle,
+  WriteCommentContainer,
+} from './post-view.style'
+import { InputContainer } from './components/write-comment.component'
 
 export const PostView = () => {
   const { id } = useParams()
   const { data: post, error, isLoading } = useGetPostByIdQuery({ id })
+  const comment = useRef<HTMLSpanElement>(null)
 
   if (error) {
     return (
@@ -54,6 +72,27 @@ export const PostView = () => {
         </PostTagsContainer>
       )}
       <ContentText>{post.content}</ContentText>
+      <GrayLine />
+      <ActionContainer>
+        <ActionInnerContainer>
+          <Like />
+          <p>{post.likes} likes</p>
+        </ActionInnerContainer>
+        <ActionInnerContainer>
+          <Dislike />
+          <p>{post.likes} likes</p>
+        </ActionInnerContainer>
+        <ActionInnerContainer></ActionInnerContainer>
+        <ActionInnerContainer>
+          <Comment />
+          <p>{post.comments.length} comments</p>
+        </ActionInnerContainer>
+      </ActionContainer>
+      <WriteCommentContainer>
+        <StyledAvatar style={{ height: '40px', width: '40px' }} src={post.user.avatar} />
+        <InputContainer ref={comment} />
+        <PostBtn>Post</PostBtn>
+      </WriteCommentContainer>
     </PostViewLayout>
   )
 }
