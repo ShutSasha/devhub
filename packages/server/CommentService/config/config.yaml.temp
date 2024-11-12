@@ -1,0 +1,2 @@
+env: "local"
+storage_path: "mongodb_connection"
