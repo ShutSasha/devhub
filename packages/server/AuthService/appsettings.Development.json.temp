@@ -26,7 +26,7 @@
    },
    "JwtOptions": {
       "AccessSecretKey": "jwt_access_secrets",
-      "RefreshSecretKey": "jwt_refresh_secret",
+      "RefreshSecretKey": "jwt_refresh_secrets",
       "ExpiresDuration": "1"
    }
 }
