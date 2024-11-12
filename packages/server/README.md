@@ -33,6 +33,16 @@ Before running the services, ensure that you have:
    ```
    python --version
    ```
+
+   run
+   ```py
+   pip install requests python-dotenv
+   ```
+
+   run
+   ```
+   npm install
+   ```
    
 ## Steps to Run All Services
 
