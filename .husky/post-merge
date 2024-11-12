@@ -1,0 +1,2 @@
+#!/bin/bash
+python ./scripts/config_update.py
