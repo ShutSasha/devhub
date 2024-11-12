@@ -4,8 +4,8 @@ import requests
 from dotenv import load_dotenv, set_key
 
 configs = [
-    "..\\packages\\server\\CommentService\\config\\config.yaml.temp",
-    "..\\packages\\server\\PostService\\config\\config.yaml.temp",
+    ".\\packages\\server\\CommentService\\config\\config.yaml.temp",
+    ".\\packages\\server\\PostService\\config\\config.yaml.temp",
     ]
 
 load_dotenv()
