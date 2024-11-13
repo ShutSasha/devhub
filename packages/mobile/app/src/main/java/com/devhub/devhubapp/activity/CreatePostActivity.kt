@@ -37,6 +37,7 @@ class CreatePostActivity : AppCompatActivity() {
 
     companion object {
         private const val REQUEST_IMAGE_PICK = 1
+        private const val MAX_TAGS = 4
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,9 +54,11 @@ class CreatePostActivity : AppCompatActivity() {
         val postTags = findViewById<EditText>(R.id.tags_input)
         val postContent = findViewById<EditText>(R.id.content_input)
         val addBackgroundButton = findViewById<FrameLayout>(R.id.add_background_button)
+        val titleErrorView = findViewById<TextView>(R.id.title_error)
+        val contentErrorView = findViewById<TextView>(R.id.content_error)
+        val tagsErrorView = findViewById<TextView>(R.id.tags_error)
 
         val user = encryptedPreferencesManager.getUserData()
-
         usernameView.text = user.username
         if (user.avatar.isNotEmpty()) {
             Glide.with(this)
@@ -64,13 +67,44 @@ class CreatePostActivity : AppCompatActivity() {
         }
 
         createPostButton.setOnClickListener {
-            createNewPost(
-                userId = user._id,
-                title = postTitle.text.toString(),
-                content = postContent.text.toString(),
-                tags = postTags.text.toString().split(",").map { it.trim() },
-                imageUri = selectedImageUri
-            )
+            val titleText = postTitle.text.toString().trim()
+            val contentText = postContent.text.toString().trim()
+            val tagsText = postTags.text.toString().trim()
+            val tagsList = tagsText.split(",").map { it.trim() }.filter { it.isNotEmpty() }
+
+            titleErrorView.visibility = View.GONE
+            contentErrorView.visibility = View.GONE
+            tagsErrorView.visibility = View.GONE
+
+            var isValid = true
+
+            if (titleText.isEmpty()) {
+                titleErrorView.visibility = View.VISIBLE
+                titleErrorView.text = "Please enter a title"
+                isValid = false
+            }
+
+            if (contentText.isEmpty()) {
+                contentErrorView.visibility = View.VISIBLE
+                contentErrorView.text = "Please enter content"
+                isValid = false
+            }
+
+            if (tagsList.size > MAX_TAGS) {
+                tagsErrorView.visibility = View.VISIBLE
+                tagsErrorView.text = "Too many tags! Please use $MAX_TAGS or fewer."
+                isValid = false
+            }
+
+            if (isValid) {
+                createNewPost(
+                    userId = user._id,
+                    title = titleText,
+                    content = contentText,
+                    tags = tagsList,
+                    imageUri = selectedImageUri
+                )
+            }
         }
 
         addBackgroundButton.isClickable = true
@@ -110,18 +144,30 @@ class CreatePostActivity : AppCompatActivity() {
                 override fun onResponse(call: Call<Post>, response: Response<Post>) {
                     if (response.isSuccessful) {
                         val intent = Intent(this@CreatePostActivity, MainActivity::class.java)
-                        intent.flags =
-                            Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+                        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
                         intent.putExtra("UPDATE_POSTS", true)
                         startActivity(intent)
                         finish()
                     } else {
-                        Log.e(
-                            "CreatePostActivity",
-                            "Failed to create post: ${response.message()}"
-                        )
-                        response.errorBody()?.let { errorBody ->
-                            Log.e("CreatePostActivity", "Error body: ${errorBody.string()}")
+                        response.errorBody()?.string()?.let { errorBody ->
+                            if (errorBody.contains("Field validation for 'Title' failed")) {
+                                findViewById<TextView>(R.id.title_error).apply {
+                                    text = "Title is required"
+                                    visibility = View.VISIBLE
+                                }
+                            }
+                            if (errorBody.contains("Field validation for 'Content' failed")) {
+                                findViewById<TextView>(R.id.content_error).apply {
+                                    text = "Content is required"
+                                    visibility = View.VISIBLE
+                                }
+                            }
+                            if (errorBody.contains("too many tags")) {
+                                findViewById<TextView>(R.id.tags_error).apply {
+                                    text = "Too many tags! Please use $MAX_TAGS or fewer."
+                                    visibility = View.VISIBLE
+                                }
+                            }
                         }
                     }
                 }
@@ -131,7 +177,6 @@ class CreatePostActivity : AppCompatActivity() {
                 }
             })
     }
-
 
     private fun openImagePicker() {
         val intent = Intent(Intent.ACTION_PICK).apply {
@@ -178,4 +223,3 @@ class CreatePostActivity : AppCompatActivity() {
         return null
     }
 }
-
