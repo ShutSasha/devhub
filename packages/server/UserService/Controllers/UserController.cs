@@ -1,4 +1,6 @@
+using Amazon.Util.Internal;
 using Microsoft.AspNetCore.Mvc;
+using UserService.Abstracts;
 using UserService.Contracts.User;
 using UserService.Helpers.Response;
 
@@ -8,9 +10,9 @@ namespace UserService.Controllers;
 [Route("api/users")]
 public class UserController : ControllerBase
 {
-   private readonly Services.UserService _userService;
+   private readonly IUserService _userService;
 
-   public UserController(Services.UserService userService)
+   public UserController(IUserService userService)
    {
       _userService = userService;
    }
@@ -33,4 +35,32 @@ public class UserController : ControllerBase
          );
       }
    }
+
+   [HttpPost("update-photo/{userId}")]
+   public async Task<IActionResult> UpdateUserPhoto(IFormFile file, [FromRoute] string userId)
+   {
+      if (file == null || file.Length == 0)
+      {
+         return BadRequest("No file uploaded.");
+      }
+
+      try
+      {
+         await using var fileStream = file.OpenReadStream();
+         var fileName = file.FileName;
+         var contentType = file.ContentType;
+         await _userService.EditUserIcon(userId, fileName, fileStream, contentType);
+
+         return Ok(new { Message = "User photo updated successfully." });
+      }
+      catch (Exception ex)
+      {
+         
+         return ErrorResponseHelper.CreateErrorResponse(
+            400,
+            "Update user error",
+            ex.Message);
+      }
+   }
+
 }
