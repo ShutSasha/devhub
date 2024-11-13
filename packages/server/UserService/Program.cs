@@ -1,8 +1,12 @@
 using System.Net;
+using Amazon.S3;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
+using UserService.Abstracts;
+using UserService.Helpers.Config;
 using UserService.Models.Database;
+using UserService.Models.Storage;
 using UserService.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -39,7 +43,11 @@ services.AddSingleton<IMongoDatabase>(sp =>
 });
 
 services.AddGrpc();
-services.AddScoped<UserService.Services.UserService>();
+services.Configure<AwsOptions>(configuration.GetSection("AWS"));
+services.AddSingleton<IAmazonS3>(AwsS3ClientFactory.CreateS3Client(configuration));
+services.AddScoped<IUserService,UserService.Services.UserService>();
+services.AddScoped<IStorageService, StorageService>();
+
 
 var app = builder.Build();
 app.UseCors("AllowLocalPorts");
