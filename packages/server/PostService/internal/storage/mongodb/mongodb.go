@@ -58,7 +58,7 @@ func (s *Storage) Save(
 		Likes:       0,
 		Dislikes:    0,
 		HeaderImage: headerImage,
-		Comments:    []models.Comment{},
+		Comments:    []primitive.ObjectID{},
 		Tags:        tags,
 	}
 
@@ -318,4 +318,31 @@ func (s *Storage) GetPaginated(ctx context.Context, limit, page int, fileProvide
 	}
 
 	return posts, nil
+}
+
+func (s *Storage) AddCommentID(
+	ctx context.Context,
+	postId primitive.ObjectID,
+	commentId primitive.ObjectID,
+) error {
+	const op = "storage.mongodb.AddCommentID"
+
+	collection := s.db.Database("DevHubDB").Collection("posts")
+
+	filter := bson.M{"_id": postId}
+
+	update := bson.M{
+		"$push": bson.M{"comments": commentId},
+	}
+
+	result, err := collection.UpdateOne(ctx, filter, update)
+	if err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	if result.MatchedCount == 0 {
+		return fmt.Errorf("%s: no post found with the given ID", op)
+	}
+
+	return nil
 }

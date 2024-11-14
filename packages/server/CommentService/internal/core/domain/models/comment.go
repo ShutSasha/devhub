@@ -1,4 +1,4 @@
-package domain
+package models
 
 import (
 	"time"
@@ -8,8 +8,7 @@ import (
 
 type Comment struct {
 	User        primitive.ObjectID `json:"user" bson:"user"`
+	Post        primitive.ObjectID `json:"post" bson:"post"`
 	CommentText string             `json:"commentText" bson:"commentText"`
-	Likes       int                `json:"likes" bson:"likes"`
-	Dislikes    int                `json:"dislikes" bson:"dislikes"`
 	CreatedAt   time.Time          `json:"createdAt" bson:"createdAt"`
 }

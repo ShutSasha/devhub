@@ -35,17 +35,26 @@ func main() {
 		cfg.Aws.Bucket,
 		cfg.Http.Port,
 		cfg.Http.Timeout,
+		cfg.Grpc.PostServicePort,
 	)
 	done := make(chan os.Signal, 1)
 	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 
 	go func() {
 		if err := application.HttpApp.Run(); err != nil {
-			log.Error("failed to start server", err.Error())
+			log.Error("failed to start http server", sl.Err(err))
 		}
 	}()
 
-	log.Info("server started")
+	log.Info("http server started")
+
+	go func() {
+		if err := application.GRPCApp.Run(); err != nil {
+			log.Error("failed to start grpc server", sl.Err(err))
+		}
+	}()
+
+	log.Info("grpc server started")
 
 	<-done
 	log.Info("stopping server")
