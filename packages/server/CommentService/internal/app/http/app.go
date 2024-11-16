@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"time"
 
+	_ "github.com/ShutSasha/devhub/packages/server/CommentService/docs"
 	pb "github.com/ShutSasha/devhub/packages/server/CommentService/gen/go/post"
 	handler "github.com/ShutSasha/devhub/packages/server/CommentService/internal/adapter/handler/http"
 	mwLogger "github.com/ShutSasha/devhub/packages/server/CommentService/internal/adapter/handler/http/middleware/logger"
@@ -15,6 +16,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/rs/cors"
+	httpSwagger "github.com/swaggo/http-swagger/v2"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -57,8 +59,12 @@ func New(
 	router.Use(middleware.Recoverer)
 	router.Use(middleware.URLFormat)
 
+	router.Get("/swagger/*", httpSwagger.Handler(
+		httpSwagger.URL(fmt.Sprintf("http://localhost:%d/swagger/doc.json", port)),
+	))
+
 	router.Route("/api/comments", func(r chi.Router) {
-		r.Get("/{id}", commentHandler.GeById())
+		r.Get("/{id}", commentHandler.GetById())
 		r.Post("/", commentHandler.Create())
 	})
 

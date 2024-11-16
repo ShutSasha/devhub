@@ -72,6 +72,7 @@ func (h *PrettyHandler) Handle(_ context.Context, r slog.Record) error {
 
 	h.l.Println(
 		timeStr,
+		"Comment:",
 		level,
 		msg,
 		color.WhiteString(string(b)),

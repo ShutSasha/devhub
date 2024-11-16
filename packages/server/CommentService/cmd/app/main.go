@@ -38,25 +38,25 @@ func main() {
 
 	go func() {
 		if err := application.HttpApp.Run(); err != nil {
-			log.Error("failed to start comment server", sl.Err(err))
+			log.Error("commentService: failed to start comment server", sl.Err(err))
 		}
 	}()
 
-	log.Info("comment server started")
+	log.Info("commentService: http server started")
 
 	<-done
-	log.Info("stopping comment server")
+	log.Info("commentService: stopping server")
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
 	if err := application.HttpApp.Server.Shutdown(ctx); err != nil {
-		log.Error("failed to stop comment server", sl.Err(err))
+		log.Error("commentService: failed to stop http server", sl.Err(err))
 
 		return
 	}
 
-	log.Info("server stopped")
+	log.Info("commentService: server stopped")
 }
 
 func setupLogger(env string) *slog.Logger {

@@ -23,8 +23,8 @@ type CommentToPostAdder interface {
 	) error
 }
 
-func (ps *PostService) AddCommentToUser(ctx context.Context, commentId string, postId string) error {
-	const op = "services.AddCommentToUser"
+func (ps *PostService) AddCommentToPost(ctx context.Context, commentId string, postId string) error {
+	const op = "services.AddCommentToPost"
 
 	objectPostId, err := primitive.ObjectIDFromHex(postId)
 	if err != nil {

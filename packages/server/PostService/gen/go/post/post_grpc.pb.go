@@ -19,14 +19,14 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	PostService_AddCommentToUser_FullMethodName = "/PostService/AddCommentToUser"
+	PostService_AddCommentToPost_FullMethodName = "/PostService/AddCommentToPost"
 )
 
 // PostServiceClient is the client API for PostService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type PostServiceClient interface {
-	AddCommentToUser(ctx context.Context, in *AddCommentRequest, opts ...grpc.CallOption) (*AddCommentResponse, error)
+	AddCommentToPost(ctx context.Context, in *AddCommentRequest, opts ...grpc.CallOption) (*AddCommentResponse, error)
 }
 
 type postServiceClient struct {
@@ -37,10 +37,10 @@ func NewPostServiceClient(cc grpc.ClientConnInterface) PostServiceClient {
 	return &postServiceClient{cc}
 }
 
-func (c *postServiceClient) AddCommentToUser(ctx context.Context, in *AddCommentRequest, opts ...grpc.CallOption) (*AddCommentResponse, error) {
+func (c *postServiceClient) AddCommentToPost(ctx context.Context, in *AddCommentRequest, opts ...grpc.CallOption) (*AddCommentResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(AddCommentResponse)
-	err := c.cc.Invoke(ctx, PostService_AddCommentToUser_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, PostService_AddCommentToPost_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -51,7 +51,7 @@ func (c *postServiceClient) AddCommentToUser(ctx context.Context, in *AddComment
 // All implementations must embed UnimplementedPostServiceServer
 // for forward compatibility.
 type PostServiceServer interface {
-	AddCommentToUser(context.Context, *AddCommentRequest) (*AddCommentResponse, error)
+	AddCommentToPost(context.Context, *AddCommentRequest) (*AddCommentResponse, error)
 	mustEmbedUnimplementedPostServiceServer()
 }
 
@@ -62,8 +62,8 @@ type PostServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedPostServiceServer struct{}
 
-func (UnimplementedPostServiceServer) AddCommentToUser(context.Context, *AddCommentRequest) (*AddCommentResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method AddCommentToUser not implemented")
+func (UnimplementedPostServiceServer) AddCommentToPost(context.Context, *AddCommentRequest) (*AddCommentResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddCommentToPost not implemented")
 }
 func (UnimplementedPostServiceServer) mustEmbedUnimplementedPostServiceServer() {}
 func (UnimplementedPostServiceServer) testEmbeddedByValue()                     {}
@@ -86,20 +86,20 @@ func RegisterPostServiceServer(s grpc.ServiceRegistrar, srv PostServiceServer) {
 	s.RegisterService(&PostService_ServiceDesc, srv)
 }
 
-func _PostService_AddCommentToUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _PostService_AddCommentToPost_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(AddCommentRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(PostServiceServer).AddCommentToUser(ctx, in)
+		return srv.(PostServiceServer).AddCommentToPost(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: PostService_AddCommentToUser_FullMethodName,
+		FullMethod: PostService_AddCommentToPost_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PostServiceServer).AddCommentToUser(ctx, req.(*AddCommentRequest))
+		return srv.(PostServiceServer).AddCommentToPost(ctx, req.(*AddCommentRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -112,8 +112,8 @@ var PostService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*PostServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "AddCommentToUser",
-			Handler:    _PostService_AddCommentToUser_Handler,
+			MethodName: "AddCommentToPost",
+			Handler:    _PostService_AddCommentToPost_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

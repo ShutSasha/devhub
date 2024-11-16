@@ -42,33 +42,33 @@ func main() {
 
 	go func() {
 		if err := application.HttpApp.Run(); err != nil {
-			log.Error("failed to start http server", sl.Err(err))
+			log.Error("postService: failed to start http server", sl.Err(err))
 		}
 	}()
 
-	log.Info("http server started")
+	log.Info("postService: http server started")
 
 	go func() {
 		if err := application.GRPCApp.Run(); err != nil {
-			log.Error("failed to start grpc server", sl.Err(err))
+			log.Error("postService: failed to start grpc server", sl.Err(err))
 		}
 	}()
 
-	log.Info("grpc server started")
+	log.Info("postService: grpc server started")
 
 	<-done
-	log.Info("stopping server")
+	log.Info("postService: stopping server")
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
 	if err := application.HttpApp.Server.Shutdown(ctx); err != nil {
-		log.Error("failed to stop server", sl.Err(err))
+		log.Error("postService: failed to stop server", sl.Err(err))
 
 		return
 	}
 
-	log.Info("server stopped")
+	log.Info("postService: server stopped")
 }
 
 func setupLogger(env string) *slog.Logger {

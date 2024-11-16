@@ -9,7 +9,7 @@ import (
 )
 
 type PostService interface {
-	AddCommentToUser(ctx context.Context, commentId string, postId string) error
+	AddCommentToPost(ctx context.Context, commentId string, postId string) error
 }
 
 type postAPI struct {
@@ -21,13 +21,13 @@ func Register(gRPCServer *grpc.Server, postService PostService) {
 	postv1.RegisterPostServiceServer(gRPCServer, &postAPI{postService: postService})
 }
 
-func (p *postAPI) AddCommentToUser(
+func (p *postAPI) AddCommentToPost(
 	ctx context.Context,
 	in *postv1.AddCommentRequest,
 ) (*postv1.AddCommentResponse, error) {
 	const op = "grpc.post.AddCommentToUser"
 
-	err := p.postService.AddCommentToUser(context.TODO(), in.CommentId, in.PostId)
+	err := p.postService.AddCommentToPost(context.TODO(), in.CommentId, in.PostId)
 	if err != nil {
 		return &postv1.AddCommentResponse{
 			Success: false,

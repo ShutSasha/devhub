@@ -30,6 +30,16 @@ type createCommentRequest struct {
 	Content string `json:"content"`
 }
 
+// @Summary      Create a new comment
+// @Description  This endpoint allows a user to create a new comment on a post.
+// @Tags         comments
+// @Accept       json
+// @Produce      json
+// @Param        request body createCommentRequest true "Create Comment Request"
+// @Success      201 {object} map[string]interface{} "Comment successfully created"
+// @Failure      400 {object} map[string]interface{} "Invalid request body"
+// @Failure      500 {object} map[string]interface{} "Failed to create comment"
+// @Router       /api/comments [post]
 func (ch *CommentHandler) Create() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		const op = "handler.http.Create"
@@ -61,7 +71,7 @@ func (ch *CommentHandler) Create() http.HandlerFunc {
 			return
 		}
 
-		_, err = ch.grpcClient.AddCommentToUser(context.TODO(), &pb.AddCommentRequest{
+		_, err = ch.grpcClient.AddCommentToPost(context.TODO(), &pb.AddCommentRequest{
 			PostId:    comment.PostId.Hex(),
 			CommentId: commentID.Hex(),
 		})
@@ -77,7 +87,17 @@ func (ch *CommentHandler) Create() http.HandlerFunc {
 	}
 }
 
-func (ch *CommentHandler) GeById() http.HandlerFunc {
+// @Summary      Retrieve a comment by ID
+// @Description  Fetch a comment using its unique ID.
+// @Tags         comments
+// @Accept       json
+// @Produce      json
+// @Param        id path string true "Comment ID"
+// @Success      200 {object} map[string]interface{} "Comment retrieved successfully"
+// @Failure      404 {object} map[string]interface{} "Comment not found"
+// @Failure      500 {object} map[string]interface{} "Failed to retrieve comment"
+// @Router       /api/comments/{id} [get]
+func (ch *CommentHandler) GetById() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		const op = "handler.http.GeById"
 		defer r.Body.Close()

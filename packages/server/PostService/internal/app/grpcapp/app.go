@@ -34,7 +34,7 @@ func New(
 
 	recoveryOpts := []recovery.Option{
 		recovery.WithRecoveryHandler(func(p interface{}) (err error) {
-			log.Error("Recovered from panic", slog.Any("panic", p))
+			log.Error("postService: Recovered from panic", slog.Any("panic", p))
 
 			return status.Errorf(codes.Internal, "internal error")
 		}),
@@ -74,8 +74,6 @@ func (a *App) Run() error {
 		return fmt.Errorf("%s: %w", op, err)
 	}
 
-	a.log.Info("grpc server started", slog.String("addr", l.Addr().String()))
-
 	if err := a.gRPCServer.Serve(l); err != nil {
 		return fmt.Errorf("%s: %w", op, err)
 	}
@@ -87,7 +85,7 @@ func (a *App) Stop() {
 	const op = "grpcapp.Stop"
 
 	a.log.With(slog.String("op", op)).
-		Info("stopping gRPC server", slog.Int("port", a.port))
+		Info("postService: stopping gRPC server", slog.Int("port", a.port))
 
 	a.gRPCServer.GracefulStop()
 }
