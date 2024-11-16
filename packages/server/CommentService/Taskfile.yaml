@@ -1,0 +1,9 @@
+version: '3'
+
+tasks:
+  run:
+    desc: "Run the comment service"
+    cmds:
+      - |
+        cd ./cmd/app
+        go run main.go --config ../../config/config.yaml
