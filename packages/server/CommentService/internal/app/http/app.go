@@ -10,6 +10,7 @@ import (
 
 	_ "github.com/ShutSasha/devhub/packages/server/CommentService/docs"
 	pb "github.com/ShutSasha/devhub/packages/server/CommentService/gen/go/post"
+	ub "github.com/ShutSasha/devhub/packages/server/CommentService/gen/go/user"
 	handler "github.com/ShutSasha/devhub/packages/server/CommentService/internal/adapter/handler/http"
 	mwLogger "github.com/ShutSasha/devhub/packages/server/CommentService/internal/adapter/handler/http/middleware/logger"
 	"github.com/ShutSasha/devhub/packages/server/CommentService/internal/core/port"
@@ -32,17 +33,27 @@ func New(
 	port int,
 	timout time.Duration,
 	postServicePort int,
+	userServicePort int,
 ) *App {
-	conn, err := grpc.NewClient(
+	connPost, err := grpc.NewClient(
 		fmt.Sprintf("localhost:%d", postServicePort),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	)
 	if err != nil {
-		panic("failed to connect to gRPC server")
+		panic("failed to connect to post gRPC server")
 	}
+	grpcPostClient := pb.NewPostServiceClient(connPost)
 
-	grpcPostClient := pb.NewPostServiceClient(conn)
-	commentHandler := handler.NewCommentHandler(svc, log, grpcPostClient)
+	connUser, err := grpc.NewClient(
+		fmt.Sprintf("localhost:%d", userServicePort),
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	)
+	if err != nil {
+		panic("failed to connect to user gRPC server")
+	}
+	grpcUserClient := ub.NewUserServiceClient(connUser)
+
+	commentHandler := handler.NewCommentHandler(svc, log, grpcPostClient, grpcUserClient)
 
 	corsHandler := cors.New(cors.Options{
 		AllowedOrigins:   []string{"http://localhost:5295"},

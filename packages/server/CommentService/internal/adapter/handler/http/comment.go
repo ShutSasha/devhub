@@ -3,10 +3,12 @@ package http
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"log/slog"
 	"net/http"
 
 	pb "github.com/ShutSasha/devhub/packages/server/CommentService/gen/go/post"
+	ub "github.com/ShutSasha/devhub/packages/server/CommentService/gen/go/user"
 	"github.com/ShutSasha/devhub/packages/server/CommentService/internal/adapter/utils"
 	"github.com/ShutSasha/devhub/packages/server/CommentService/internal/core/port"
 	"github.com/go-chi/chi/v5"
@@ -15,13 +17,15 @@ import (
 )
 
 type CommentHandler struct {
-	logger     *slog.Logger
-	svc        port.CommentService
-	grpcClient pb.PostServiceClient
+	logger         *slog.Logger
+	svc            port.CommentService
+	grpcPostClient pb.PostServiceClient
+	grpcUserClient ub.UserServiceClient
 }
 
-func NewCommentHandler(svc port.CommentService, log *slog.Logger, grpcClient pb.PostServiceClient) *CommentHandler {
-	return &CommentHandler{log, svc, grpcClient}
+func NewCommentHandler(svc port.CommentService, log *slog.Logger,
+	grpcPostClient pb.PostServiceClient, grpcUserClient ub.UserServiceClient) *CommentHandler {
+	return &CommentHandler{log, svc, grpcPostClient, grpcUserClient}
 }
 
 type createCommentRequest struct {
@@ -71,13 +75,30 @@ func (ch *CommentHandler) Create() http.HandlerFunc {
 			return
 		}
 
-		_, err = ch.grpcClient.AddCommentToPost(context.TODO(), &pb.AddCommentRequest{
+		_, err = ch.grpcPostClient.AddCommentToPost(context.TODO(), &pb.AddCommentRequest{
 			PostId:    comment.PostId.Hex(),
 			CommentId: commentID.Hex(),
 		})
 		if err != nil {
 			utils.HandleError(log, w, r, "failed to comment to post",
 				err, http.StatusInternalServerError, "comment", "Failed to create comment")
+			return
+		}
+
+		resp, err := ch.grpcUserClient.AddCommentToUser(context.TODO(), &ub.AddCommentRequest{
+			Id:        comment.User.Id.Hex(),
+			CommentId: commentID.Hex(),
+		})
+		if resp != nil {
+			if !resp.Success {
+				utils.HandleError(log, w, r, "failed to add comment to user",
+					fmt.Errorf("%s: %s", op, resp.Message), http.StatusInternalServerError, "comment", "failed to add comment to user")
+				return
+			}
+		}
+		if err != nil {
+			utils.HandleError(log, w, r, "failed to add comment to user",
+				err, http.StatusInternalServerError, "comment", "failed to add comment to user")
 			return
 		}
 

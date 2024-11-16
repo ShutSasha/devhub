@@ -24,18 +24,18 @@ func Register(gRPCServer *grpc.Server, postService PostService) {
 func (p *postAPI) AddCommentToPost(
 	ctx context.Context,
 	in *postv1.AddCommentRequest,
-) (*postv1.AddCommentResponse, error) {
+) (*postv1.AddCommentToPostResponse, error) {
 	const op = "grpc.post.AddCommentToUser"
 
 	err := p.postService.AddCommentToPost(context.TODO(), in.CommentId, in.PostId)
 	if err != nil {
-		return &postv1.AddCommentResponse{
+		return &postv1.AddCommentToPostResponse{
 			Success: false,
 			Message: err.Error(),
 		}, fmt.Errorf("%s: %w", op, err)
 	}
 
-	return &postv1.AddCommentResponse{
+	return &postv1.AddCommentToPostResponse{
 		Success: true,
 		Message: "",
 	}, nil

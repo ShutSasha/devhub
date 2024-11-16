@@ -31,6 +31,7 @@ func main() {
 		cfg.Http.Port,
 		cfg.Http.Timeout,
 		cfg.Grpc.PostServicePort,
+		cfg.Grpc.UserServicePort,
 	)
 
 	done := make(chan os.Signal, 1)

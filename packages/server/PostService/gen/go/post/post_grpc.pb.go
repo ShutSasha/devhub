@@ -19,14 +19,14 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	PostService_AddCommentToPost_FullMethodName = "/PostService/AddCommentToPost"
+	PostService_AddCommentToPost_FullMethodName = "/post.PostService/AddCommentToPost"
 )
 
 // PostServiceClient is the client API for PostService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type PostServiceClient interface {
-	AddCommentToPost(ctx context.Context, in *AddCommentRequest, opts ...grpc.CallOption) (*AddCommentResponse, error)
+	AddCommentToPost(ctx context.Context, in *AddCommentRequest, opts ...grpc.CallOption) (*AddCommentToPostResponse, error)
 }
 
 type postServiceClient struct {
@@ -37,9 +37,9 @@ func NewPostServiceClient(cc grpc.ClientConnInterface) PostServiceClient {
 	return &postServiceClient{cc}
 }
 
-func (c *postServiceClient) AddCommentToPost(ctx context.Context, in *AddCommentRequest, opts ...grpc.CallOption) (*AddCommentResponse, error) {
+func (c *postServiceClient) AddCommentToPost(ctx context.Context, in *AddCommentRequest, opts ...grpc.CallOption) (*AddCommentToPostResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(AddCommentResponse)
+	out := new(AddCommentToPostResponse)
 	err := c.cc.Invoke(ctx, PostService_AddCommentToPost_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -51,7 +51,7 @@ func (c *postServiceClient) AddCommentToPost(ctx context.Context, in *AddComment
 // All implementations must embed UnimplementedPostServiceServer
 // for forward compatibility.
 type PostServiceServer interface {
-	AddCommentToPost(context.Context, *AddCommentRequest) (*AddCommentResponse, error)
+	AddCommentToPost(context.Context, *AddCommentRequest) (*AddCommentToPostResponse, error)
 	mustEmbedUnimplementedPostServiceServer()
 }
 
@@ -62,7 +62,7 @@ type PostServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedPostServiceServer struct{}
 
-func (UnimplementedPostServiceServer) AddCommentToPost(context.Context, *AddCommentRequest) (*AddCommentResponse, error) {
+func (UnimplementedPostServiceServer) AddCommentToPost(context.Context, *AddCommentRequest) (*AddCommentToPostResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddCommentToPost not implemented")
 }
 func (UnimplementedPostServiceServer) mustEmbedUnimplementedPostServiceServer() {}
@@ -108,7 +108,7 @@ func _PostService_AddCommentToPost_Handler(srv interface{}, ctx context.Context,
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var PostService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "PostService",
+	ServiceName: "post.PostService",
 	HandlerType: (*PostServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{

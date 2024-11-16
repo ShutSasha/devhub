@@ -20,6 +20,7 @@ func New(
 	httpPort int,
 	timeout time.Duration,
 	postServicePort int,
+	userServicePort int,
 ) *App {
 	storage, err := mongodb.New(storagePath)
 	if err != nil {
@@ -35,6 +36,7 @@ func New(
 		httpPort,
 		timeout,
 		postServicePort,
+		userServicePort,
 	)
 
 	return &App{
