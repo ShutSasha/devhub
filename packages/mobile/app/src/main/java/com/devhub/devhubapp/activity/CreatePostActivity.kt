@@ -37,6 +37,7 @@ class CreatePostActivity : AppCompatActivity() {
 
     companion object {
         private const val REQUEST_IMAGE_PICK = 1
+        private const val MAX_TAGS = 4
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,44 +47,80 @@ class CreatePostActivity : AppCompatActivity() {
         encryptedPreferencesManager = EncryptedPreferencesManager(this)
         postAPI = RetrofitClient.getInstance(this).getRetrofit().create(PostAPI::class.java)
 
-        val userAvatar = findViewById<ImageView>(R.id.user_avatar)
-        val username = findViewById<TextView>(R.id.username)
+        val userAvatarView = findViewById<ImageView>(R.id.user_avatar)
+        val usernameView = findViewById<TextView>(R.id.username)
         val createPostButton = findViewById<TextView>(R.id.create_post_button)
         val postTitle = findViewById<EditText>(R.id.title_input)
         val postTags = findViewById<EditText>(R.id.tags_input)
         val postContent = findViewById<EditText>(R.id.content_input)
         val addBackgroundButton = findViewById<FrameLayout>(R.id.add_background_button)
+        val titleErrorView = findViewById<TextView>(R.id.title_error)
+        val contentErrorView = findViewById<TextView>(R.id.content_error)
+        val tagsErrorView = findViewById<TextView>(R.id.tags_error)
 
-        val usernameText = intent.getStringExtra("USERNAME") ?: "@username"
-        val userAvatarUrl = intent.getStringExtra("USER_AVATAR")
-
-        username.text = usernameText
-
-        if (!userAvatarUrl.isNullOrEmpty()) {
+        val user = encryptedPreferencesManager.getUserData()
+        usernameView.text = user.username
+        if (user.avatar.isNotEmpty()) {
             Glide.with(this)
-                .load(userAvatarUrl)
-                .into(userAvatar)
+                .load(user.avatar)
+                .into(userAvatarView)
         }
 
         createPostButton.setOnClickListener {
-            createNewPost(
-                userId = encryptedPreferencesManager.getUserData()?._id ?: "",
-                title = postTitle.text.toString(),
-                content = postContent.text.toString(),
-                tags = postTags.text.toString().split(",").map { it.trim() },
-                imageUri = selectedImageUri // Make sure to declare this variable globally
-            )
-        }
+            val titleText = postTitle.text.toString().trim()
+            val contentText = postContent.text.toString().trim()
+            val tagsText = postTags.text.toString().trim()
+            val tagsList = tagsText.split(",").map { it.trim() }.filter { it.isNotEmpty() }
 
+            titleErrorView.visibility = View.GONE
+            contentErrorView.visibility = View.GONE
+            tagsErrorView.visibility = View.GONE
+
+            var isValid = true
+
+            if (titleText.isEmpty()) {
+                titleErrorView.visibility = View.VISIBLE
+                titleErrorView.text = "Please enter a title"
+                isValid = false
+            }
+
+            if (contentText.isEmpty()) {
+                contentErrorView.visibility = View.VISIBLE
+                contentErrorView.text = "Please enter content"
+                isValid = false
+            }
+
+            if (tagsList.size > MAX_TAGS) {
+                tagsErrorView.visibility = View.VISIBLE
+                tagsErrorView.text = "Too many tags! Please use $MAX_TAGS or fewer."
+                isValid = false
+            }
+
+            if (isValid) {
+                createNewPost(
+                    userId = user._id,
+                    title = titleText,
+                    content = contentText,
+                    tags = tagsList,
+                    imageUri = selectedImageUri
+                )
+            }
+        }
 
         addBackgroundButton.isClickable = true
         addBackgroundButton.setOnClickListener {
-            Toast.makeText(this, "Background button clicked", Toast.LENGTH_SHORT).show() // Сообщение на экране
+            Toast.makeText(this, "Background button clicked", Toast.LENGTH_SHORT).show()
             openImagePicker()
         }
     }
 
-    private fun createNewPost(userId: String, title: String, content: String, tags: List<String>, imageUri: Uri?) {
+    private fun createNewPost(
+        userId: String,
+        title: String,
+        content: String,
+        tags: List<String>,
+        imageUri: Uri?
+    ) {
         val userIdBody = userId.toRequestBody("multipart/form-data".toMediaTypeOrNull())
         val titleBody = title.toRequestBody("multipart/form-data".toMediaTypeOrNull())
         val contentBody = content.toRequestBody("multipart/form-data".toMediaTypeOrNull())
@@ -94,33 +131,52 @@ class CreatePostActivity : AppCompatActivity() {
             val imageFile = getFileFromUri(imageUri)
             if (imageFile != null) {
                 val requestFile = imageFile.asRequestBody("image/jpeg".toMediaTypeOrNull())
-                imagePart = MultipartBody.Part.createFormData("headerImage", imageFile.name, requestFile)
+                imagePart = MultipartBody.Part.createFormData(
+                    "headerImage",
+                    imageFile.name,
+                    requestFile
+                )
             }
         }
 
-        postAPI.createPost(userIdBody, titleBody, contentBody, tagsBody, imagePart).enqueue(object : Callback<Post> {
-            override fun onResponse(call: Call<Post>, response: Response<Post>) {
-                if (response.isSuccessful) {
-                    val intent = Intent(this@CreatePostActivity, MainActivity::class.java)
-                    intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
-                    intent.putExtra("UPDATE_POSTS", true)
-                    startActivity(intent)
-                    finish()
-                } else {
-                    Log.e("CreatePostActivity", "Failed to create post: ${response.message()}")
-                    response.errorBody()?.let { errorBody ->
-                        Log.e("CreatePostActivity", "Error body: ${errorBody.string()}")
+        postAPI.createPost(userIdBody, titleBody, contentBody, tagsBody, imagePart)
+            .enqueue(object : Callback<Post> {
+                override fun onResponse(call: Call<Post>, response: Response<Post>) {
+                    if (response.isSuccessful) {
+                        val intent = Intent(this@CreatePostActivity, MainActivity::class.java)
+                        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+                        intent.putExtra("UPDATE_POSTS", true)
+                        startActivity(intent)
+                        finish()
+                    } else {
+                        response.errorBody()?.string()?.let { errorBody ->
+                            if (errorBody.contains("Field validation for 'Title' failed")) {
+                                findViewById<TextView>(R.id.title_error).apply {
+                                    text = "Title is required"
+                                    visibility = View.VISIBLE
+                                }
+                            }
+                            if (errorBody.contains("Field validation for 'Content' failed")) {
+                                findViewById<TextView>(R.id.content_error).apply {
+                                    text = "Content is required"
+                                    visibility = View.VISIBLE
+                                }
+                            }
+                            if (errorBody.contains("too many tags")) {
+                                findViewById<TextView>(R.id.tags_error).apply {
+                                    text = "Too many tags! Please use $MAX_TAGS or fewer."
+                                    visibility = View.VISIBLE
+                                }
+                            }
+                        }
                     }
                 }
-            }
 
-            override fun onFailure(call: Call<Post>, t: Throwable) {
-                Log.e("CreatePostActivity", "Error creating post: ${t.message}", t)
-            }
-        })
+                override fun onFailure(call: Call<Post>, t: Throwable) {
+                    Log.e("CreatePostActivity", "Error creating post: ${t.message}", t)
+                }
+            })
     }
-
-
 
     private fun openImagePicker() {
         val intent = Intent(Intent.ACTION_PICK).apply {
@@ -166,7 +222,4 @@ class CreatePostActivity : AppCompatActivity() {
         }
         return null
     }
-
-
-
 }

@@ -128,11 +128,23 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
+    <TextView
+        android:id="@+id/title_error"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Title is required"
+        android:textColor="@color/wrong"
+        android:visibility="gone"
+        android:textSize="14sp"
+        app:layout_constraintTop_toBottomOf="@id/title_input"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
     <EditText
         android:id="@+id/tags_input"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="25dp"
+        android:layout_marginTop="30dp"
         android:hint="Add tags"
         android:fontFamily="@font/montserrat_medium_font"
         android:textSize="16sp"
@@ -144,11 +156,23 @@
         app:layout_constraintTop_toBottomOf="@id/title_input"
         app:layout_constraintStart_toStartOf="parent"/>
 
+    <TextView
+        android:id="@+id/tags_error"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="Too many tags! Please use 4 or fewer."
+        android:textColor="@color/wrong"
+        android:visibility="gone"
+        android:textSize="14sp"
+        app:layout_constraintTop_toBottomOf="@id/tags_input"
+        app:layout_constraintStart_toStartOf="parent" />
+
     <EditText
         android:id="@+id/content_input"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="25dp"
+        android:layout_marginTop="30dp"
         android:hint="Content here..."
         android:fontFamily="@font/montserrat_medium_font"
         android:textSize="16sp"
@@ -159,6 +183,18 @@
         android:background="@android:color/transparent"
         app:layout_constraintTop_toBottomOf="@id/tags_input"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/content_error"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Content is required"
+        android:textColor="@color/wrong"
+        android:visibility="gone"
+        android:textSize="14sp"
+        app:layout_constraintTop_toBottomOf="@id/content_input"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

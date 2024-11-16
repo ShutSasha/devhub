@@ -34,8 +34,6 @@ class HeaderFragment : Fragment() {
 
         createPostButton.setOnClickListener {
             val intent = Intent(requireContext(), CreatePostActivity::class.java)
-            intent.putExtra("USER_AVATAR", user.avatar)
-            intent.putExtra("USERNAME", user.username)
             startActivity(intent)
         }
 

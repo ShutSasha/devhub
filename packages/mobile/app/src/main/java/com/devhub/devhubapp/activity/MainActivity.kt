@@ -5,12 +5,11 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.LinearLayout
+import android.widget.ScrollView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentTransaction
 import com.devhub.devhubapp.R
 import com.devhub.devhubapp.classes.EncryptedPreferencesManager
 import com.devhub.devhubapp.classes.RetrofitClient
@@ -25,17 +24,20 @@ import kotlinx.coroutines.withContext
 
 class MainActivity : AppCompatActivity() {
     @SuppressLint("CommitTransaction")
+    private var currentPage = 1
+    private var isLoading = false
+    private lateinit var encryptedPreferencesManager: EncryptedPreferencesManager
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
 
-        val encryptedPreferencesManager = EncryptedPreferencesManager(this)
+        encryptedPreferencesManager = EncryptedPreferencesManager(this)
         val user = encryptedPreferencesManager.getUserData()
 
         if (user._id.isEmpty()) {
-            val intent = Intent(this, WelcomeActivity::class.java)
-            startActivity(intent)
+            startActivity(Intent(this, WelcomeActivity::class.java))
             finish()
             return
         }
@@ -46,52 +48,52 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
-        val fragmentManager : FragmentManager = supportFragmentManager
-        val fragmentTransaction : FragmentTransaction = fragmentManager.beginTransaction()
-
-        val userAvatar = intent.getStringExtra("USER_AVATAR")
-        val username = intent.getStringExtra("USERNAME")
-
+        val fragmentManager = supportFragmentManager
         if (savedInstanceState == null) {
-            val headerFragment = HeaderFragment()
-
-            val args = Bundle()
-            args.putString("USER_AVATAR", userAvatar)
-            args.putString("USERNAME", username)
-            headerFragment.arguments = args
-
-            fragmentTransaction.replace(R.id.header_container, headerFragment)
-            fragmentTransaction.replace(R.id.footer_container, FooterFragment())
-            fragmentTransaction.commit()
+            fragmentManager.beginTransaction()
+                .replace(R.id.header_container, HeaderFragment())
+                .replace(R.id.footer_container, FooterFragment())
+                .commit()
         }
 
-        fetchPostsAndDisplay()
+        fetchPostsAndDisplay(currentPage)
+
+        val scrollView = findViewById<ScrollView>(R.id.scrollView)
+        scrollView.viewTreeObserver.addOnScrollChangedListener {
+            val view = scrollView.getChildAt(scrollView.childCount - 1)
+            val diff = (view.bottom - (scrollView.height + scrollView.scrollY))
+
+            if (diff <= 0 && !isLoading) {
+                currentPage++
+                fetchPostsAndDisplay(currentPage)
+            }
+        }
+
         if (intent.getBooleanExtra("UPDATE_POSTS", false)) {
             refreshPosts()
-        } else {
-            fetchPostsAndDisplay()
         }
     }
 
     private fun refreshPosts() {
-        val fragmentManager = supportFragmentManager
-        val container = findViewById<LinearLayout>(R.id.posts_container)
-        container.removeAllViews()
-
-        fetchPostsAndDisplay()
+        currentPage = 1
+        findViewById<LinearLayout>(R.id.posts_container).removeAllViews()
+        fetchPostsAndDisplay(currentPage)
     }
 
-    private fun fetchPostsAndDisplay() {
+    private fun fetchPostsAndDisplay(page: Int) {
+        isLoading = true
         GlobalScope.launch(Dispatchers.Main) {
             try {
                 val posts = withContext(Dispatchers.IO) {
-                    RetrofitClient.getInstance(applicationContext).postAPI.getPosts(limit = 10, page = 1)
+                    RetrofitClient.getInstance(applicationContext).postAPI.getPosts(limit = 10, page = page)
                 }
                 if (posts.isNotEmpty()) {
                     displayPosts(posts)
                 }
+                isLoading = false
             } catch (e: Exception) {
                 Log.e("MainActivity", "Error fetching posts: ${e.message}", e)
+                isLoading = false
             }
         }
     }
