@@ -29,16 +29,9 @@ public class UserGrpcService : global::UserService.UserService.UserServiceBase
       var result = await _userCollection.UpdateOneAsync(filter, update);
       
 
-      if (result.ModifiedCount > 0)
-      {
-         _logger.LogInformation($"Post with id {request.PostId} successfully added to user");
-         return new AddPostResponse { Success = true, Message = "Post added successfully" };
-      }
-      else
-      {
-         _logger.LogError($"Can't add post with id: {request.PostId} to user");
-         return new AddPostResponse { Success = false, Message = "Failed to add post" };
-      }
+      return result.ModifiedCount > 0
+         ? new AddPostResponse { Success = true, Message = "Post added successfully" }
+         : new AddPostResponse { Success = false, Message = "Failed to add post" };
    }
 
    public override async Task<DeletePostResponse> DeletePostFromUser(DeletePostRequest request,
@@ -60,21 +53,10 @@ public class UserGrpcService : global::UserService.UserService.UserServiceBase
       
       var update = Builders<User>.Update.Pull(u => u.Posts, request.PostId);
       var updateResult = await _userCollection.UpdateOneAsync(filter, update);
-      
-      if (updateResult.ModifiedCount > 0)
-      {
-         return new DeletePostResponse
-         {
-            Success = true,
-            Message = "Post deleted successfully."
-         };
-      }
 
-      return new DeletePostResponse
-      {
-         Success = false,
-         Message = "Failed to delete post."
-      };
+      return updateResult.ModifiedCount > 0
+         ? new DeletePostResponse { Success = true, Message = "Post deleted successfully." }
+         : new DeletePostResponse { Success = false, Message = "Failed to delete post" };
    }
 
    public override async Task<RestorePostResponse> RestoreUserPost(RestorePostRequest request,
@@ -103,19 +85,9 @@ public class UserGrpcService : global::UserService.UserService.UserServiceBase
       var update = Builders<User>.Update.Push(u => u.Posts, request.PostId);
       var result = await _userCollection.UpdateOneAsync(u => u.Id == request.UserId, update);
       
-      if (result.ModifiedCount > 0)
-      {
-         return new RestorePostResponse
-         {
-            Success = true,
-            Message = "Post restored successfully"
-         };
-      }
-      return new RestorePostResponse
-      {
-         Success = false,
-         Message = "Failed to restore post"
-      };
+      return result.ModifiedCount > 0 
+         ? new RestorePostResponse { Success = true, Message = "Post restored successfully" }
+         : new RestorePostResponse { Success = false, Message = "Failed to restore post" };
    }
 
    public override async Task<AddCommentResponse> AddCommentToUser(AddCommentRequest request, ServerCallContext context)
@@ -142,4 +114,27 @@ public class UserGrpcService : global::UserService.UserService.UserServiceBase
          ? new AddCommentResponse { Success = true, Message = "Successfully added comment" }
          : new AddCommentResponse { Success = false, Message = "Can't update user model" };
    }
+
+   public override async Task<DeleteCommentResponse> DeleteCommentFromUser(DeleteCommentRequest request, ServerCallContext context)
+   {
+      var filter = Builders<User>.Filter.AnyEq(u => u.Posts, request.CommentId);
+      var user = await _userCollection.Find(filter).FirstOrDefaultAsync();
+      
+      if (user == null)
+      {
+         return new DeleteCommentResponse
+         {
+            Success = false,
+            Message ="User wasn't found "
+         };
+      }
+      
+      var update = Builders<User>.Update.Pull(u => u.Comments, request.CommentId);
+      var updateResult = await _userCollection.UpdateOneAsync(filter, update);
+
+      return updateResult.ModifiedCount > 0
+         ? new DeleteCommentResponse { Success = true, Message = "Successfully delete comment" }
+         : new DeleteCommentResponse { Success = false, Message = "Can't delete comment from user" };
+   }
+   
 }
