@@ -28,6 +28,7 @@ public class UserService
             throw new Exception($"404:User with ID {id} not found.");
          }
          
+         _logger.LogInformation($"User with id {id} was successfully found");
          var update = Builders<User>.Update
             .Set(u => u.Name, name)
             .Set(u => u.Bio, bio)
