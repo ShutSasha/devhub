@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using UserService.Abstracts;
 using UserService.Contracts.User;
 using UserService.Helpers.Response;
+using ZstdSharp.Unsafe;
 
 namespace UserService.Controllers;
 

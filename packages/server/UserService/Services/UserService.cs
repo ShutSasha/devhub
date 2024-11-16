@@ -59,6 +59,11 @@ public class UserService : IUserService
       }
       
       var updatePictureResult = await _storageService.UploadFileAsync(id, fileName, fileStream, contentType);
+
+      if (candidate.Avatar.StartsWith("user_icons"))
+      {
+         await _storageService.DeleteFileAsync(candidate.Avatar);
+      }
       
       candidate.Avatar = updatePictureResult;
       
@@ -79,4 +84,14 @@ public class UserService : IUserService
       
    }
 
+   public async Task<User> GetById(string id)
+   {
+      var candidate = await _userCollection.Find(u => u.Id == id).FirstOrDefaultAsync();
+      if (candidate != null)
+      {
+         return candidate;
+      }
+
+      throw new Exception("404: User with this id wasn't found");
+   }
 }
