@@ -35,6 +35,13 @@ func New(
 	postServicePort int,
 	userServicePort int,
 ) *App {
+	corsHandler := cors.New(cors.Options{
+		AllowedOrigins:   []string{"http://localhost:5295"},
+		AllowedMethods:   []string{"GET", "POST", "PATCH", "DELETE"},
+		AllowedHeaders:   []string{"Authorization", "Content-Type"},
+		AllowCredentials: true,
+	})
+
 	connPost, err := grpc.NewClient(
 		fmt.Sprintf("localhost:%d", postServicePort),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
@@ -54,13 +61,6 @@ func New(
 	grpcUserClient := ub.NewUserServiceClient(connUser)
 
 	commentHandler := handler.NewCommentHandler(svc, log, grpcPostClient, grpcUserClient)
-
-	corsHandler := cors.New(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:5295"},
-		AllowedMethods:   []string{"GET", "POST", "PATCH", "DELETE"},
-		AllowedHeaders:   []string{"Authorization", "Content-Type"},
-		AllowCredentials: true,
-	})
 
 	router := chi.NewRouter()
 
