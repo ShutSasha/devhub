@@ -1,6 +1,7 @@
 using Grpc.Core;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
+using MongoDB.Driver.Core.Events;
 using UserService.Models.Database;
 using UserService.Models.User;
 
@@ -112,5 +113,28 @@ public class UserGrpcService : global::UserService.UserService.UserServiceBase
          Success = false,
          Message = "Failed to restore post"
       };
+   }
+
+   public async override Task<AddCommentResponse> AddCommentToUser(AddCommentRequest request, ServerCallContext context)
+   {
+      var userId = request.Id;
+
+      var candidate = Builders<User>.Filter.Eq(u => u.Id, userId);
+      
+      if (candidate == null)
+      {
+         return new AddCommentResponse
+         {
+            Success = false,
+            Message =$"User with id: {request.Id} wasn't found "
+         };
+      }
+
+      var userUpdate = Builders<User>.Update.Push(u=> u.Comments,request.CommentId);
+      var updateResult = await _userCollection.UpdateOneAsync(candidate, userUpdate);
+      
+      return updateResult.ModifiedCount > 0 
+         ? new AddCommentResponse { Success = true, Message = "Successfully added comment" }
+         : new AddCommentResponse { Success = false, Message = "Can't update user model" };
    }
 }
