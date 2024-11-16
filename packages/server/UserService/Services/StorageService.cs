@@ -36,30 +36,30 @@ public class StorageService : IStorageService
 
          if (response.HttpStatusCode == HttpStatusCode.OK)
          {
-            return $"https://{_options.BucketName}.s3.amazonaws.com/{key}";
+            return $"https://mydevhubimagebucket.s3.eu-west-3.amazonaws.com/{request.Key}";
          }
 
          throw new Exception("File upload failed");
       }
       catch (AmazonS3Exception e)
       {
-         Console.WriteLine($"AmazonS3Exception: {e.Message}");
-         throw;
+         throw new AmazonS3Exception($"500: {e.Message}");
       }
       catch (Exception e)
       {
-         Console.WriteLine($"Exception: {e.Message}");
-         throw;
+         throw new Exception($"500:{e.Message}");
       }
    }
 
    public async Task DeleteFileAsync(string avatarPath)
    {
+      var uri = new Uri(avatarPath);
+      var key = uri.AbsolutePath.TrimStart('/');
 
       var request = new DeleteObjectRequest
       {
          BucketName = _options.BucketName,
-         Key = avatarPath
+         Key = key,
       };
 
       try
@@ -78,15 +78,11 @@ public class StorageService : IStorageService
       }
       catch (AmazonS3Exception e)
       {
-         Console.WriteLine($"AmazonS3Exception: {e.Message}");
-         throw;
+         throw new AmazonS3Exception($"500: {e.Message}");
       }
       catch (Exception e)
       {
-         Console.WriteLine($"Exception: {e.Message}");
-         throw;
+         throw new Exception($"500:{e.Message}");
       }
-
-
    }
 }

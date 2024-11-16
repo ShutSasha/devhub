@@ -42,7 +42,10 @@ public class UserController : ControllerBase
    {
       if (file == null || file.Length == 0)
       {
-         return BadRequest("No file uploaded.");
+         return ErrorResponseHelper.CreateErrorResponse(
+            400,
+            "File upload Exception",
+            "File is empty or wasn't send");
       }
 
       try
@@ -56,12 +59,10 @@ public class UserController : ControllerBase
       }
       catch (Exception ex)
       {
-         
          return ErrorResponseHelper.CreateErrorResponse(
-            400,
+            Convert.ToInt32(ex.Message.Split(":")[0]),
             "Update user error",
-            ex.Message);
+            ex.Message.Split(":")[1]);
       }
    }
-
 }
