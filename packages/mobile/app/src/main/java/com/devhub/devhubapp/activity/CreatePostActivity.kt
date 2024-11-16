@@ -16,17 +16,12 @@ import com.devhub.devhubapp.api.PostAPI
 import com.devhub.devhubapp.classes.RetrofitClient
 import com.devhub.devhubapp.dataClasses.Post
 import com.devhub.devhubapp.classes.EncryptedPreferencesManager
-import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import android.provider.OpenableColumns
-import androidx.core.content.FileProvider
-
-import android.widget.Toast
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
@@ -64,6 +59,11 @@ class CreatePostActivity : AppCompatActivity() {
             Glide.with(this)
                 .load(user.avatar)
                 .into(userAvatarView)
+        }
+
+        val backButton = findViewById<ImageView>(R.id.back_button)
+        backButton.setOnClickListener {
+            finish()
         }
 
         createPostButton.setOnClickListener {
@@ -109,7 +109,6 @@ class CreatePostActivity : AppCompatActivity() {
 
         addBackgroundButton.isClickable = true
         addBackgroundButton.setOnClickListener {
-            Toast.makeText(this, "Background button clicked", Toast.LENGTH_SHORT).show()
             openImagePicker()
         }
     }
@@ -144,7 +143,8 @@ class CreatePostActivity : AppCompatActivity() {
                 override fun onResponse(call: Call<Post>, response: Response<Post>) {
                     if (response.isSuccessful) {
                         val intent = Intent(this@CreatePostActivity, MainActivity::class.java)
-                        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+                        intent.flags =
+                            Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
                         intent.putExtra("UPDATE_POSTS", true)
                         startActivity(intent)
                         finish()
