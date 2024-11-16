@@ -1,2 +1,3 @@
 #!/bin/bash
+pip install requests python-dotenv;
 python ./scripts/config_update.py
