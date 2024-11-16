@@ -9,11 +9,11 @@ namespace UserService.Services;
 
 public class UserGrpcService : global::UserService.UserService.UserServiceBase
 {
-   private readonly ILogger<UserService> _logger;
+   private readonly ILogger<UserGrpcService> _logger;
    private readonly IMongoCollection<User> _userCollection;
 
    public UserGrpcService(IMongoDatabase mongoDatabase, IOptions<MongoDbSettings> mongoDbSettings,
-      ILogger<UserService> logger)
+      ILogger<UserGrpcService> logger)
    {
       _logger = logger;
       _userCollection = mongoDatabase.GetCollection<User>(mongoDbSettings.Value.CollectionName);
@@ -27,14 +27,16 @@ public class UserGrpcService : global::UserService.UserService.UserServiceBase
       var update = Builders<User>.Update.Push(u => u.Posts, request.PostId);
 
       var result = await _userCollection.UpdateOneAsync(filter, update);
-
+      
 
       if (result.ModifiedCount > 0)
       {
+         _logger.LogInformation($"Post with id {request.PostId} successfully added to user");
          return new AddPostResponse { Success = true, Message = "Post added successfully" };
       }
       else
       {
+         _logger.LogError($"Can't add post with id: {request.PostId} to user");
          return new AddPostResponse { Success = false, Message = "Failed to add post" };
       }
    }
@@ -53,10 +55,12 @@ public class UserGrpcService : global::UserService.UserService.UserServiceBase
             Message = "User or post not found."
          };
       }
-
+      
+      _logger.LogInformation($"User with id: {user.Id} was successfully found");
+      
       var update = Builders<User>.Update.Pull(u => u.Posts, request.PostId);
       var updateResult = await _userCollection.UpdateOneAsync(filter, update);
-
+      
       if (updateResult.ModifiedCount > 0)
       {
          return new DeletePostResponse
@@ -95,10 +99,10 @@ public class UserGrpcService : global::UserService.UserService.UserServiceBase
             Message = "Post is already restored"
          };
       }
-
+      _logger.LogInformation($"User with id: {user.Id} was successfully found");
       var update = Builders<User>.Update.Push(u => u.Posts, request.PostId);
       var result = await _userCollection.UpdateOneAsync(u => u.Id == request.UserId, update);
-
+      
       if (result.ModifiedCount > 0)
       {
          return new RestorePostResponse
@@ -107,7 +111,6 @@ public class UserGrpcService : global::UserService.UserService.UserServiceBase
             Message = "Post restored successfully"
          };
       }
-
       return new RestorePostResponse
       {
          Success = false,
@@ -115,10 +118,12 @@ public class UserGrpcService : global::UserService.UserService.UserServiceBase
       };
    }
 
-   public async override Task<AddCommentResponse> AddCommentToUser(AddCommentRequest request, ServerCallContext context)
+   public override async Task<AddCommentResponse> AddCommentToUser(AddCommentRequest request, ServerCallContext context)
    {
       var userId = request.Id;
 
+      _logger.LogInformation("retrieved information");
+      
       var candidate = Builders<User>.Filter.Eq(u => u.Id, userId);
       
       if (candidate == null)
