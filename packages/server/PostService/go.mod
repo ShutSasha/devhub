@@ -53,6 +53,7 @@ require (
 	github.com/BurntSushi/toml v1.2.1 // indirect
 	github.com/go-playground/validator/v10 v10.22.1
 	github.com/golang/snappy v0.0.4 // indirect
+	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.1.0
 	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/klauspost/compress v1.13.6 // indirect
 	github.com/montanaflynn/stats v0.7.1 // indirect

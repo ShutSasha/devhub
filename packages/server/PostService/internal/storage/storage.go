@@ -27,9 +27,9 @@ type PostModel struct {
 
 type CommentModel struct {
 	Id          primitive.ObjectID `json:"_id" bson:"_id"`
-	User        primitive.ObjectID `json:"user" bson:"user"`
+	User        UserModel          `json:"user" bson:"user"`
+	Post        primitive.ObjectID `json:"post" bson:"post"`
 	CommentText string             `json:"commentText" bson:"commentText"`
-	Likes       int                `json:"likes" bson:"likes"`
 	CreatedAt   time.Time          `json:"createdAt" bson:"createdAt"`
 }
 

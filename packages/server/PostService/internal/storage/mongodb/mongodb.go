@@ -2,7 +2,6 @@ package mongodb
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"time"
 
@@ -11,9 +10,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
-	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/domain/interfaces"
 	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/domain/models"
-	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/storage"
 )
 
 type Storage struct {
@@ -58,7 +55,7 @@ func (s *Storage) Save(
 		Likes:       0,
 		Dislikes:    0,
 		HeaderImage: headerImage,
-		Comments:    []models.Comment{},
+		Comments:    []primitive.ObjectID{},
 		Tags:        tags,
 	}
 
@@ -70,53 +67,6 @@ func (s *Storage) Save(
 	oid := insertResult.InsertedID.(primitive.ObjectID)
 
 	return oid, nil
-}
-
-func (s *Storage) GetById(
-	ctx context.Context,
-	postId primitive.ObjectID,
-	fileProvider interfaces.FileProvider,
-) (*storage.PostModel, error) {
-	const op = "storage.mongodb.GetById"
-
-	collection := s.db.Database("DevHubDB").Collection("posts")
-
-	pipeline := mongo.Pipeline{
-		bson.D{
-			{Key: "$match", Value: bson.D{
-				{Key: "_id", Value: postId},
-			}},
-		},
-		bson.D{
-			{Key: "$lookup", Value: bson.D{
-				{Key: "from", Value: "users"},
-				{Key: "localField", Value: "user"},
-				{Key: "foreignField", Value: "_id"},
-				{Key: "as", Value: "user"},
-			}},
-		},
-		bson.D{
-			{Key: "$unwind", Value: bson.D{
-				{Key: "path", Value: "$user"},
-				{Key: "preserveNullAndEmptyArrays", Value: true},
-			}},
-		},
-	}
-
-	cursor, err := collection.Aggregate(ctx, pipeline)
-	if err != nil {
-		return nil, fmt.Errorf("%s: %w", op, err)
-	}
-	defer cursor.Close(ctx)
-
-	post := &storage.PostModel{}
-	if cursor.Next(ctx) {
-		if err := cursor.Decode(post); err != nil {
-			return nil, fmt.Errorf("%s: %w", op, err)
-		}
-	}
-
-	return post, nil
 }
 
 func (s *Storage) Remove(
@@ -189,133 +139,23 @@ func (s *Storage) Update(
 	return nil
 }
 
-func (s *Storage) Search(ctx context.Context, sortBy string, query string,
-	tags []string, fileProvider interfaces.FileProvider) ([]storage.PostModel, error) {
-	const op = "storage.mongodb.Search"
+func (s *Storage) RemoveCommentFromPost(
+	ctx context.Context,
+	postId primitive.ObjectID,
+	commentId primitive.ObjectID,
+) error {
+	const op = "storage.mongodb.RemoveCommentFromPost"
 
 	collection := s.db.Database("DevHubDB").Collection("posts")
 
-	pipeline := mongo.Pipeline{}
+	filter := bson.M{"_id": postId}
 
-	searchFilter := bson.D{}
-	if query != "" {
-		searchFilter = append(searchFilter, bson.E{
-			Key: "$or", Value: bson.A{
-				bson.M{"title": bson.M{"$regex": query, "$options": "i"}},
-				bson.M{"content": bson.M{"$regex": query, "$options": "i"}},
-			},
-		})
-	}
+	update := bson.M{"$pull": bson.M{"comments": commentId}}
 
-	if len(tags) > 0 {
-		var regexTagFilters []bson.M
-		for _, tag := range tags {
-			regexTagFilters = append(regexTagFilters, bson.M{
-				"tags": bson.M{
-					"$elemMatch": bson.M{
-						"$regex":   tag,
-						"$options": "i",
-					},
-				},
-			})
-		}
-
-		searchFilter = append(searchFilter, bson.E{Key: "$and", Value: regexTagFilters})
-	}
-
-	if len(searchFilter) > 0 {
-		pipeline = append(pipeline, bson.D{{Key: "$match", Value: searchFilter}})
-	}
-
-	pipeline = append(pipeline, bson.D{
-		{Key: "$lookup", Value: bson.D{
-			{Key: "from", Value: "users"},
-			{Key: "localField", Value: "user"},
-			{Key: "foreignField", Value: "_id"},
-			{Key: "as", Value: "user"},
-		}},
-	})
-
-	pipeline = append(pipeline, bson.D{
-		{Key: "$unwind", Value: bson.D{
-			{Key: "path", Value: "$user"},
-			{Key: "preserveNullAndEmptyArrays", Value: true},
-		}},
-	})
-
-	var sortField string
-	switch sortBy {
-	case "date":
-		sortField = "created_at"
-	case "likes":
-		sortField = "likes"
-	default:
-		sortField = "likes"
-	}
-
-	pipeline = append(pipeline, bson.D{{Key: "$sort", Value: bson.D{{Key: sortField, Value: -1}}}})
-
-	cursor, err := collection.Aggregate(ctx, pipeline)
+	_, err := collection.UpdateOne(ctx, filter, update)
 	if err != nil {
-		if errors.Is(err, mongo.ErrNilCursor) {
-			return nil, storage.ErrPostsNotFound
-		}
-		return nil, fmt.Errorf("%s: could not execute search query: %w", op, err)
-	}
-	defer cursor.Close(ctx)
-
-	var posts []storage.PostModel
-	if err := cursor.All(ctx, &posts); err != nil {
-		return nil, fmt.Errorf("%s: could not decode results: %w", op, err)
+		return fmt.Errorf("%s: %w", op, err)
 	}
 
-	return posts, nil
-}
-
-func (s *Storage) GetPaginated(ctx context.Context, limit, page int, fileProvider interfaces.FileProvider) ([]storage.PostModel, error) {
-	const op = "storage.mongodb.GetPaginated"
-
-	collection := s.db.Database("DevHubDB").Collection("posts")
-
-	pipeline := mongo.Pipeline{
-		bson.D{
-			{Key: "$lookup", Value: bson.D{
-				{Key: "from", Value: "users"},
-				{Key: "localField", Value: "user"},
-				{Key: "foreignField", Value: "_id"},
-				{Key: "as", Value: "user"},
-			}},
-		},
-		bson.D{
-			{Key: "$unwind", Value: bson.D{
-				{Key: "path", Value: "$user"},
-				{Key: "preserveNullAndEmptyArrays", Value: true},
-			}},
-		},
-		bson.D{
-			{Key: "$sort", Value: bson.D{{Key: "createdAt", Value: -1}}},
-		},
-		bson.D{
-			{Key: "$skip", Value: int64((page - 1) * limit)},
-		},
-		bson.D{
-			{Key: "$limit", Value: int64(limit)},
-		},
-	}
-
-	cursor, err := collection.Aggregate(ctx, pipeline)
-	if err != nil {
-		if errors.Is(err, mongo.ErrNilCursor) {
-			return nil, storage.ErrPostsNotFound
-		}
-		return nil, fmt.Errorf("%s: could not retrieve paginated posts: %w", op, err)
-	}
-	defer cursor.Close(ctx)
-
-	var posts []storage.PostModel
-	if err := cursor.All(ctx, &posts); err != nil {
-		return nil, fmt.Errorf("%s: could not decode results: %w", op, err)
-	}
-
-	return posts, nil
+	return nil
 }
