@@ -1,2 +1,8 @@
 env: "local"
 storage_path: "mongodb_connection"
+http:
+  port: 8081
+  timeout: 10s
+grpc:
+  user_service_port: 5228
+  post_service_port: 5226

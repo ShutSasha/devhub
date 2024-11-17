@@ -12,8 +12,15 @@ tasks:
     desc: "Run the Go PostService"
     cmds:
       - |
-        cd ./PostService/cmd/app
-        go run main.go --config ../../config/config.yaml
+        cd ./PostService
+        task run
+  
+  run_comment_service:
+    desc: "Run the Go CommentService"
+    cmds:
+      - |
+        cd ./CommentService
+        task run
         
   run_user_service:
     desc: "Run the C# UserService"
@@ -36,3 +43,4 @@ tasks:
       - run_post_service
       - run_user_service
       - run_api_getaway
+      - run_comment_service

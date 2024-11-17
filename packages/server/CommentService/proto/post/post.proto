@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package post;
+
+option go_package = "github.com/ShutSasha/devhub/packages/server/PostService;post";
+
+service PostService{
+  rpc AddCommentToPost (AddCommentRequest) returns (AddCommentToPostResponse);
+  rpc RemoveCommentFromPost (RemoveCommentRequest) returns (RemoveCommentResponse);
+}
+
+message  AddCommentRequest{
+  string postId = 1;
+  string commentId = 2;
+}
+
+message AddCommentToPostResponse{
+  bool success = 1;
+  string message = 2;
+}
+
+message  RemoveCommentRequest{
+  string postId = 1;
+  string commentId = 2;
+}
+
+message  RemoveCommentResponse{
+  bool success = 1;
+  string message = 2;
+}

@@ -6,7 +6,9 @@ import (
 	"time"
 
 	pb "github.com/ShutSasha/devhub/tree/main/packages/server/PostService/gen/go/user"
+	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/app/grpcapp"
 	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/app/httpapp"
+	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/services"
 	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/storage/mongodb"
 	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/storage/s3"
 	"google.golang.org/grpc"
@@ -15,6 +17,7 @@ import (
 
 type App struct {
 	HttpApp *httpapp.App
+	GRPCApp *grpcapp.App
 }
 
 func New(
@@ -27,6 +30,7 @@ func New(
 	bucket string,
 	httpPort int,
 	timeout time.Duration,
+	grpcPort int,
 ) *App {
 	conn, err := grpc.NewClient(
 		fmt.Sprintf("localhost:%d", userServicePort),
@@ -48,6 +52,10 @@ func New(
 
 	grpcUserClient := pb.NewUserServiceClient(conn)
 
+	postService := services.New(dbStorage, dbStorage)
+
+	grpcApp := grpcapp.New(log, postService, grpcPort)
+
 	httpApp := httpapp.New(
 		log,
 		dbStorage,
@@ -59,5 +67,6 @@ func New(
 
 	return &App{
 		HttpApp: httpApp,
+		GRPCApp: grpcApp,
 	}
 }

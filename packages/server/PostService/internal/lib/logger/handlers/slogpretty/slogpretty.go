@@ -66,12 +66,12 @@ func (h *PrettyHandler) Handle(_ context.Context, r slog.Record) error {
 		}
 	}
 
-	// Use the log event time rather than the current time
 	timeStr := r.Time.Format("[15:04:05.000]")
 	msg := color.CyanString(r.Message)
 
 	h.l.Println(
 		timeStr,
+		"Post:",
 		level,
 		msg,
 		color.WhiteString(string(b)),
