@@ -3,9 +3,11 @@ syntax = "proto3";
 option go_package = "github.com/ShutSasha/devhub/packages/server/PostService;user";
 
 service UserService{
-  rpc AddPostToUser (AddPostRequest) returns (AddPostResponse);
-  rpc DeletePostFromUser (DeletePostRequest) returns (DeletePostResponse);
-  rpc RestoreUserPost (RestorePostRequest) returns (RestorePostResponse);
+  rpc AddPostToUser (AddPostRequest) returns (UserResponse);
+  rpc DeletePostFromUser (DeletePostRequest) returns (UserResponse);
+  rpc RestoreUserPost (RestorePostRequest) returns (UserResponse);
+  rpc AddPostReactionToUser(AddReactionRequest) returns (UserResponse);
+  rpc DeletePostReactionFromUser(DeleteReactionRequest) returns (UserResponse);
 }
 
 message  AddPostRequest{
@@ -13,18 +15,8 @@ message  AddPostRequest{
   string postId = 2;
 }
 
-message AddPostResponse{
-  bool success = 1;
-  string message = 2;
-}
-
 message DeletePostRequest{
   string postId = 1;
-}
-
-message DeletePostResponse{
-  bool success = 1;
-  string message = 2;
 }
 
 message RestorePostRequest{
@@ -32,7 +24,19 @@ message RestorePostRequest{
   string postId = 2;
 }
 
-message RestorePostResponse{
+message AddReactionRequest{
+  string userId = 1;
+  string postId = 2;
+  string type = 3;
+}
+
+message DeleteReactionRequest{
+  string userId = 1;
+  string postId = 2;
+  string type = 3;
+}
+
+message UserResponse{
   bool success = 1;
   string message = 2;
 }

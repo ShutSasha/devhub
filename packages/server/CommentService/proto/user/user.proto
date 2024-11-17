@@ -3,11 +3,11 @@ syntax = "proto3";
 option go_package = "github.com/ShutSasha/devhub/packages/server/CommentService;user";
 
 service UserService{
-  rpc AddPostToUser (AddPostRequest) returns (AddPostResponse);
-  rpc DeletePostFromUser (DeletePostRequest) returns (DeletePostResponse);
-  rpc RestoreUserPost (RestorePostRequest) returns (RestorePostResponse);
-  rpc AddCommentToUser (AddCommentRequest) returns (AddCommentResponse);
-  rpc DeleteCommentFromUser (DeleteCommentRequest) returns (DeleteCommentResponse);
+  rpc AddPostToUser (AddPostRequest) returns (UserResponse);
+  rpc DeletePostFromUser (DeletePostRequest) returns (UserResponse);
+  rpc RestoreUserPost (RestorePostRequest) returns (UserResponse);
+  rpc AddCommentToUser (AddCommentRequest) returns (UserResponse);
+  rpc DeleteCommentFromUser (DeleteCommentRequest) returns (UserResponse);
 }
 
 message AddPostRequest{
@@ -15,18 +15,8 @@ message AddPostRequest{
   string postId = 2;
 }
 
-message AddPostResponse{
-  bool success = 1;
-  string message = 2;
-}
-
 message DeletePostRequest{
   string postId = 1;
-}
-
-message DeletePostResponse{
-  bool success = 1;
-  string message = 2;
 }
 
 message RestorePostRequest{
@@ -34,19 +24,9 @@ message RestorePostRequest{
   string postId = 2;
 }
 
-message RestorePostResponse{
-  bool success = 1;
-  string message = 2;
-}
-
 message AddCommentRequest{
   string id = 1;
   string commentId = 2;
-}
-
-message AddCommentResponse{
-  bool success = 1;
-  string message = 2;
 }
 
 message DeleteCommentRequest{
@@ -54,7 +34,7 @@ message DeleteCommentRequest{
   string commentId = 2;
 }
 
-message DeleteCommentResponse{
+message UserResponse{
   bool success = 1;
   string message = 2;
 }

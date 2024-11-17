@@ -11,12 +11,10 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-
 func (s *Storage) GetPaginated(ctx context.Context, limit, page int, fileProvider interfaces.FileProvider) ([]storage.PostModel, error) {
 	const op = "storage.mongodb.GetPaginated"
 
 	collection := s.db.Database("DevHubDB").Collection("posts")
-
 	pipeline := mongo.Pipeline{
 		bson.D{
 			{Key: "$lookup", Value: bson.D{
@@ -45,13 +43,7 @@ func (s *Storage) GetPaginated(ctx context.Context, limit, page int, fileProvide
 				{Key: "from", Value: "users"},
 				{Key: "localField", Value: "comments.user"},
 				{Key: "foreignField", Value: "_id"},
-				{Key: "as", Value: "commentAuthor"},
-			}},
-		},
-		bson.D{
-			{Key: "$unwind", Value: bson.D{
-				{Key: "path", Value: "$commentAuthor"},
-				{Key: "preserveNullAndEmptyArrays", Value: true},
+				{Key: "as", Value: "commentAuthors"},
 			}},
 		},
 		bson.D{
@@ -62,7 +54,18 @@ func (s *Storage) GetPaginated(ctx context.Context, limit, page int, fileProvide
 						{Key: "as", Value: "comment"},
 						{Key: "in", Value: bson.D{
 							{Key: "_id", Value: "$$comment._id"},
-							{Key: "user", Value: "$commentAuthor"},
+							{Key: "user", Value: bson.D{
+								{Key: "$arrayElemAt", Value: bson.A{
+									bson.D{{Key: "$filter", Value: bson.D{
+										{Key: "input", Value: "$commentAuthors"},
+										{Key: "as", Value: "author"},
+										{Key: "cond", Value: bson.D{
+											{Key: "$eq", Value: bson.A{"$$author._id", "$$comment.user"}},
+										}},
+									}}},
+									0,
+								}},
+							}},
 							{Key: "post", Value: "$$comment.post"},
 							{Key: "commentText", Value: "$$comment.commentText"},
 							{Key: "createdAt", Value: "$$comment.createdAt"},
