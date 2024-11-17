@@ -21,8 +21,8 @@ type PostModel struct {
 	Likes       int                `json:"likes" bson:"likes"`
 	Dislikes    int                `json:"dislikes" bson:"dislikes"`
 	HeaderImage string             `json:"headerImage" bson:"headerImage"`
-	// Comments    []CommentModel     `json:"comments" bson:"comments"`
-	Tags []string `json:"tags" bson:"tags"`
+	Comments    []CommentModel     `json:"comments" bson:"comments"`
+	Tags        []string           `json:"tags" bson:"tags"`
 }
 
 type CommentModel struct {
