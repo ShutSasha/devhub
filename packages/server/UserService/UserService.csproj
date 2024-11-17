@@ -8,6 +8,8 @@
   
   
   <ItemGroup>
+    <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="3.7.301" />
+    <PackageReference Include="AWSSDK.S3" Version="3.7.405.12" />
     <PackageReference Include="Grpc.AspNetCore.Web" Version="2.66.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.9.0" />
     <Protobuf Include="Protos\user.proto" GrpcServices="Server"/>
@@ -20,6 +22,15 @@
     </PackageReference>
     <PackageReference Include="MongoDB.Bson" Version="3.0.0" />
     <PackageReference Include="MongoDB.Driver" Version="3.0.0" />
+  </ItemGroup>
+  
+  
+  <ItemGroup>
+    <Content Update="appsettings.Development.json.temp">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>

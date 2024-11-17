@@ -7,6 +7,7 @@ configs = [
     ".\\packages\\server\\CommentService\\config\\config.yaml.temp",
     ".\\packages\\server\\PostService\\config\\config.yaml.temp",
     ".\\packages\\server\\AuthService\\appsettings.Development.json.temp",
+    ".\\packages\\server\\UserService\\appsettings.Development.json.temp"
     ]
 
 load_dotenv()
