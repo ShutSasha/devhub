@@ -6,6 +6,7 @@ option go_package = "github.com/ShutSasha/devhub/packages/server/PostService;pos
 
 service PostService{
   rpc AddCommentToPost (AddCommentRequest) returns (AddCommentToPostResponse);
+  rpc RemoveCommentFromPost (RemoveCommentRequest) returns (RemoveCommentResponse);
 }
 
 message  AddCommentRequest{
@@ -14,6 +15,16 @@ message  AddCommentRequest{
 }
 
 message AddCommentToPostResponse{
+  bool success = 1;
+  string message = 2;
+}
+
+message  RemoveCommentRequest{
+  string postId = 1;
+  string commentId = 2;
+}
+
+message  RemoveCommentResponse{
   bool success = 1;
   string message = 2;
 }

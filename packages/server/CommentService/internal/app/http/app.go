@@ -76,6 +76,7 @@ func New(
 
 	router.Route("/api/comments", func(r chi.Router) {
 		r.Get("/{id}", commentHandler.GetById())
+		r.Delete("/{id}", commentHandler.Delete())
 		r.Post("/", commentHandler.Create())
 	})
 

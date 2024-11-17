@@ -139,3 +139,23 @@ func (s *Storage) Update(
 	return nil
 }
 
+func (s *Storage) RemoveCommentFromPost(
+	ctx context.Context,
+	postId primitive.ObjectID,
+	commentId primitive.ObjectID,
+) error {
+	const op = "storage.mongodb.RemoveCommentFromPost"
+
+	collection := s.db.Database("DevHubDB").Collection("posts")
+
+	filter := bson.M{"_id": postId}
+
+	update := bson.M{"$pull": bson.M{"comments": commentId}}
+
+	_, err := collection.UpdateOne(ctx, filter, update)
+	if err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	return nil
+}

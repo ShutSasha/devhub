@@ -19,7 +19,8 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	PostService_AddCommentToPost_FullMethodName = "/post.PostService/AddCommentToPost"
+	PostService_AddCommentToPost_FullMethodName      = "/post.PostService/AddCommentToPost"
+	PostService_RemoveCommentFromPost_FullMethodName = "/post.PostService/RemoveCommentFromPost"
 )
 
 // PostServiceClient is the client API for PostService service.
@@ -27,6 +28,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type PostServiceClient interface {
 	AddCommentToPost(ctx context.Context, in *AddCommentRequest, opts ...grpc.CallOption) (*AddCommentToPostResponse, error)
+	RemoveCommentFromPost(ctx context.Context, in *RemoveCommentRequest, opts ...grpc.CallOption) (*RemoveCommentResponse, error)
 }
 
 type postServiceClient struct {
@@ -47,11 +49,22 @@ func (c *postServiceClient) AddCommentToPost(ctx context.Context, in *AddComment
 	return out, nil
 }
 
+func (c *postServiceClient) RemoveCommentFromPost(ctx context.Context, in *RemoveCommentRequest, opts ...grpc.CallOption) (*RemoveCommentResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RemoveCommentResponse)
+	err := c.cc.Invoke(ctx, PostService_RemoveCommentFromPost_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // PostServiceServer is the server API for PostService service.
 // All implementations must embed UnimplementedPostServiceServer
 // for forward compatibility.
 type PostServiceServer interface {
 	AddCommentToPost(context.Context, *AddCommentRequest) (*AddCommentToPostResponse, error)
+	RemoveCommentFromPost(context.Context, *RemoveCommentRequest) (*RemoveCommentResponse, error)
 	mustEmbedUnimplementedPostServiceServer()
 }
 
@@ -64,6 +77,9 @@ type UnimplementedPostServiceServer struct{}
 
 func (UnimplementedPostServiceServer) AddCommentToPost(context.Context, *AddCommentRequest) (*AddCommentToPostResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddCommentToPost not implemented")
+}
+func (UnimplementedPostServiceServer) RemoveCommentFromPost(context.Context, *RemoveCommentRequest) (*RemoveCommentResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RemoveCommentFromPost not implemented")
 }
 func (UnimplementedPostServiceServer) mustEmbedUnimplementedPostServiceServer() {}
 func (UnimplementedPostServiceServer) testEmbeddedByValue()                     {}
@@ -104,6 +120,24 @@ func _PostService_AddCommentToPost_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
+func _PostService_RemoveCommentFromPost_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RemoveCommentRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PostServiceServer).RemoveCommentFromPost(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PostService_RemoveCommentFromPost_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PostServiceServer).RemoveCommentFromPost(ctx, req.(*RemoveCommentRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // PostService_ServiceDesc is the grpc.ServiceDesc for PostService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -114,6 +148,10 @@ var PostService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "AddCommentToPost",
 			Handler:    _PostService_AddCommentToPost_Handler,
+		},
+		{
+			MethodName: "RemoveCommentFromPost",
+			Handler:    _PostService_RemoveCommentFromPost_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

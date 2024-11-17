@@ -206,7 +206,7 @@
             }
          ],
          "UpstreamPathTemplate": "/api/comments/{id}",
-         "UpstreamHttpMethod": ["GET"]
+         "UpstreamHttpMethod": ["GET", "DELETE"]
       }
    ],
    "GlobalConfiguration": {

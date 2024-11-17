@@ -52,7 +52,7 @@ func New(
 
 	grpcUserClient := pb.NewUserServiceClient(conn)
 
-	postService := services.New(dbStorage)
+	postService := services.New(dbStorage, dbStorage)
 
 	grpcApp := grpcapp.New(log, postService, grpcPort)
 

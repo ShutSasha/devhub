@@ -11,9 +11,11 @@ import (
 type CommentService interface {
 	Create(ctx context.Context, userId string, postId string, content string) (primitive.ObjectID, error)
 	GetById(ctx context.Context, id string) (*dtos.CommentDto, error)
+	Delete(ctx context.Context, id string) error
 }
 
 type CommentRepository interface {
 	Create(ctx context.Context, comment *models.Comment) (primitive.ObjectID, error)
 	GetById(ctx context.Context, id primitive.ObjectID) (*dtos.CommentDto, error)
+	Delete(ctx context.Context, id primitive.ObjectID) error
 }

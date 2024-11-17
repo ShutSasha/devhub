@@ -7,6 +7,7 @@ service UserService{
   rpc DeletePostFromUser (DeletePostRequest) returns (DeletePostResponse);
   rpc RestoreUserPost (RestorePostRequest) returns (RestorePostResponse);
   rpc AddCommentToUser (AddCommentRequest) returns (AddCommentResponse);
+  rpc DeleteCommentFromUser (DeleteCommentRequest) returns (DeleteCommentResponse);
 }
 
 message AddPostRequest{
@@ -44,6 +45,16 @@ message AddCommentRequest{
 }
 
 message AddCommentResponse{
+  bool success = 1;
+  string message = 2;
+}
+
+message DeleteCommentRequest{
+  string userId = 1;
+  string commentId = 2;
+}
+
+message DeleteCommentResponse{
   bool success = 1;
   string message = 2;
 }
