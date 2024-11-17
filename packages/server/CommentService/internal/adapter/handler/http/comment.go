@@ -14,6 +14,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/render"
+	"github.com/go-playground/validator/v10"
 )
 
 type CommentHandler struct {
@@ -29,9 +30,9 @@ func NewCommentHandler(svc port.CommentService, log *slog.Logger,
 }
 
 type createCommentRequest struct {
-	UserId  string `json:"userId"`
-	PostId  string `json:"postId"`
-	Content string `json:"content"`
+	UserId  string `json:"userId" validate:"required"`
+	PostId  string `json:"postId" validate:"required"`
+	Content string `json:"content" validate:"required,min=1"`
 }
 
 // @Summary      Create a new comment
@@ -58,6 +59,11 @@ func (ch *CommentHandler) Create() http.HandlerFunc {
 		if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 			utils.HandleError(log, w, r, "failed to devode request body",
 				err, http.StatusBadRequest, "comment", err.Error())
+			return
+		}
+		if err := validator.New().Struct(request); err != nil {
+			validateErr := err.(validator.ValidationErrors)
+			utils.HandleValidatorError(log, w, r, "invalid request", err, validateErr, http.StatusBadRequest)
 			return
 		}
 
@@ -129,6 +135,11 @@ func (ch *CommentHandler) GetById() http.HandlerFunc {
 		)
 
 		id := chi.URLParam(r, "id")
+		if err := utils.IsValidObjectId(id); err != nil {
+			utils.HandleError(log, w, r, "provided id is not correct", err,
+				http.StatusBadRequest, "id", "provided id is not correct")
+			return
+		}
 
 		comment, err := ch.svc.GetById(context.TODO(), id)
 		if err != nil {
@@ -163,6 +174,11 @@ func (ch *CommentHandler) Delete() http.HandlerFunc {
 		)
 
 		id := chi.URLParam(r, "id")
+		if err := utils.IsValidObjectId(id); err != nil {
+			utils.HandleError(log, w, r, "provided id is not correct", err,
+				http.StatusBadRequest, "id", "provided id is not correct")
+			return
+		}
 
 		comment, err := ch.svc.GetById(context.TODO(), id)
 		if err != nil {
