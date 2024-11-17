@@ -207,6 +207,30 @@
          ],
          "UpstreamPathTemplate": "/api/comments/{id}",
          "UpstreamHttpMethod": ["GET", "DELETE"]
+      },
+      {
+         "DownstreamPathTemplate": "/api/posts/{id}/like",
+         "DownstreamScheme": "http",
+         "DownstreamHostAndPorts": [
+            {
+               "Host": "localhost",
+               "Port": 8080
+            }
+         ],
+         "UpstreamPathTemplate": "/api/posts/{id}/like",
+         "UpstreamHttpMethod": ["POST", "DELETE"]
+      },
+      {
+         "DownstreamPathTemplate": "/api/posts/{id}/dislike",
+         "DownstreamScheme": "http",
+         "DownstreamHostAndPorts": [
+            {
+               "Host": "localhost",
+               "Port": 8080
+            }
+         ],
+         "UpstreamPathTemplate": "/api/posts/{id}/dislike",
+         "UpstreamHttpMethod": ["POST", "DELETE"]
       }
    ],
    "GlobalConfiguration": {

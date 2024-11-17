@@ -30,11 +30,11 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type UserServiceClient interface {
-	AddPostToUser(ctx context.Context, in *AddPostRequest, opts ...grpc.CallOption) (*AddPostResponse, error)
-	DeletePostFromUser(ctx context.Context, in *DeletePostRequest, opts ...grpc.CallOption) (*DeletePostResponse, error)
-	RestoreUserPost(ctx context.Context, in *RestorePostRequest, opts ...grpc.CallOption) (*RestorePostResponse, error)
-	AddCommentToUser(ctx context.Context, in *AddCommentRequest, opts ...grpc.CallOption) (*AddCommentResponse, error)
-	DeleteCommentFromUser(ctx context.Context, in *DeleteCommentRequest, opts ...grpc.CallOption) (*DeleteCommentResponse, error)
+	AddPostToUser(ctx context.Context, in *AddPostRequest, opts ...grpc.CallOption) (*UserResponse, error)
+	DeletePostFromUser(ctx context.Context, in *DeletePostRequest, opts ...grpc.CallOption) (*UserResponse, error)
+	RestoreUserPost(ctx context.Context, in *RestorePostRequest, opts ...grpc.CallOption) (*UserResponse, error)
+	AddCommentToUser(ctx context.Context, in *AddCommentRequest, opts ...grpc.CallOption) (*UserResponse, error)
+	DeleteCommentFromUser(ctx context.Context, in *DeleteCommentRequest, opts ...grpc.CallOption) (*UserResponse, error)
 }
 
 type userServiceClient struct {
@@ -45,9 +45,9 @@ func NewUserServiceClient(cc grpc.ClientConnInterface) UserServiceClient {
 	return &userServiceClient{cc}
 }
 
-func (c *userServiceClient) AddPostToUser(ctx context.Context, in *AddPostRequest, opts ...grpc.CallOption) (*AddPostResponse, error) {
+func (c *userServiceClient) AddPostToUser(ctx context.Context, in *AddPostRequest, opts ...grpc.CallOption) (*UserResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(AddPostResponse)
+	out := new(UserResponse)
 	err := c.cc.Invoke(ctx, UserService_AddPostToUser_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -55,9 +55,9 @@ func (c *userServiceClient) AddPostToUser(ctx context.Context, in *AddPostReques
 	return out, nil
 }
 
-func (c *userServiceClient) DeletePostFromUser(ctx context.Context, in *DeletePostRequest, opts ...grpc.CallOption) (*DeletePostResponse, error) {
+func (c *userServiceClient) DeletePostFromUser(ctx context.Context, in *DeletePostRequest, opts ...grpc.CallOption) (*UserResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(DeletePostResponse)
+	out := new(UserResponse)
 	err := c.cc.Invoke(ctx, UserService_DeletePostFromUser_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -65,9 +65,9 @@ func (c *userServiceClient) DeletePostFromUser(ctx context.Context, in *DeletePo
 	return out, nil
 }
 
-func (c *userServiceClient) RestoreUserPost(ctx context.Context, in *RestorePostRequest, opts ...grpc.CallOption) (*RestorePostResponse, error) {
+func (c *userServiceClient) RestoreUserPost(ctx context.Context, in *RestorePostRequest, opts ...grpc.CallOption) (*UserResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(RestorePostResponse)
+	out := new(UserResponse)
 	err := c.cc.Invoke(ctx, UserService_RestoreUserPost_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -75,9 +75,9 @@ func (c *userServiceClient) RestoreUserPost(ctx context.Context, in *RestorePost
 	return out, nil
 }
 
-func (c *userServiceClient) AddCommentToUser(ctx context.Context, in *AddCommentRequest, opts ...grpc.CallOption) (*AddCommentResponse, error) {
+func (c *userServiceClient) AddCommentToUser(ctx context.Context, in *AddCommentRequest, opts ...grpc.CallOption) (*UserResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(AddCommentResponse)
+	out := new(UserResponse)
 	err := c.cc.Invoke(ctx, UserService_AddCommentToUser_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -85,9 +85,9 @@ func (c *userServiceClient) AddCommentToUser(ctx context.Context, in *AddComment
 	return out, nil
 }
 
-func (c *userServiceClient) DeleteCommentFromUser(ctx context.Context, in *DeleteCommentRequest, opts ...grpc.CallOption) (*DeleteCommentResponse, error) {
+func (c *userServiceClient) DeleteCommentFromUser(ctx context.Context, in *DeleteCommentRequest, opts ...grpc.CallOption) (*UserResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(DeleteCommentResponse)
+	out := new(UserResponse)
 	err := c.cc.Invoke(ctx, UserService_DeleteCommentFromUser_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -99,11 +99,11 @@ func (c *userServiceClient) DeleteCommentFromUser(ctx context.Context, in *Delet
 // All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility.
 type UserServiceServer interface {
-	AddPostToUser(context.Context, *AddPostRequest) (*AddPostResponse, error)
-	DeletePostFromUser(context.Context, *DeletePostRequest) (*DeletePostResponse, error)
-	RestoreUserPost(context.Context, *RestorePostRequest) (*RestorePostResponse, error)
-	AddCommentToUser(context.Context, *AddCommentRequest) (*AddCommentResponse, error)
-	DeleteCommentFromUser(context.Context, *DeleteCommentRequest) (*DeleteCommentResponse, error)
+	AddPostToUser(context.Context, *AddPostRequest) (*UserResponse, error)
+	DeletePostFromUser(context.Context, *DeletePostRequest) (*UserResponse, error)
+	RestoreUserPost(context.Context, *RestorePostRequest) (*UserResponse, error)
+	AddCommentToUser(context.Context, *AddCommentRequest) (*UserResponse, error)
+	DeleteCommentFromUser(context.Context, *DeleteCommentRequest) (*UserResponse, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -114,19 +114,19 @@ type UserServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedUserServiceServer struct{}
 
-func (UnimplementedUserServiceServer) AddPostToUser(context.Context, *AddPostRequest) (*AddPostResponse, error) {
+func (UnimplementedUserServiceServer) AddPostToUser(context.Context, *AddPostRequest) (*UserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddPostToUser not implemented")
 }
-func (UnimplementedUserServiceServer) DeletePostFromUser(context.Context, *DeletePostRequest) (*DeletePostResponse, error) {
+func (UnimplementedUserServiceServer) DeletePostFromUser(context.Context, *DeletePostRequest) (*UserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeletePostFromUser not implemented")
 }
-func (UnimplementedUserServiceServer) RestoreUserPost(context.Context, *RestorePostRequest) (*RestorePostResponse, error) {
+func (UnimplementedUserServiceServer) RestoreUserPost(context.Context, *RestorePostRequest) (*UserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RestoreUserPost not implemented")
 }
-func (UnimplementedUserServiceServer) AddCommentToUser(context.Context, *AddCommentRequest) (*AddCommentResponse, error) {
+func (UnimplementedUserServiceServer) AddCommentToUser(context.Context, *AddCommentRequest) (*UserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddCommentToUser not implemented")
 }
-func (UnimplementedUserServiceServer) DeleteCommentFromUser(context.Context, *DeleteCommentRequest) (*DeleteCommentResponse, error) {
+func (UnimplementedUserServiceServer) DeleteCommentFromUser(context.Context, *DeleteCommentRequest) (*UserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteCommentFromUser not implemented")
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}

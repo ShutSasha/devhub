@@ -58,62 +58,57 @@ func (s *Storage) Search(ctx context.Context, sortBy string, query string,
 			{Key: "foreignField", Value: "_id"},
 			{Key: "as", Value: "user"},
 		}},
-	})
-
-	pipeline = append(pipeline, bson.D{
-		{Key: "$unwind", Value: bson.D{
-			{Key: "path", Value: "$user"},
-			{Key: "preserveNullAndEmptyArrays", Value: true},
-		}},
-	})
-
-	// agregate comments
-
-	pipeline = append(pipeline, bson.D{
-		{Key: "$lookup", Value: bson.D{
-			{Key: "from", Value: "comments"},
-			{Key: "localField", Value: "comments"},
-			{Key: "foreignField", Value: "_id"},
-			{Key: "as", Value: "comments"},
-		}},
-	})
-
-	// agregate comments.user
-
-	pipeline = append(pipeline, bson.D{
-		{Key: "$lookup", Value: bson.D{
-			{Key: "from", Value: "users"},
-			{Key: "localField", Value: "comments.user"},
-			{Key: "foreignField", Value: "_id"},
-			{Key: "as", Value: "commentAuthor"},
-		}},
-	})
-
-	// Unwind commentAuthor for each comment
-	pipeline = append(pipeline, bson.D{
-		{Key: "$unwind", Value: bson.D{
-			{Key: "path", Value: "$commentAuthor"},
-			{Key: "preserveNullAndEmptyArrays", Value: true},
-		}},
-	})
-
-	pipeline = append(pipeline, bson.D{
-		{Key: "$set", Value: bson.D{
-			{Key: "comments", Value: bson.D{
-				{Key: "$map", Value: bson.D{
-					{Key: "input", Value: "$comments"},
-					{Key: "as", Value: "comment"},
-					{Key: "in", Value: bson.D{
-						{Key: "_id", Value: "$$comment._id"},
-						{Key: "user", Value: "$commentAuthor"},
-						{Key: "post", Value: "$$comment.post"},
-						{Key: "commentText", Value: "$$comment.commentText"},
-						{Key: "createdAt", Value: "$$comment.createdAt"},
+	},
+		bson.D{
+			{Key: "$unwind", Value: bson.D{
+				{Key: "path", Value: "$user"},
+				{Key: "preserveNullAndEmptyArrays", Value: true},
+			}},
+		},
+		bson.D{
+			{Key: "$lookup", Value: bson.D{
+				{Key: "from", Value: "comments"},
+				{Key: "localField", Value: "comments"},
+				{Key: "foreignField", Value: "_id"},
+				{Key: "as", Value: "comments"},
+			}},
+		},
+		bson.D{
+			{Key: "$lookup", Value: bson.D{
+				{Key: "from", Value: "users"},
+				{Key: "localField", Value: "comments.user"},
+				{Key: "foreignField", Value: "_id"},
+				{Key: "as", Value: "commentAuthors"},
+			}},
+		},
+		bson.D{
+			{Key: "$set", Value: bson.D{
+				{Key: "comments", Value: bson.D{
+					{Key: "$map", Value: bson.D{
+						{Key: "input", Value: "$comments"},
+						{Key: "as", Value: "comment"},
+						{Key: "in", Value: bson.D{
+							{Key: "_id", Value: "$$comment._id"},
+							{Key: "user", Value: bson.D{
+								{Key: "$arrayElemAt", Value: bson.A{
+									bson.D{{Key: "$filter", Value: bson.D{
+										{Key: "input", Value: "$commentAuthors"},
+										{Key: "as", Value: "author"},
+										{Key: "cond", Value: bson.D{
+											{Key: "$eq", Value: bson.A{"$$author._id", "$$comment.user"}},
+										}},
+									}}},
+									0,
+								}},
+							}},
+							{Key: "post", Value: "$$comment.post"},
+							{Key: "commentText", Value: "$$comment.commentText"},
+							{Key: "createdAt", Value: "$$comment.createdAt"},
+						}},
 					}},
 				}},
 			}},
-		}},
-	})
+		})
 
 	var sortField string
 	switch sortBy {

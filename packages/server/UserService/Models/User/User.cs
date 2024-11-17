@@ -76,6 +76,13 @@ public class User
    [BsonElement("reports")]
    [BsonRepresentation(BsonType.ObjectId)]
    public List<string> Reports { get; set; } = new List<string>();
+
+   [BsonElement("likedPosts")]
+   [BsonRepresentation(BsonType.ObjectId)]
+   public List<string> LikedPosts { get; set; } = new List<string>();
    
-   
+   [BsonElement("dislikedPosts")]
+   [BsonRepresentation(BsonType.ObjectId)]
+   public List<string> DislikedPosts { get; set; } = new List<string>();
+
 }
