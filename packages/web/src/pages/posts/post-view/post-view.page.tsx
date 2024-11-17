@@ -1,10 +1,14 @@
+import { useRef } from 'react'
 import { useGetPostByIdQuery } from '@api/post.api'
 import { StyledAvatar, StyledUserCredentialsContainer, Username } from '@shared/components/post/post.style'
 import { PostViewLayout } from '@shared/layouts/posts/post-view.layout'
 import { useParams } from 'react-router-dom'
 import { parseDate } from '@utils/parseDate.util'
 import { parseTagsToUI } from '@utils/parseTagsToUI.util'
-import { useRef } from 'react'
+import { useAppSelector } from '@app/store/store'
+import { useCreateCommentMutation } from '@api/comment.api'
+import { handleServerException } from '@utils/handleServerException.util'
+import { toast } from 'react-toastify'
 
 import {
   ActionContainer,
@@ -22,12 +26,32 @@ import {
   PostTitle,
   WriteCommentContainer,
 } from './post-view.style'
+import { Comment as CommentComponent } from './components/comment.component'
 import { InputContainer } from './components/write-comment.component'
+
+import { ErrorException } from '~types/error/error.type'
 
 export const PostView = () => {
   const { id } = useParams()
-  const { data: post, error, isLoading } = useGetPostByIdQuery({ id })
+  const { data: post, error, isLoading, refetch } = useGetPostByIdQuery({ id })
+  const user = useAppSelector(state => state.userSlice.user)
   const comment = useRef<HTMLSpanElement>(null)
+  const [createComment] = useCreateCommentMutation()
+
+  const handlePostComment = async () => {
+    try {
+      const response = await createComment({
+        content: comment.current?.textContent,
+        postId: id,
+        userId: user?._id,
+      }).unwrap()
+
+      if (response) refetch()
+    } catch (e) {
+      console.error(e)
+      toast.error(handleServerException(e as ErrorException)?.join(', '))
+    }
+  }
 
   if (error) {
     return (
@@ -88,11 +112,15 @@ export const PostView = () => {
           <p>{post.comments.length} comments</p>
         </ActionInnerContainer>
       </ActionContainer>
+
       <WriteCommentContainer>
-        <StyledAvatar style={{ height: '40px', width: '40px' }} src={post.user.avatar} />
+        <StyledAvatar src={user?.avatar || 'https://i.pinimg.com/736x/ed/af/52/edaf52b72775ebb5d6fa004bed32526b.jpg'} />
         <InputContainer ref={comment} />
-        <PostBtn>Post</PostBtn>
+        <PostBtn onClick={handlePostComment}>Post</PostBtn>
       </WriteCommentContainer>
+
+      {Array.isArray(post.comments) &&
+        post.comments.map(comment => <CommentComponent key={comment._id} comment={comment} />)}
     </PostViewLayout>
   )
 }
