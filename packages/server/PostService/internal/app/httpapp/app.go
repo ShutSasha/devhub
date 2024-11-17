@@ -14,6 +14,7 @@ import (
 	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/http-server/handlers/post/delete"
 	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/http-server/handlers/post/get/paginate"
 	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/http-server/handlers/post/get/single"
+	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/http-server/handlers/post/react"
 	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/http-server/handlers/post/save"
 	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/http-server/handlers/post/search"
 	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/http-server/handlers/post/update"
@@ -36,6 +37,7 @@ type PostStorage interface {
 	interfaces.PostRemover
 	interfaces.PostUpdater
 	interfaces.PostSearcher
+	interfaces.PostReactor
 }
 
 type FileStorage interface {
@@ -77,6 +79,11 @@ func New(
 		r.Get("/", paginate.New(log, postStorage, fileStorage))
 		r.Delete("/{id}", delete.New(log, postStorage, postStorage, fileStorage, fileStorage, grpcClient))
 		r.Patch("/{id}", update.New(log, postStorage, postStorage, fileStorage, fileStorage, fileStorage))
+
+		r.Post("/{id}/like", react.NewLike(log, postStorage,grpcClient))
+		r.Post("/{id}/dislike", react.NewDislike(log, postStorage,grpcClient))
+		r.Delete("/{id}/like", react.NewUnlike(log, postStorage,grpcClient))
+		r.Delete("/{id}/dislike", react.NewUndislike(log, postStorage,grpcClient))
 
 		r.Get("/search", search.New(log, postStorage, fileStorage))
 	})

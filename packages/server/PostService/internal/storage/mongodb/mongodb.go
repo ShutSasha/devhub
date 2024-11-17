@@ -90,55 +90,6 @@ func (s *Storage) Remove(
 	return nil
 }
 
-func (s *Storage) Update(
-	ctx context.Context,
-	postId primitive.ObjectID,
-	title string,
-	content string,
-	headerImage string,
-	tags []string,
-) error {
-	const op = "storage.mongodb.Update"
-
-	if len(tags) < 1 {
-		tags = []string{}
-	}
-
-	collection := s.db.Database("DevHubDB").Collection("posts")
-
-	filter := bson.M{"_id": postId}
-
-	updateFields := bson.M{}
-	if title != "" {
-		updateFields["title"] = title
-	}
-
-	if content != "" {
-		updateFields["content"] = content
-	}
-
-	if headerImage != "" {
-		updateFields["header_image"] = headerImage
-	}
-
-	if tags != nil {
-		updateFields["tags"] = tags
-	}
-
-	if len(updateFields) == 0 {
-		return nil
-	}
-
-	update := bson.M{"$set": updateFields}
-
-	_, err := collection.UpdateOne(ctx, filter, update)
-	if err != nil {
-		return fmt.Errorf("%s: %w", op, err)
-	}
-
-	return nil
-}
-
 func (s *Storage) RemoveCommentFromPost(
 	ctx context.Context,
 	postId primitive.ObjectID,

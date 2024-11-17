@@ -53,13 +53,7 @@ func (s *Storage) GetById(
 				{Key: "from", Value: "users"},
 				{Key: "localField", Value: "comments.user"},
 				{Key: "foreignField", Value: "_id"},
-				{Key: "as", Value: "commentAuthor"},
-			}},
-		},
-		bson.D{
-			{Key: "$unwind", Value: bson.D{
-				{Key: "path", Value: "$commentAuthor"},
-				{Key: "preserveNullAndEmptyArrays", Value: true},
+				{Key: "as", Value: "commentAuthors"},
 			}},
 		},
 		bson.D{
@@ -70,7 +64,18 @@ func (s *Storage) GetById(
 						{Key: "as", Value: "comment"},
 						{Key: "in", Value: bson.D{
 							{Key: "_id", Value: "$$comment._id"},
-							{Key: "user", Value: "$commentAuthor"},
+							{Key: "user", Value: bson.D{
+								{Key: "$arrayElemAt", Value: bson.A{
+									bson.D{{Key: "$filter", Value: bson.D{
+										{Key: "input", Value: "$commentAuthors"},
+										{Key: "as", Value: "author"},
+										{Key: "cond", Value: bson.D{
+											{Key: "$eq", Value: bson.A{"$$author._id", "$$comment.user"}},
+										}},
+									}}},
+									0,
+								}},
+							}},
 							{Key: "post", Value: "$$comment.post"},
 							{Key: "commentText", Value: "$$comment.commentText"},
 							{Key: "createdAt", Value: "$$comment.createdAt"},

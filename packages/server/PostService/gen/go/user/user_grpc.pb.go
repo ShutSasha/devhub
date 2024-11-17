@@ -19,18 +19,22 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	UserService_AddPostToUser_FullMethodName      = "/UserService/AddPostToUser"
-	UserService_DeletePostFromUser_FullMethodName = "/UserService/DeletePostFromUser"
-	UserService_RestoreUserPost_FullMethodName    = "/UserService/RestoreUserPost"
+	UserService_AddPostToUser_FullMethodName              = "/UserService/AddPostToUser"
+	UserService_DeletePostFromUser_FullMethodName         = "/UserService/DeletePostFromUser"
+	UserService_RestoreUserPost_FullMethodName            = "/UserService/RestoreUserPost"
+	UserService_AddPostReactionToUser_FullMethodName      = "/UserService/AddPostReactionToUser"
+	UserService_DeletePostReactionFromUser_FullMethodName = "/UserService/DeletePostReactionFromUser"
 )
 
 // UserServiceClient is the client API for UserService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type UserServiceClient interface {
-	AddPostToUser(ctx context.Context, in *AddPostRequest, opts ...grpc.CallOption) (*AddPostResponse, error)
-	DeletePostFromUser(ctx context.Context, in *DeletePostRequest, opts ...grpc.CallOption) (*DeletePostResponse, error)
-	RestoreUserPost(ctx context.Context, in *RestorePostRequest, opts ...grpc.CallOption) (*RestorePostResponse, error)
+	AddPostToUser(ctx context.Context, in *AddPostRequest, opts ...grpc.CallOption) (*UserResponse, error)
+	DeletePostFromUser(ctx context.Context, in *DeletePostRequest, opts ...grpc.CallOption) (*UserResponse, error)
+	RestoreUserPost(ctx context.Context, in *RestorePostRequest, opts ...grpc.CallOption) (*UserResponse, error)
+	AddPostReactionToUser(ctx context.Context, in *AddReactionRequest, opts ...grpc.CallOption) (*UserResponse, error)
+	DeletePostReactionFromUser(ctx context.Context, in *DeleteReactionRequest, opts ...grpc.CallOption) (*UserResponse, error)
 }
 
 type userServiceClient struct {
@@ -41,9 +45,9 @@ func NewUserServiceClient(cc grpc.ClientConnInterface) UserServiceClient {
 	return &userServiceClient{cc}
 }
 
-func (c *userServiceClient) AddPostToUser(ctx context.Context, in *AddPostRequest, opts ...grpc.CallOption) (*AddPostResponse, error) {
+func (c *userServiceClient) AddPostToUser(ctx context.Context, in *AddPostRequest, opts ...grpc.CallOption) (*UserResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(AddPostResponse)
+	out := new(UserResponse)
 	err := c.cc.Invoke(ctx, UserService_AddPostToUser_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -51,9 +55,9 @@ func (c *userServiceClient) AddPostToUser(ctx context.Context, in *AddPostReques
 	return out, nil
 }
 
-func (c *userServiceClient) DeletePostFromUser(ctx context.Context, in *DeletePostRequest, opts ...grpc.CallOption) (*DeletePostResponse, error) {
+func (c *userServiceClient) DeletePostFromUser(ctx context.Context, in *DeletePostRequest, opts ...grpc.CallOption) (*UserResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(DeletePostResponse)
+	out := new(UserResponse)
 	err := c.cc.Invoke(ctx, UserService_DeletePostFromUser_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -61,10 +65,30 @@ func (c *userServiceClient) DeletePostFromUser(ctx context.Context, in *DeletePo
 	return out, nil
 }
 
-func (c *userServiceClient) RestoreUserPost(ctx context.Context, in *RestorePostRequest, opts ...grpc.CallOption) (*RestorePostResponse, error) {
+func (c *userServiceClient) RestoreUserPost(ctx context.Context, in *RestorePostRequest, opts ...grpc.CallOption) (*UserResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(RestorePostResponse)
+	out := new(UserResponse)
 	err := c.cc.Invoke(ctx, UserService_RestoreUserPost_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) AddPostReactionToUser(ctx context.Context, in *AddReactionRequest, opts ...grpc.CallOption) (*UserResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UserResponse)
+	err := c.cc.Invoke(ctx, UserService_AddPostReactionToUser_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) DeletePostReactionFromUser(ctx context.Context, in *DeleteReactionRequest, opts ...grpc.CallOption) (*UserResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UserResponse)
+	err := c.cc.Invoke(ctx, UserService_DeletePostReactionFromUser_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -75,9 +99,11 @@ func (c *userServiceClient) RestoreUserPost(ctx context.Context, in *RestorePost
 // All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility.
 type UserServiceServer interface {
-	AddPostToUser(context.Context, *AddPostRequest) (*AddPostResponse, error)
-	DeletePostFromUser(context.Context, *DeletePostRequest) (*DeletePostResponse, error)
-	RestoreUserPost(context.Context, *RestorePostRequest) (*RestorePostResponse, error)
+	AddPostToUser(context.Context, *AddPostRequest) (*UserResponse, error)
+	DeletePostFromUser(context.Context, *DeletePostRequest) (*UserResponse, error)
+	RestoreUserPost(context.Context, *RestorePostRequest) (*UserResponse, error)
+	AddPostReactionToUser(context.Context, *AddReactionRequest) (*UserResponse, error)
+	DeletePostReactionFromUser(context.Context, *DeleteReactionRequest) (*UserResponse, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -88,14 +114,20 @@ type UserServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedUserServiceServer struct{}
 
-func (UnimplementedUserServiceServer) AddPostToUser(context.Context, *AddPostRequest) (*AddPostResponse, error) {
+func (UnimplementedUserServiceServer) AddPostToUser(context.Context, *AddPostRequest) (*UserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddPostToUser not implemented")
 }
-func (UnimplementedUserServiceServer) DeletePostFromUser(context.Context, *DeletePostRequest) (*DeletePostResponse, error) {
+func (UnimplementedUserServiceServer) DeletePostFromUser(context.Context, *DeletePostRequest) (*UserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeletePostFromUser not implemented")
 }
-func (UnimplementedUserServiceServer) RestoreUserPost(context.Context, *RestorePostRequest) (*RestorePostResponse, error) {
+func (UnimplementedUserServiceServer) RestoreUserPost(context.Context, *RestorePostRequest) (*UserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RestoreUserPost not implemented")
+}
+func (UnimplementedUserServiceServer) AddPostReactionToUser(context.Context, *AddReactionRequest) (*UserResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddPostReactionToUser not implemented")
+}
+func (UnimplementedUserServiceServer) DeletePostReactionFromUser(context.Context, *DeleteReactionRequest) (*UserResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeletePostReactionFromUser not implemented")
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}
 func (UnimplementedUserServiceServer) testEmbeddedByValue()                     {}
@@ -172,6 +204,42 @@ func _UserService_RestoreUserPost_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserService_AddPostReactionToUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddReactionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).AddPostReactionToUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_AddPostReactionToUser_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).AddPostReactionToUser(ctx, req.(*AddReactionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_DeletePostReactionFromUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteReactionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).DeletePostReactionFromUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_DeletePostReactionFromUser_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).DeletePostReactionFromUser(ctx, req.(*DeleteReactionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // UserService_ServiceDesc is the grpc.ServiceDesc for UserService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -190,6 +258,14 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "RestoreUserPost",
 			Handler:    _UserService_RestoreUserPost_Handler,
+		},
+		{
+			MethodName: "AddPostReactionToUser",
+			Handler:    _UserService_AddPostReactionToUser_Handler,
+		},
+		{
+			MethodName: "DeletePostReactionFromUser",
+			Handler:    _UserService_DeletePostReactionFromUser_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
