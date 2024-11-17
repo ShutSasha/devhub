@@ -10,15 +10,46 @@ export const CommentContainer = styled.div`
 `
 
 export const CommentInnerContainer = styled.div`
+  width: 100%;
   display: flex;
   flex-direction: column;
 `
 
 export const CommentHeaderContainer = styled.div`
   display: flex;
+  justify-content: space-between;
   align-items: center;
   gap: 18px;
   margin-bottom: 4px;
+`
+
+export const CommentHeaderInnerContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 4px;
+`
+
+export const RemoveBtn = styled.button`
+  font-family: ${FONTS.MONTSERRAT};
+  background-color: transparent;
+  font-size: 16px;
+  line-height: 20px;
+  padding: 4px 8px;
+  border-radius: 5px;
+  align-self: flex-start;
+  cursor: pointer;
+  transition: all 0.25s ease-in;
+  box-sizing: border-box;
+  color: #f7971d;
+  border: 1px solid #f7971d;
+
+  &:hover {
+    background-color: #f7971d;
+
+    border: 1px solid transparent;
+    color: #fff;
+  }
 `
 
 export const Username = styled.p`
