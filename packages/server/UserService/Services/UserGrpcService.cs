@@ -207,10 +207,10 @@ public class UserGrpcService : global::UserService.UserService.UserServiceBase
       var update = request.Type switch
       {
          "like" => Builders<User>.Update
-            .Pull(u => u.DislikedPosts, request.PostId),
+            .Pull(u => u.LikedPosts, request.PostId),
 
          "dislike" => Builders<User>.Update
-            .Pull(u => u.LikedPosts, request.PostId),
+            .Pull(u => u.DislikedPosts, request.PostId),
 
          _ => null
       };
@@ -231,7 +231,7 @@ public class UserGrpcService : global::UserService.UserService.UserServiceBase
       var updateResult = await _userCollection.UpdateOneAsync(filter, update);
 
       return updateResult.ModifiedCount > 0
-         ? new UserResponse { Success = true, Message = "Successfully delete comment" }
-         : new UserResponse { Success = false, Message = "Can't delete comment from user" };
+         ? new UserResponse { Success = true, Message = "Successfully delete reaction" }
+         : new UserResponse { Success = false, Message = "Can't delete reaction" };
    }
 }
