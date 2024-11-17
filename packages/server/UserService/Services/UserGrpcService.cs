@@ -117,22 +117,11 @@ public class UserGrpcService : global::UserService.UserService.UserServiceBase
 
    public override async Task<DeleteCommentResponse> DeleteCommentFromUser(DeleteCommentRequest request, ServerCallContext context)
    {
-      var filter = Builders<User>.Filter.AnyEq(u => u.Posts, request.CommentId);
-      var user = await _userCollection.Find(filter).FirstOrDefaultAsync();
-      
-      if (user == null)
-      {
-         return new DeleteCommentResponse
-         {
-            Success = false,
-            Message ="User wasn't found "
-         };
-      }
-      
+      var filter = Builders<User>.Filter.Eq(u => u.Id, request.UserId);
       var update = Builders<User>.Update.Pull(u => u.Comments, request.CommentId);
-      var updateResult = await _userCollection.UpdateOneAsync(filter, update);
+      var updatedUser = await _userCollection.FindOneAndUpdateAsync(filter, update);
 
-      return updateResult.ModifiedCount > 0
+      return updatedUser == null
          ? new DeleteCommentResponse { Success = true, Message = "Successfully delete comment" }
          : new DeleteCommentResponse { Success = false, Message = "Can't delete comment from user" };
    }

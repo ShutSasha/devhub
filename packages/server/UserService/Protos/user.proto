@@ -50,7 +50,8 @@ message AddCommentResponse{
 }
 
 message DeleteCommentRequest{
-  string commentId = 1;
+  string userId = 1;
+  string commentId = 2;
 }
 
 message DeleteCommentResponse{
