@@ -12,15 +12,15 @@ import dislikePressed from '@assets/images/post/dislikes/dislike-pressed.svg'
 import comment from '@assets/images/post/comments/comment.svg'
 import commentHover from '@assets/images/post/comments/comment-hover.svg'
 import { FONTS } from '@shared/consts/fonts.enum'
-import { Link } from 'react-router-dom'
 
-export const Container = styled(Link)`
+export const Container = styled.div`
   background-color: ${colors.background};
 
   margin-bottom: 10px;
   padding: 12px;
 
   border-radius: 10px;
+  cursor: pointer;
 `
 
 export const HeaderImage = styled.img`
@@ -179,5 +179,5 @@ export const StyledCount = styled.p`
   font-family: ${FONTS.INTER};
   font-size: 16px;
   line-height: 18px;
-  font-weight: 4000;
+  font-weight: 400;
 `

@@ -13,7 +13,7 @@ import { colors } from '@shared/consts/colors.const'
 export const PostTitle = styled.p`
   font-size: 20px;
   line-height: 24px;
-  font-familt: ${FONTS.INTER};
+  font-family: ${FONTS.INTER};
   font-weight: 700;
   margin-bottom: 18px;
 `
@@ -33,7 +33,7 @@ export const PostImage = styled.img`
 export const PostCreationData = styled.p`
   font-size: 16px;
   line-height: 20px;
-  font-familt: ${FONTS.INTER};
+  font-family: ${FONTS.INTER};
   color: #ededed7d;
   font-weight: 700;
   margin-bottom: 18px;
@@ -49,14 +49,14 @@ export const PostTagsContainer = styled.div`
 export const PostTag = styled.p`
   font-size: 16px;
   line-height: 20px;
-  font-familt: ${FONTS.INTER};
+  font-family: ${FONTS.INTER};
   font-weight: 700;
 `
 
 export const ContentText = styled.p`
   font-size: 16px;
   line-height: 24px;
-  font-familt: ${FONTS.INTER};
+  font-family: ${FONTS.INTER};
   color: #fff;
   font-weight: 500;
   text-justify: inter-word;
@@ -153,7 +153,7 @@ export const PostBtn = styled.button`
   box-sizing: border-box;
   border: 1px solid transparent;
 
-  &: hover {
+  &:hover {
     background-color: transparent;
     border: 1px solid #f7971d;
     color: #f7971d;
