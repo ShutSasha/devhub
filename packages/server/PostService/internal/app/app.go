@@ -6,6 +6,7 @@ import (
 	"time"
 
 	pb "github.com/ShutSasha/devhub/tree/main/packages/server/PostService/gen/go/user"
+	cb "github.com/ShutSasha/devhub/tree/main/packages/server/PostService/gen/go/comment"
 	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/app/grpcapp"
 	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/app/httpapp"
 	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/services"
@@ -31,9 +32,18 @@ func New(
 	httpPort int,
 	timeout time.Duration,
 	grpcPort int,
+	commentServicePort int,
 ) *App {
-	conn, err := grpc.NewClient(
+	userConn, err := grpc.NewClient(
 		fmt.Sprintf("localhost:%d", userServicePort),
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	)
+	if err != nil {
+		panic("failed to connect to gRPC server")
+	}
+
+	commentConn, err := grpc.NewClient(
+		fmt.Sprintf("localhost:%d", commentServicePort),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	)
 	if err != nil {
@@ -50,7 +60,9 @@ func New(
 		panic(err)
 	}
 
-	grpcUserClient := pb.NewUserServiceClient(conn)
+	grpcUserClient := pb.NewUserServiceClient(userConn)
+
+	grpcCommentClient := cb.NewCommentServiceClient(commentConn)
 
 	postService := services.New(dbStorage, dbStorage)
 
@@ -61,6 +73,7 @@ func New(
 		dbStorage,
 		fileStorage,
 		grpcUserClient,
+		grpcCommentClient,
 		httpPort,
 		timeout,
 	)

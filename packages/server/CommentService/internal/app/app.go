@@ -7,11 +7,13 @@ import (
 	"github.com/ShutSasha/devhub/packages/server/CommentService/internal/adapter/storage/mongodb"
 	"github.com/ShutSasha/devhub/packages/server/CommentService/internal/adapter/storage/mongodb/repository"
 	"github.com/ShutSasha/devhub/packages/server/CommentService/internal/app/http"
+	"github.com/ShutSasha/devhub/packages/server/CommentService/internal/app/grpc"
 	"github.com/ShutSasha/devhub/packages/server/CommentService/internal/core/service"
 )
 
 type App struct {
 	HttpApp *http.App
+	GrpcApp *grpc.App
 }
 
 func New(
@@ -21,6 +23,7 @@ func New(
 	timeout time.Duration,
 	postServicePort int,
 	userServicePort int,
+	commentServicePort int,
 ) *App {
 	storage, err := mongodb.New(storagePath)
 	if err != nil {
@@ -39,7 +42,10 @@ func New(
 		userServicePort,
 	)
 
+	grpcApp := grpc.New(log, service, commentServicePort)
+
 	return &App{
 		HttpApp: httpApp,
+		GrpcApp: grpcApp,
 	}
 }

@@ -1,6 +1,7 @@
 using Amazon.Util.Internal;
 using Microsoft.AspNetCore.Mvc;
 using UserService.Abstracts;
+using UserService.Contracts.Posts;
 using UserService.Contracts.User;
 using UserService.Helpers.Response;
 using ZstdSharp.Unsafe;
@@ -67,6 +68,7 @@ public class UserController : ControllerBase
    }
 
    [HttpGet("user-details/{userId}")]
+   [ProducesResponseType(200,Type =typeof(UserDetailsResponse))]
    public async Task<IActionResult> GetUserDetails(string userId)
    {
       try
@@ -79,5 +81,23 @@ public class UserController : ControllerBase
          return ErrorResponseHelper.CreateErrorResponse(400, nameof(GetUserDetails), e.Message);
       }
    }
-   
+
+   [HttpGet("user-reactions/{userId}")]
+   [ProducesResponseType(200,Type =typeof(UserReactionsResponse))]
+   public async Task<IActionResult> GetUserReactions(string userId)
+   {
+      try
+      {
+         var userReactions = await _userService.GetUserReaction(userId);
+         
+         return Ok(userReactions);
+      }
+      catch (Exception e)
+      {
+         return ErrorResponseHelper.CreateErrorResponse(
+            Convert.ToInt32(e.Message.Split(":")[1]),
+            nameof(GetUserDetails),
+            e.Message);
+      }
+   }
 }

@@ -230,7 +230,7 @@
             }
          ],
          "UpstreamPathTemplate": "/api/posts/{id}/like",
-         "UpstreamHttpMethod": ["POST", "DELETE"]
+         "UpstreamHttpMethod": ["POST"]
       },
       {
          "DownstreamPathTemplate": "/api/posts/{id}/dislike",
@@ -242,7 +242,7 @@
             }
          ],
          "UpstreamPathTemplate": "/api/posts/{id}/dislike",
-         "UpstreamHttpMethod": ["POST", "DELETE"]
+         "UpstreamHttpMethod": ["POST"]
       }
    ],
    "GlobalConfiguration": {

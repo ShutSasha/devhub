@@ -2,6 +2,7 @@ using Grpc.Core;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using MongoDB.Driver.Core.Events;
+using MongoDB.Driver.Linq;
 using UserService.Models.Database;
 using UserService.Models.User;
 
@@ -129,6 +130,7 @@ public class UserGrpcService : global::UserService.UserService.UserServiceBase
             Message = "User wasn't found "
          };
       }
+
       _logger.LogInformation($"Preparing for updating user with id {user.Id}");
       var filter = Builders<User>.Filter.Eq(u => u.Id, request.UserId);
       var update = Builders<User>.Update.Pull(u => u.Comments, request.CommentId);
@@ -139,99 +141,153 @@ public class UserGrpcService : global::UserService.UserService.UserServiceBase
          : new UserResponse { Success = false, Message = "Can't delete comment from user" };
    }
 
-   public override async Task<UserResponse> AddPostReactionToUser(AddReactionRequest request, ServerCallContext context)
-   {
-      var user = await _userCollection.Find(u => u.Id == request.UserId)
-         .FirstOrDefaultAsync();
-
-      if (user == null)
-      {
-         return new UserResponse
-         {
-            Success = false,
-            Message = "User wasn't found "
-         };
-      }
-
-      var filter = Builders<User>.Filter.Eq(u => u.Id, request.UserId);
-
-      var update = request.Type switch
-      {
-         "like" => Builders<User>.Update
-            .Push(u => u.LikedPosts, request.PostId),
-
-         "dislike" => Builders<User>.Update
-            .Push(u => u.DislikedPosts, request.PostId),
-
-         _ => null
-      };
-      
-      _logger.LogInformation($"Preparing for updating user with id {user.Id}");
-      
-      if (update == null)
-      {
-         _logger.LogError($"Cannot process type {request.Type}");
-         
-         return new UserResponse
-         {
-            Success = false,
-            Message = "Invalid reaction type"
-         };
-      }
-      
-
-      var updateResult = await _userCollection.UpdateOneAsync(filter, update);
-
-      return updateResult.ModifiedCount > 0
-         ? new UserResponse { Success = true, Message = "Reaction added successfully" }
-         : new UserResponse { Success = false, Message = "Failed to update reaction" };
-   }
-
-   public override async Task<UserResponse> DeletePostReactionFromUser(DeleteReactionRequest request,
+   public override async Task<AddReactionResponse> AddPostReactionToUser(AddReactionRequest request,
       ServerCallContext context)
    {
-      var user = await _userCollection.Find(u => u.Id == request.UserId)
-         .FirstOrDefaultAsync();
+      var reactionResponse = new AddReactionResponse
+      {
+         Dislikes = 0,
+         Likes = 0,
+         Message = string.Empty,
+         Success = false
+      };
 
+      var user = await _userCollection.Find(u => u.Id == request.UserId).FirstOrDefaultAsync();
       if (user == null)
       {
-         return new UserResponse
-         {
-            Success = false,
-            Message = "User wasn't found "
-         };
+         reactionResponse.Message = "User wasn't found";
+         return reactionResponse;
       }
+
+      var hasLikeOnPost = user.LikedPosts.Contains(request.PostId);
+      var hasDislikeOnPost = user.DislikedPosts.Contains(request.PostId);
 
       var filter = Builders<User>.Filter.Eq(u => u.Id, request.UserId);
+      UpdateDefinition<User>? update = null;
 
-      var update = request.Type switch
+      (string type, bool hasLike, bool hasDislike) = (request.Type.ToLower(), hasLikeOnPost, hasDislikeOnPost);
+
+      switch (type, hasLike, hasDislike)
       {
-         "like" => Builders<User>.Update
-            .Pull(u => u.LikedPosts, request.PostId),
+         case ("like", false, false):
+            reactionResponse.Likes = 1;
+            update = Builders<User>.Update.Push(u => u.LikedPosts, request.PostId);
+            break;
 
-         "dislike" => Builders<User>.Update
-            .Pull(u => u.DislikedPosts, request.PostId),
+         case ("dislike", false, false):
+            reactionResponse.Dislikes = 1;
+            update = Builders<User>.Update.Push(u => u.DislikedPosts, request.PostId);
+            break;
 
-         _ => null
-      };
-      
-      _logger.LogInformation($"Preparing for updating user with id {user.Id}");
-      
+         case ("like", true, false):
+            reactionResponse.Likes = -1;
+            update = Builders<User>.Update.Pull(u => u.LikedPosts, request.PostId);
+            break;
+
+         case ("dislike", false, true):
+            reactionResponse.Dislikes = -1;
+            update = Builders<User>.Update.Pull(u => u.DislikedPosts, request.PostId);
+            break;
+
+         case ("like", false, true):
+            reactionResponse.Dislikes = -1;
+            reactionResponse.Likes = 1;
+            update = Builders<User>.Update
+               .Pull(u => u.DislikedPosts, request.PostId)
+               .AddToSet(u => u.LikedPosts, request.PostId);
+            break;
+
+         case ("dislike", true, false):
+            reactionResponse.Likes = -1;
+            reactionResponse.Dislikes = 1;
+            update = Builders<User>.Update
+               .Pull(u => u.LikedPosts, request.PostId)
+               .AddToSet(u => u.DislikedPosts, request.PostId);
+            break;
+
+         default:
+            reactionResponse.Message = $"Invalid reaction type: {request.Type}";
+            _logger.LogWarning(reactionResponse.Message);
+            return reactionResponse;
+      }
+
       if (update == null)
       {
-         _logger.LogError($"Cannot process type {request.Type}");
-         
+         reactionResponse.Message = "No changes to apply.";
+         _logger.LogInformation(reactionResponse.Message);
+         return reactionResponse;
+      }
+
+      _logger.LogInformation($"Updating user {user.Id} with reaction {type} on post {request.PostId}");
+      var updateResult = await _userCollection.UpdateOneAsync(filter, update);
+
+      if (updateResult.ModifiedCount > 0)
+      {
+         reactionResponse.Success = true;
+         reactionResponse.Message = "Reaction updated successfully";
+      }
+      else
+      {
+         reactionResponse.Message = "Failed to update reaction";
+         _logger.LogWarning($"No documents were modified for user {user.Id}");
+      }
+
+      return reactionResponse;
+   }
+
+   public override async Task<UserResponse> DeleteReactedPost(DeleteReactedPostRequest request,
+      ServerCallContext context)
+   {
+      if (string.IsNullOrWhiteSpace(request.PostId))
+      {
          return new UserResponse
          {
             Success = false,
-            Message = "Invalid reaction type"
+            Message = "Post ID is required."
          };
       }
 
-      var updateResult = await _userCollection.UpdateOneAsync(filter, update);
+      var postId = request.PostId;
 
-      return updateResult.ModifiedCount > 0
-         ? new UserResponse { Success = true, Message = "Successfully delete reaction" }
-         : new UserResponse { Success = false, Message = "Can't delete reaction" };
+      var filter = Builders<User>.Filter.Or(
+         Builders<User>.Filter.AnyEq(u => u.LikedPosts, postId),
+         Builders<User>.Filter.AnyEq(u => u.DislikedPosts, postId)
+      );
+
+      var update = Builders<User>.Update
+         .Pull(u => u.LikedPosts, postId)
+         .Pull(u => u.DislikedPosts, postId);
+
+      try
+      {
+         var updateResult = await _userCollection.UpdateManyAsync(filter, update);
+
+         if (updateResult.ModifiedCount > 0)
+         {
+            _logger.LogInformation($"Post {postId} removed from {updateResult.ModifiedCount} user(s).");
+
+            return new UserResponse
+            {
+               Success = true,
+               Message = $"Post {postId} reactions removed successfully."
+            };
+         }
+
+         _logger.LogWarning($"Post {postId} was not found in any user's reactions.");
+         return new UserResponse
+         {
+            Success = true,
+            Message = "No users had reacted to the post."
+         };
+      }
+      catch (Exception ex)
+      {
+         _logger.LogError($"Failed to remove reactions for post {postId}: {ex.Message}");
+         return new UserResponse
+         {
+            Success = false,
+            Message = "An error occurred while removing reactions."
+         };
+      }
    }
 }

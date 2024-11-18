@@ -1,3 +1,4 @@
+using UserService.Contracts.Posts;
 using UserService.Contracts.User;
 using UserService.Models.User;
 
@@ -9,4 +10,5 @@ public interface IUserService
    Task EditUserIcon(string id, string fileName, Stream fileStream, string contentType);
    Task<UserDetailsResponse> GetUserDetailsById(string id);
    Task<User> GetById(string id);
+   Task<UserReactionsResponse> GetUserReaction(string userId);
 }
