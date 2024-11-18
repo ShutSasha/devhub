@@ -48,15 +48,15 @@ func New(
 			slog.String("request_id", middleware.GetReqID(r.Context())),
 		)
 
-		id := chi.URLParam(r, "id")
+		postId := chi.URLParam(r, "id")
 
-		postId, err := primitive.ObjectIDFromHex(id)
+		postObjectId, err := primitive.ObjectIDFromHex(postId)
 		if err != nil {
 			utils.HandleError(log, w, r, "failed to create objectId from postId", err, http.StatusBadRequest, "postId", "Invalid postId format")
 			return
 		}
 
-		post, err := postProvider.GetById(context.TODO(), postId, fileProvider)
+		post, err := postProvider.GetById(context.TODO(), postObjectId, fileProvider)
 		if err == nil && post.HeaderImage != "" {
 			fileRemoveErr := fileRemover.Remove(context.TODO(), post.HeaderImage)
 			if fileRemoveErr != nil {
@@ -69,7 +69,7 @@ func New(
 		}
 
 		grpcDeleteResponse, err := grpcUserClient.DeletePostFromUser(context.TODO(), &pb.DeletePostRequest{
-			PostId: id,
+			PostId: postId,
 		})
 		if err != nil {
 			utils.HandleError(log, w, r, "failed to notify user service", err, http.StatusInternalServerError, "userService", "Failed to notify user service")
@@ -85,7 +85,7 @@ func New(
 
 		err = postRemover.Remove(
 			context.TODO(),
-			postId,
+			postObjectId,
 		)
 		if err != nil {
 			log.Error("can not delete post", sl.Err(err))
@@ -93,7 +93,7 @@ func New(
 
 			_, rollbackErr := grpcUserClient.RestoreUserPost(context.TODO(), &pb.RestorePostRequest{
 				UserId: post.User.Id.Hex(),
-				PostId: postId.Hex(),
+				PostId: postObjectId.Hex(),
 			})
 			if rollbackErr != nil {
 				utils.HandleError(log, w, r, "failed to rollback post in user service", rollbackErr, http.StatusInternalServerError,
@@ -110,20 +110,24 @@ func New(
 			return
 		}
 
-		log.Info("post successfully deleted", slog.Any("id", postId))
+		log.Info("post successfully deleted", slog.Any("id", postObjectId))
 
 		commGrpcServResponse, err := grpcCommentClient.RemoveComments(context.TODO(), &cb.RemoveCommentRequest{
 			From: "posts",
-			Id:   id,
+			Id:   postId,
 		})
-		if err != nil {
-			utils.HandleError(log, w, r, "failed to remove comments from post", err, http.StatusInternalServerError,
+		if err != nil || (commGrpcServResponse != nil && !commGrpcServResponse.Success) {
+			utils.HandleError(log, w, r, "failed to remove comments from post"+commGrpcServResponse.Message, err, http.StatusInternalServerError,
 				"commentService", "Post comments are not deleted")
 			return
 		}
-		if !commGrpcServResponse.Success {
-			utils.HandleError(log, w, r, "comment service returned failure", fmt.Errorf(commGrpcServResponse.Message), http.StatusInternalServerError,
-				"commentService", "COmment service returned failure: "+commGrpcServResponse.Message)
+
+		userGrpcServerResp, err := grpcUserClient.DeleteReactedPost(context.TODO(), &pb.DeleteReactedPostRequest{
+			PostId: postId,
+		})
+		if err != nil || (userGrpcServerResp != nil && !userGrpcServerResp.Success) {
+			utils.HandleError(log, w, r, "failed to remove likes and dislikes"+userGrpcServerResp.Message, err, http.StatusInternalServerError,
+				"userService", "failed to remove likes and dislikes")
 			return
 		}
 

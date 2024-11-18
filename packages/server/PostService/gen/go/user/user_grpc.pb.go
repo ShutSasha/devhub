@@ -25,6 +25,7 @@ const (
 	UserService_AddPostReactionToUser_FullMethodName = "/UserService/AddPostReactionToUser"
 	UserService_AddCommentToUser_FullMethodName      = "/UserService/AddCommentToUser"
 	UserService_DeleteCommentFromUser_FullMethodName = "/UserService/DeleteCommentFromUser"
+	UserService_DeleteReactedPost_FullMethodName     = "/UserService/DeleteReactedPost"
 )
 
 // UserServiceClient is the client API for UserService service.
@@ -37,6 +38,7 @@ type UserServiceClient interface {
 	AddPostReactionToUser(ctx context.Context, in *AddReactionRequest, opts ...grpc.CallOption) (*AddReactionResponse, error)
 	AddCommentToUser(ctx context.Context, in *AddCommentRequest, opts ...grpc.CallOption) (*UserResponse, error)
 	DeleteCommentFromUser(ctx context.Context, in *DeleteCommentRequest, opts ...grpc.CallOption) (*UserResponse, error)
+	DeleteReactedPost(ctx context.Context, in *DeleteReactedPostRequest, opts ...grpc.CallOption) (*UserResponse, error)
 }
 
 type userServiceClient struct {
@@ -107,6 +109,16 @@ func (c *userServiceClient) DeleteCommentFromUser(ctx context.Context, in *Delet
 	return out, nil
 }
 
+func (c *userServiceClient) DeleteReactedPost(ctx context.Context, in *DeleteReactedPostRequest, opts ...grpc.CallOption) (*UserResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UserResponse)
+	err := c.cc.Invoke(ctx, UserService_DeleteReactedPost_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServiceServer is the server API for UserService service.
 // All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility.
@@ -117,6 +129,7 @@ type UserServiceServer interface {
 	AddPostReactionToUser(context.Context, *AddReactionRequest) (*AddReactionResponse, error)
 	AddCommentToUser(context.Context, *AddCommentRequest) (*UserResponse, error)
 	DeleteCommentFromUser(context.Context, *DeleteCommentRequest) (*UserResponse, error)
+	DeleteReactedPost(context.Context, *DeleteReactedPostRequest) (*UserResponse, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -144,6 +157,9 @@ func (UnimplementedUserServiceServer) AddCommentToUser(context.Context, *AddComm
 }
 func (UnimplementedUserServiceServer) DeleteCommentFromUser(context.Context, *DeleteCommentRequest) (*UserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteCommentFromUser not implemented")
+}
+func (UnimplementedUserServiceServer) DeleteReactedPost(context.Context, *DeleteReactedPostRequest) (*UserResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteReactedPost not implemented")
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}
 func (UnimplementedUserServiceServer) testEmbeddedByValue()                     {}
@@ -274,6 +290,24 @@ func _UserService_DeleteCommentFromUser_Handler(srv interface{}, ctx context.Con
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserService_DeleteReactedPost_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteReactedPostRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).DeleteReactedPost(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_DeleteReactedPost_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).DeleteReactedPost(ctx, req.(*DeleteReactedPostRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // UserService_ServiceDesc is the grpc.ServiceDesc for UserService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -304,6 +338,10 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteCommentFromUser",
 			Handler:    _UserService_DeleteCommentFromUser_Handler,
+		},
+		{
+			MethodName: "DeleteReactedPost",
+			Handler:    _UserService_DeleteReactedPost_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

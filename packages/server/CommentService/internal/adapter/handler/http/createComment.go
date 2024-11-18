@@ -96,6 +96,7 @@ func (ch *CommentHandler) Create() http.HandlerFunc {
 
 		log.Info("comment successfully added")
 		w.WriteHeader(http.StatusCreated)
+		w.Header().Set("Content-Type", "application/json")
 		render.JSON(w, r, comment)
 	}
 }
