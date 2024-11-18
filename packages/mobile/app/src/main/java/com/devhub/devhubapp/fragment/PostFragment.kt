@@ -12,18 +12,12 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.devhub.devhubapp.R
 import com.devhub.devhubapp.activity.PostActivity
-import com.devhub.devhubapp.classes.RetrofitClient
 import com.devhub.devhubapp.dataClasses.Post
 import com.google.android.flexbox.FlexboxLayout
 import com.google.gson.Gson
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import kotlin.math.log
 
 class PostFragment : Fragment() {
     private lateinit var post: Post
@@ -122,29 +116,15 @@ class PostFragment : Fragment() {
             textView.typeface = ResourcesCompat.getFont(requireContext(), R.font.inter_bold_font)
             hashtagsContainer.addView(textView)
         }
-        likeCountTextView.text = formatLikesCount(post.likes)
-        dislikeCountTextView.text = formatDislikesCount(post.dislikes)
-        commentCountTextView.text = formatCommentCount(post.comments.size)
+        likeCountTextView.text = formatCount(post.likes)
+        dislikeCountTextView.text = formatCount(post.dislikes)
+        commentCountTextView.text = formatCount(post.comments.size)
     }
 
-    private fun formatLikesCount(likes: Int): String {
+    private fun formatCount(reaction: Int): String {
         return when {
-            likes >= 1000 -> String.format("%.1fK", likes / 1000.0)
-            else -> likes.toString()
-        }
-    }
-
-    private fun formatDislikesCount(dislikes: Int): String {
-        return when {
-            dislikes >= 1000 -> String.format("%.1fK", dislikes / 1000.0)
-            else -> dislikes.toString()
-        }
-    }
-
-    private fun formatCommentCount(comments: Int): String {
-        return when {
-            comments >= 1000 -> String.format("%.1fK", comments / 1000.0)
-            else -> comments.toString()
+            reaction >= 1000 -> String.format("%.1fK", reaction / 1000.0)
+            else -> reaction.toString()
         }
     }
 }

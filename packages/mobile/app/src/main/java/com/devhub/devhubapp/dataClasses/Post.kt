@@ -1,9 +1,5 @@
 package com.devhub.devhubapp.dataClasses
 
-import com.google.gson.annotations.SerializedName
-import java.util.Date
-
-
 data class Post(
     val _id: String,
     val headerImage: String?,
