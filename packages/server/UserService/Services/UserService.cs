@@ -140,6 +140,7 @@ public class UserService : IUserService
          Bio = user.Bio,
          Avatar = user.Avatar,
          CreatedAt = user.CreatedAt,
+         Username = user.UserName,
          Name = user.Name,
          Comments = comments,
          Posts = posts

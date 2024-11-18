@@ -182,6 +182,18 @@
          "UpstreamPathTemplate": "/api/users",
          "UpstreamHttpMethod": ["PATCH"]
       },
+      {
+         "DownstreamPathTemplate": "/api/users/user-details/{userId}",
+         "DownstreamScheme": "http",
+         "DownstreamHostAndPorts": [
+            {
+               "Host": "localhost",
+               "Port": 5229
+            }
+         ],
+         "UpstreamPathTemplate": "/api/users/user-details/{userId}",
+         "UpstreamHttpMethod": ["GET"]
+      },
       
       {
          "DownstreamPathTemplate": "/api/comments",
