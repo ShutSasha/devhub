@@ -36,6 +36,7 @@ func main() {
 		cfg.Http.Port,
 		cfg.Http.Timeout,
 		cfg.Grpc.PostServicePort,
+		cfg.Grpc.CommentServicePort,
 	)
 	done := make(chan os.Signal, 1)
 	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)

@@ -10,6 +10,7 @@ import (
 
 	_ "github.com/ShutSasha/devhub/tree/main/packages/server/PostService/docs"
 	pb "github.com/ShutSasha/devhub/tree/main/packages/server/PostService/gen/go/user"
+	cb "github.com/ShutSasha/devhub/tree/main/packages/server/PostService/gen/go/comment"
 	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/domain/interfaces"
 	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/http-server/handlers/post/delete"
 	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/http-server/handlers/post/get/paginate"
@@ -50,7 +51,8 @@ func New(
 	log *slog.Logger,
 	postStorage PostStorage,
 	fileStorage FileStorage,
-	grpcClient pb.UserServiceClient,
+	grpcUserClient pb.UserServiceClient,
+	grpcCommentClient cb.CommentServiceClient,
 	port int,
 	timout time.Duration,
 ) *App {
@@ -75,15 +77,13 @@ func New(
 
 	router.Route("/api/posts", func(r chi.Router) {
 		r.Get("/{id}", single.New(log, postStorage, fileStorage))
-		r.Post("/", save.New(log, postStorage, postStorage, postStorage, fileStorage, fileStorage, fileStorage, grpcClient))
+		r.Post("/", save.New(log, postStorage, postStorage, postStorage, fileStorage, fileStorage, fileStorage, grpcUserClient))
 		r.Get("/", paginate.New(log, postStorage, fileStorage))
-		r.Delete("/{id}", delete.New(log, postStorage, postStorage, fileStorage, fileStorage, grpcClient))
+		r.Delete("/{id}", delete.New(log, postStorage, postStorage, fileStorage, fileStorage, grpcUserClient, grpcCommentClient))
 		r.Patch("/{id}", update.New(log, postStorage, postStorage, fileStorage, fileStorage, fileStorage))
 
-		r.Post("/{id}/like", react.NewLike(log, postStorage,grpcClient))
-		r.Post("/{id}/dislike", react.NewDislike(log, postStorage,grpcClient))
-		r.Delete("/{id}/like", react.NewUnlike(log, postStorage,grpcClient))
-		r.Delete("/{id}/dislike", react.NewUndislike(log, postStorage,grpcClient))
+		r.Post("/{id}/like", react.NewLike(log, postStorage,grpcUserClient))
+		r.Post("/{id}/dislike", react.NewDislike(log, postStorage,grpcUserClient))
 
 		r.Get("/search", search.New(log, postStorage, fileStorage))
 	})

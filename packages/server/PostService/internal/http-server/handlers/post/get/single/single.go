@@ -58,6 +58,13 @@ func New(log *slog.Logger, postProvider interfaces.PostProvider, fileProvider in
 
 		log.Info("post successfully found", slog.Any("id", postId))
 
+		if post == nil {
+			w.WriteHeader(http.StatusNotFound)
+
+			render.JSON(w, r, map[string]interface{}{})
+			return
+		}
+
 		render.JSON(w, r, post)
 	}
 }

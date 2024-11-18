@@ -6,6 +6,7 @@ import (
 	"log/slog"
 	"net/http"
 
+	cb "github.com/ShutSasha/devhub/tree/main/packages/server/PostService/gen/go/comment"
 	pb "github.com/ShutSasha/devhub/tree/main/packages/server/PostService/gen/go/user"
 	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/domain/interfaces"
 	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/http-server/utils"
@@ -35,7 +36,8 @@ func New(
 	postProvider interfaces.PostProvider,
 	fileRemover interfaces.FileRemover,
 	fileProvider interfaces.FileProvider,
-	grpcClient pb.UserServiceClient,
+	grpcUserClient pb.UserServiceClient,
+	grpcCommentClient cb.CommentServiceClient,
 ) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		const op = "handlers.post.delete.New"
@@ -66,7 +68,7 @@ func New(
 			log.Error("failed to get post by postId", sl.Err(err))
 		}
 
-		grpcDeleteResponse, err := grpcClient.DeletePostFromUser(context.TODO(), &pb.DeletePostRequest{
+		grpcDeleteResponse, err := grpcUserClient.DeletePostFromUser(context.TODO(), &pb.DeletePostRequest{
 			PostId: id,
 		})
 		if err != nil {
@@ -89,7 +91,7 @@ func New(
 			log.Error("can not delete post", sl.Err(err))
 			log.Info("rolling back post")
 
-			_, rollbackErr := grpcClient.RestoreUserPost(context.TODO(), &pb.RestorePostRequest{
+			_, rollbackErr := grpcUserClient.RestoreUserPost(context.TODO(), &pb.RestorePostRequest{
 				UserId: post.User.Id.Hex(),
 				PostId: postId.Hex(),
 			})
@@ -109,6 +111,21 @@ func New(
 		}
 
 		log.Info("post successfully deleted", slog.Any("id", postId))
+
+		commGrpcServResponse, err := grpcCommentClient.RemoveComments(context.TODO(), &cb.RemoveCommentRequest{
+			From: "posts",
+			Id:   id,
+		})
+		if err != nil {
+			utils.HandleError(log, w, r, "failed to remove comments from post", err, http.StatusInternalServerError,
+				"commentService", "Post comments are not deleted")
+			return
+		}
+		if !commGrpcServResponse.Success {
+			utils.HandleError(log, w, r, "comment service returned failure", fmt.Errorf(commGrpcServResponse.Message), http.StatusInternalServerError,
+				"commentService", "COmment service returned failure: "+commGrpcServResponse.Message)
+			return
+		}
 
 		render.JSON(w, r, map[string]interface{}{
 			"Status":  http.StatusOK,
