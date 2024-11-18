@@ -26,6 +26,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.devhub.devhubapp.fragment.AddCommentFragment
 import java.util.Locale
 
 
@@ -40,9 +41,13 @@ class PostActivity : AppCompatActivity() {
         val fragmentTransaction: FragmentTransaction = fragmentManager.beginTransaction()
         if (savedInstanceState == null) {
             fragmentTransaction.replace(R.id.header_container_post, HeaderFragment())
-            fragmentTransaction.replace(R.id.footer_container_post, FooterFragment())
             fragmentTransaction.commit()
         }
+
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.add_comment_container, AddCommentFragment())
+            .commit()
+
 
         val postJson = intent.getStringExtra("post")
         val post = Gson().fromJson(postJson, Post::class.java)
@@ -76,6 +81,7 @@ class PostActivity : AppCompatActivity() {
         commentsRecyclerView.layoutManager = LinearLayoutManager(this)
         val commentAdapter = CommentFragment(post.comments)
         commentsRecyclerView.adapter = commentAdapter
+        commentsRecyclerView.overScrollMode = View.OVER_SCROLL_NEVER
 
         postImage.visibility = if (post.headerImage == "") View.GONE else View.VISIBLE
 
