@@ -4,7 +4,7 @@ import { parseDate } from '@utils/parseDate.util'
 import { useDeleteCommentByIdMutation } from '@api/comment.api'
 import { handleServerException } from '@utils/handleServerException.util'
 import { toast } from 'react-toastify'
-import { useAppDispatch } from '@app/store/store'
+import { useAppDispatch, useAppSelector } from '@app/store/store'
 import { api } from '@api/post.api'
 
 import {
@@ -26,6 +26,7 @@ interface CommentProps {
 }
 
 export const Comment: FC<CommentProps> = ({ comment }) => {
+  const userId = useAppSelector(state => state.userSlice.user?._id)
   const dispatch = useAppDispatch()
   const [deleteComment] = useDeleteCommentByIdMutation()
 
@@ -58,7 +59,7 @@ export const Comment: FC<CommentProps> = ({ comment }) => {
             <Username>{comment.user.username}</Username>
             <CommentPostedDate>{parseDate(comment.createdAt)}</CommentPostedDate>
           </CommentHeaderInnerContainer>
-          <RemoveBtn onClick={handleDeleteComment}>Delete</RemoveBtn>
+          {userId === comment.user._id ? <RemoveBtn onClick={handleDeleteComment}>Delete</RemoveBtn> : ''}
         </CommentHeaderContainer>
         <CommentText>{comment.commentText}</CommentText>
       </CommentInnerContainer>
