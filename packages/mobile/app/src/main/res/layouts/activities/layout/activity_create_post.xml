@@ -44,7 +44,6 @@
             android:textSize="16sp"
             app:layout_constraintStart_toEndOf="@id/user_avatar"
             app:layout_constraintTop_toTopOf="@id/user_avatar" />
-
     </LinearLayout>
 
     <Button
@@ -113,16 +112,34 @@
         android:layout_marginTop="25dp"
         android:scaleType="centerCrop"
         android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@id/title_input"
+        app:layout_constraintBottom_toTopOf="@id/change_background_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/create_post_button" />
+
+    <Button
+        android:id="@+id/change_background_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/shape_dashed_background"
+        android:drawableEnd="@drawable/ic_upload"
+        android:drawablePadding="10dp"
+        android:fontFamily="@font/montserrat_regular_font"
+        android:padding="10dp"
+        android:text="Change background"
+        android:textAllCaps="false"
+        android:textColor="@color/black300"
+        android:textSize="14sp"
+        android:visibility="invisible"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/selected_background_image" />
 
     <EditText
         android:id="@+id/title_input"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="15dp"
         android:background="@android:color/transparent"
         android:fontFamily="@font/montserrat_medium_font"
         android:hint="Title here..."
@@ -133,7 +150,7 @@
         android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/add_background_button" />
+        app:layout_constraintTop_toBottomOf="@id/change_background_button" />
 
     <TextView
         android:id="@+id/title_error"
@@ -183,8 +200,6 @@
         android:background="@android:color/transparent"
         android:fontFamily="@font/montserrat_medium_font"
         android:hint="Content here..."
-        android:inputType="textMultiLine"
-        android:minLines="3"
         android:textColor="@color/text_secondary"
         android:textColorHint="@color/text_secondary"
         android:textSize="16sp"
@@ -202,6 +217,4 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/content_input" />
-
-
 </androidx.constraintlayout.widget.ConstraintLayout>

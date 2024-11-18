@@ -22,6 +22,7 @@ import retrofit2.Response
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
 import android.provider.OpenableColumns
+import android.widget.Button
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
@@ -65,6 +66,13 @@ class CreatePostActivity : AppCompatActivity() {
         backButton.setOnClickListener {
             finish()
         }
+
+        val changeBackgroundButton = findViewById<Button>(R.id.change_background_button)
+        changeBackgroundButton.setOnClickListener {
+            openImagePicker()
+        }
+
+        updateBackgroundControls(showChangeButton = false)
 
         createPostButton.setOnClickListener {
             val titleText = postTitle.text.toString().trim()
@@ -187,20 +195,34 @@ class CreatePostActivity : AppCompatActivity() {
 
     private var selectedImageUri: Uri? = null
 
+    private fun updateBackgroundControls(showChangeButton: Boolean) {
+        val addBackgroundButton = findViewById<FrameLayout>(R.id.add_background_button)
+        val selectedImageView = findViewById<ImageView>(R.id.selected_background_image)
+        val changeBackgroundButton = findViewById<Button>(R.id.change_background_button)
+
+        if (selectedImageUri != null) {
+            addBackgroundButton.visibility = View.GONE
+            selectedImageView.visibility = View.VISIBLE
+            changeBackgroundButton.visibility = View.VISIBLE
+        } else {
+            addBackgroundButton.visibility = View.VISIBLE
+            selectedImageView.visibility = View.GONE
+            changeBackgroundButton.visibility = View.INVISIBLE
+        }
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_IMAGE_PICK && resultCode == RESULT_OK) {
             selectedImageUri = data?.data
             if (selectedImageUri != null) {
-                val backgroundButton = findViewById<FrameLayout>(R.id.add_background_button)
                 val selectedImageView = findViewById<ImageView>(R.id.selected_background_image)
-
-                backgroundButton.visibility = View.GONE
-                selectedImageView.visibility = View.VISIBLE
 
                 Glide.with(this)
                     .load(selectedImageUri)
                     .into(selectedImageView)
+
+                updateBackgroundControls(showChangeButton = true)
             }
         }
     }
