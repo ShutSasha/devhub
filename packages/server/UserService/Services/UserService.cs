@@ -3,6 +3,7 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
 using UserService.Abstracts;
+using UserService.Contracts.Posts;
 using UserService.Contracts.User;
 using UserService.Models.Database;
 using UserService.Models.User;
@@ -103,10 +104,19 @@ public class UserService : IUserService
       throw new Exception("404: User with this id wasn't found");
    }
 
+   public async Task<UserReactionsResponse> GetUserReaction(string userId)
+   {
+      var candidate = await GetById(userId);
+      return new UserReactionsResponse
+      {
+         DislikedPosts = candidate.DislikedPosts,
+         LikedPosts = candidate.LikedPosts,
+      };
+   }
+
    public async Task<UserDetailsResponse> GetUserDetailsById(string id)
    {
-      var user = await _userCollection.Find(u => u.Id == id)
-         .FirstOrDefaultAsync();
+      var user = await GetById(id);
       
       var posts = await _postCollection
          .Find(p => user.Posts.Contains(p.Id))
