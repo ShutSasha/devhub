@@ -1,7 +1,9 @@
 package com.devhub.devhubapp.activity
 
+import CommentFragment
+import android.icu.text.SimpleDateFormat
+import android.icu.util.TimeZone
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -9,26 +11,22 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import com.bumptech.glide.Glide
 import com.devhub.devhubapp.R
-import com.devhub.devhubapp.classes.RetrofitClient
 import com.devhub.devhubapp.dataClasses.Post
 import com.devhub.devhubapp.fragment.FooterFragment
 import com.devhub.devhubapp.fragment.HeaderFragment
-import com.devhub.devhubapp.fragment.PostFragment
 import com.google.android.flexbox.FlexboxLayout
 import com.google.gson.Gson
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import java.util.Locale
 
 
 class PostActivity : AppCompatActivity() {
@@ -56,28 +54,38 @@ class PostActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+        findViewById<LinearLayout>(R.id.back_button_container).setOnClickListener {
+            finish()
+        }
     }
 
     private fun displayPost(post: Post) {
 
-        val profile_image: ImageView = findViewById(R.id.profile_image)
-        val username : TextView = findViewById(R.id.username)
+        val profileImage: ImageView = findViewById(R.id.profile_image)
+        val username: TextView = findViewById(R.id.username)
         val postTitle: TextView = findViewById(R.id.post_title)
-        val postContent: TextView = findViewById(R.id.post_content)
         val postImage: ImageView = findViewById(R.id.post_image)
-        val like_count: TextView = findViewById(R.id.like_count)
-        val dislike_count: TextView = findViewById(R.id.dislike_count)
-        val comment_count: TextView = findViewById(R.id.comment_count)
+        val postCreateTime: TextView = findViewById(R.id.post_create_time)
+        val postContent: TextView = findViewById(R.id.post_content)
+        val likeCount: TextView = findViewById(R.id.like_count)
+        val dislikeCount: TextView = findViewById(R.id.dislike_count)
+        /*        val starCount: TextView = findViewById(R.id.star_count)*/
+        val commentCount: TextView = findViewById(R.id.comment_count)
         val hashtagsContainer: FlexboxLayout = findViewById(R.id.hashtags_container)
+        val commentsRecyclerView: RecyclerView = findViewById(R.id.comments_recycler_view)
+        commentsRecyclerView.layoutManager = LinearLayoutManager(this)
+        val commentAdapter = CommentFragment(post.comments)
+        commentsRecyclerView.adapter = commentAdapter
 
         postImage.visibility = if (post.headerImage == "") View.GONE else View.VISIBLE
 
         Glide.with(this)
             .load(post.user.avatar)
-            .into(profile_image)
+            .into(profileImage)
 
         username.text = post.user.username
         postTitle.text = post.title
+        postCreateTime.text = formatDate(post.createdAt)
         postContent.text = post.content
 
         Glide.with(this)
@@ -99,29 +107,25 @@ class PostActivity : AppCompatActivity() {
             textView.typeface = ResourcesCompat.getFont(this@PostActivity, R.font.inter_bold_font)
             hashtagsContainer.addView(textView)
         }
-        like_count.text = formatLikesCount(post.likes)
-        dislike_count.text = formatDislikesCount(post.dislikes)
-        comment_count.text = formatCommentCount(post.comments.size)
+        likeCount.text = formatCount(post.likes)
+        dislikeCount.text = formatCount(post.dislikes)
+        /*        starCount.text = formatCount(post.stars)*/
+        commentCount.text = formatCount(post.comments.size)
     }
 
-    private fun formatLikesCount(likes: Int): String {
+    private fun formatCount(reaction: Int): String {
         return when {
-            likes >= 1000 -> String.format("%.1fK", likes / 1000.0)
-            else -> likes.toString()
+            reaction >= 1000 -> String.format("%.1fK", reaction / 1000.0)
+            else -> reaction.toString()
         }
     }
 
-    private fun formatDislikesCount(dislikes: Int): String {
-        return when {
-            dislikes >= 1000 -> String.format("%.1fK", dislikes / 1000.0)
-            else -> dislikes.toString()
-        }
+    private fun formatDate(dateString: String): String {
+        val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
+        inputFormat.timeZone = TimeZone.getTimeZone("UTC")
+        val outputFormat = SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.getDefault())
+        val date = inputFormat.parse(dateString)
+        return outputFormat.format(date)
     }
 
-    private fun formatCommentCount(comments: Int): String {
-        return when {
-            comments >= 1000 -> String.format("%.1fK", comments / 1000.0)
-            else -> comments.toString()
-        }
-    }
 }
