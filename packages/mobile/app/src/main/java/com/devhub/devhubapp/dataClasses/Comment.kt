@@ -5,5 +5,7 @@ data class Comment(
     val commentText: String,
     val createdAt: String,
     val likes: Int,
-    val user: String
+    val dislikes: Int,
+    val user: User,
+    val post: String
 )
