@@ -1,50 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
     android:background="@drawable/shape_footer_background"
     android:gravity="center"
+    android:orientation="horizontal"
     android:paddingVertical="20dp">
 
     <ImageView
         android:id="@+id/home_icon"
         android:layout_width="32dp"
         android:layout_height="32dp"
-        android:src="@drawable/ic_home_active"
-        android:contentDescription="Home"
-        android:layout_weight="1"/>
+        android:layout_weight="1"
+        android:src="@drawable/ic_home_active" />
 
     <ImageView
         android:id="@+id/group_icon"
         android:layout_width="32dp"
         android:layout_height="32dp"
-        android:src="@drawable/ic_friends"
-        android:contentDescription="Friends"
-        android:layout_weight="1"/>
+        android:layout_weight="1"
+        android:src="@drawable/ic_friends" />
 
     <ImageView
         android:id="@+id/search_icon"
         android:layout_width="32dp"
         android:layout_height="32dp"
-        android:src="@drawable/ic_search"
-        android:contentDescription="Search"
-        android:layout_weight="1"/>
+        android:layout_weight="1"
+        android:src="@drawable/ic_search" />
 
     <ImageView
         android:id="@+id/star_icon"
         android:layout_width="32dp"
         android:layout_height="32dp"
-        android:src="@drawable/ic_starred_posts"
-        android:contentDescription="Starred posts"
-        android:layout_weight="1"/>
+        android:layout_weight="1"
+        android:src="@drawable/ic_starred_posts" />
 
     <ImageView
         android:id="@+id/chat_icon"
         android:layout_width="32dp"
         android:layout_height="32dp"
-        android:src="@drawable/ic_messages"
-        android:contentDescription="Messages"
-        android:layout_weight="1"/>
+        android:layout_weight="1"
+        android:src="@drawable/ic_messages" />
 </LinearLayout>
