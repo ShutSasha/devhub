@@ -16,4 +16,8 @@
     <string name="back_arrow">Back arrow</string>
     <string name="welcome">Welcome!</string>
     <string name="code_collaborate_create">Code, Collaborate, Create</string>
+    <string name="back_icon_desc">Back Icon</string>
+    <string name="post">Post</string>
+    <string name="username">username</string>
+    <string name="lorem">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis a tortor at augue aliquam efficitur. Mauris ante arcu, faucibus nec augue quis, vestibulum eleifend urna. Quisque euismod placerat sodales. Proin eros nisl, tincidunt eu purus sit amet, fermentum tempus arcu. Praesent et est sed enim porttitor cursus a id mauris. Nam enim erat, lacinia non ex eu, malesuada bibendum neque. Maecenas tincidunt purus orci, non mattis nibh tristique a. Praesent quis sodales magna. </string>
 </resources>

@@ -10,4 +10,5 @@
     <color name="bg_elements">#333333</color>
     <color name="text_primary">#E6E6E6</color>
     <color name="text_secondary">#CCCCCC</color>
+    <color name="white">#FFFFFF</color>
 </resources>
