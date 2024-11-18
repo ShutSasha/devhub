@@ -8,8 +8,7 @@ service UserService{
   rpc RestoreUserPost (RestorePostRequest) returns (UserResponse);
   rpc AddCommentToUser (AddCommentRequest) returns (UserResponse);
   rpc DeleteCommentFromUser (DeleteCommentRequest) returns (UserResponse);
-  rpc AddPostReactionToUser(AddReactionRequest) returns (UserResponse);
-  rpc DeletePostReactionFromUser(DeleteReactionRequest) returns (UserResponse);
+  rpc AddPostReactionToUser(AddReactionRequest) returns (AddReactionResponse);
 }
 
 message UserResponse{
@@ -47,9 +46,9 @@ message AddReactionRequest{
   string type = 3;
 }
 
-message DeleteReactionRequest{
-  string userId = 1;
-  string postId = 2;
-  string type = 3;
+message  AddReactionResponse{
+  int32 likes = 1;
+  int32 dislikes = 2;
+  bool success = 3;
+  string message = 4;
 }
-

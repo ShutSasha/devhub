@@ -2,6 +2,7 @@ using Grpc.Core;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using MongoDB.Driver.Core.Events;
+using MongoDB.Driver.Linq;
 using UserService.Models.Database;
 using UserService.Models.User;
 
@@ -139,99 +140,98 @@ public class UserGrpcService : global::UserService.UserService.UserServiceBase
          : new UserResponse { Success = false, Message = "Can't delete comment from user" };
    }
 
-   public override async Task<UserResponse> AddPostReactionToUser(AddReactionRequest request, ServerCallContext context)
-   {
-      var user = await _userCollection.Find(u => u.Id == request.UserId)
-         .FirstOrDefaultAsync();
+public override async Task<AddReactionResponse> AddPostReactionToUser(AddReactionRequest request, ServerCallContext context)
+{
+   
+    var reactionResponse = new AddReactionResponse
+    {
+        Dislikes = 0,
+        Likes = 0,
+        Message = string.Empty,
+        Success = false
+    };
 
-      if (user == null)
-      {
-         return new UserResponse
-         {
-            Success = false,
-            Message = "User wasn't found "
-         };
-      }
+    var user = await _userCollection.Find(u => u.Id == request.UserId).FirstOrDefaultAsync();
+    if (user == null)
+    {
+        reactionResponse.Message = "User wasn't found";
+        return reactionResponse;
+    }
 
-      var filter = Builders<User>.Filter.Eq(u => u.Id, request.UserId);
+    var hasLikeOnPost = user.LikedPosts.Contains(request.PostId);
+    var hasDislikeOnPost = user.DislikedPosts.Contains(request.PostId);
+    
+    var filter = Builders<User>.Filter.Eq(u => u.Id, request.UserId);
+    UpdateDefinition<User>? update = null;
+    
+    (string type, bool hasLike, bool hasDislike) = (request.Type.ToLower(), hasLikeOnPost, hasDislikeOnPost);
 
-      var update = request.Type switch
-      {
-         "like" => Builders<User>.Update
-            .Push(u => u.LikedPosts, request.PostId),
+    switch (type,hasLike,hasDislike)
+    {
+        case ("like", false, false):
+            reactionResponse.Likes = 1;
+            update = Builders<User>.Update.Push(u => u.LikedPosts, request.PostId);
+            break;
 
-         "dislike" => Builders<User>.Update
-            .Push(u => u.DislikedPosts, request.PostId),
+        case ("dislike", false, false):
+            reactionResponse.Dislikes = 1;
+            update = Builders<User>.Update.Push(u => u.DislikedPosts, request.PostId);
+            break;
 
-         _ => null
-      };
-      
-      _logger.LogInformation($"Preparing for updating user with id {user.Id}");
-      
-      if (update == null)
-      {
-         _logger.LogError($"Cannot process type {request.Type}");
-         
-         return new UserResponse
-         {
-            Success = false,
-            Message = "Invalid reaction type"
-         };
-      }
-      
+        case ("like", true, false):
+            reactionResponse.Likes = -1;
+            update = Builders<User>.Update.Pull(u => u.LikedPosts, request.PostId);
+            break;
 
-      var updateResult = await _userCollection.UpdateOneAsync(filter, update);
+        case ("dislike", false, true):
+            reactionResponse.Dislikes = -1;
+            update = Builders<User>.Update.Pull(u => u.DislikedPosts, request.PostId);
+            break;
 
-      return updateResult.ModifiedCount > 0
-         ? new UserResponse { Success = true, Message = "Reaction added successfully" }
-         : new UserResponse { Success = false, Message = "Failed to update reaction" };
-   }
+        case ("like", false, true):
+            reactionResponse.Dislikes = -1;
+            reactionResponse.Likes = 1;
+            update = Builders<User>.Update
+                .Pull(u => u.DislikedPosts, request.PostId)
+                .AddToSet(u => u.LikedPosts, request.PostId);
+            break;
 
-   public override async Task<UserResponse> DeletePostReactionFromUser(DeleteReactionRequest request,
-      ServerCallContext context)
-   {
-      var user = await _userCollection.Find(u => u.Id == request.UserId)
-         .FirstOrDefaultAsync();
+        case ("dislike", true, false):
+            reactionResponse.Likes = -1;
+            reactionResponse.Dislikes = 1;
+            update = Builders<User>.Update
+                .Pull(u => u.LikedPosts, request.PostId)
+                .AddToSet(u => u.DislikedPosts, request.PostId);
+            break;
 
-      if (user == null)
-      {
-         return new UserResponse
-         {
-            Success = false,
-            Message = "User wasn't found "
-         };
-      }
+        default:
+            reactionResponse.Message = $"Invalid reaction type: {request.Type}";
+            _logger.LogWarning(reactionResponse.Message);
+            return reactionResponse;
+    }
+    
+    if (update == null)
+    {
+        reactionResponse.Message = "No changes to apply.";
+        _logger.LogInformation(reactionResponse.Message);
+        return reactionResponse;
+    }
+    
+    _logger.LogInformation($"Updating user {user.Id} with reaction {type} on post {request.PostId}");
+    var updateResult = await _userCollection.UpdateOneAsync(filter, update);
+    
+    if (updateResult.ModifiedCount > 0)
+    {
+        reactionResponse.Success = true;
+        reactionResponse.Message = "Reaction updated successfully";
+    }
+    else
+    {
+        reactionResponse.Message = "Failed to update reaction";
+        _logger.LogWarning($"No documents were modified for user {user.Id}");
+    }
 
-      var filter = Builders<User>.Filter.Eq(u => u.Id, request.UserId);
+    return reactionResponse;
+}
 
-      var update = request.Type switch
-      {
-         "like" => Builders<User>.Update
-            .Pull(u => u.LikedPosts, request.PostId),
-
-         "dislike" => Builders<User>.Update
-            .Pull(u => u.DislikedPosts, request.PostId),
-
-         _ => null
-      };
-      
-      _logger.LogInformation($"Preparing for updating user with id {user.Id}");
-      
-      if (update == null)
-      {
-         _logger.LogError($"Cannot process type {request.Type}");
-         
-         return new UserResponse
-         {
-            Success = false,
-            Message = "Invalid reaction type"
-         };
-      }
-
-      var updateResult = await _userCollection.UpdateOneAsync(filter, update);
-
-      return updateResult.ModifiedCount > 0
-         ? new UserResponse { Success = true, Message = "Successfully delete reaction" }
-         : new UserResponse { Success = false, Message = "Can't delete reaction" };
-   }
 }
