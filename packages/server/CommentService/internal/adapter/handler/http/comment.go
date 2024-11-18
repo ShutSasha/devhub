@@ -62,8 +62,8 @@ func (ch *CommentHandler) Create() http.HandlerFunc {
 			return
 		}
 		if err := validator.New().Struct(request); err != nil {
-			validateErr := err.(validator.ValidationErrors)
-			utils.HandleValidatorError(log, w, r, "invalid request", err, validateErr, http.StatusBadRequest)
+			utils.HandleError(log, w, r, "invalid request",
+				fmt.Errorf("the user is not authorised"), http.StatusBadRequest, "user", "The user is not authorised")
 			return
 		}
 
