@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using UserService.Abstracts;
 using UserService.Contracts.Posts;
 using UserService.Contracts.User;
+using UserService.Helpers.Errors;
 using UserService.Helpers.Response;
 using ZstdSharp.Unsafe;
 
@@ -24,7 +25,7 @@ public class UserController : ControllerBase
    {
       try
       {
-         await _userService.EditUser(request.Id, request.Name, request.Bio, request.Tags);
+         await _userService.EditUser(request.Id, request.Name, request.Bio);
          return StatusCode(200, new { Message = "Successfully updated" });
       }
       catch (Exception e)
@@ -39,7 +40,7 @@ public class UserController : ControllerBase
    }
 
    [HttpPost("update-photo/{userId}")]
-   public async Task<IActionResult> UpdateUserPhoto(IFormFile file, [FromRoute] string userId)
+   public async Task<IActionResult> UpdateUserPhoto(IFormFile file, [FromRoute] [ObjectIdValidation] string userId)
    {
       if (file == null || file.Length == 0)
       {
@@ -69,7 +70,7 @@ public class UserController : ControllerBase
 
    [HttpGet("user-details/{userId}")]
    [ProducesResponseType(200,Type =typeof(UserDetailsResponse))]
-   public async Task<IActionResult> GetUserDetails(string userId)
+   public async Task<IActionResult> GetUserDetails([ObjectIdValidation] string userId)
    {
       try
       {
@@ -84,7 +85,7 @@ public class UserController : ControllerBase
 
    [HttpGet("user-reactions/{userId}")]
    [ProducesResponseType(200,Type =typeof(UserReactionsResponse))]
-   public async Task<IActionResult> GetUserReactions(string userId)
+   public async Task<IActionResult> GetUserReactions([ObjectIdValidation] string userId)
    {
       try
       {

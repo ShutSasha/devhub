@@ -30,7 +30,7 @@ public class UserService : IUserService
       _userCollection = mongoDatabase.GetCollection<User>(mongoDbSettings.Value.CollectionName);
    }
 
-   public async Task EditUser(string id, string name, string bio, List<string> tags)
+   public async Task EditUser(string id, string name, string bio)
    {
       var filter = Builders<User>.Filter.Eq(u => u.Id, id);
       var user = await _userCollection.Find(filter).FirstOrDefaultAsync();
@@ -43,8 +43,7 @@ public class UserService : IUserService
 
       var update = Builders<User>.Update
          .Set(u => u.Name, name)
-         .Set(u => u.Bio, bio)
-         .Set(u => u.Tags, tags);
+         .Set(u => u.Bio, bio);
 
       var result = await _userCollection.UpdateOneAsync(filter, update);
 

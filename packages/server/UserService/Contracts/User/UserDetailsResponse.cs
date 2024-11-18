@@ -5,6 +5,7 @@ namespace UserService.Contracts.User;
 
 public class UserDetailsResponse
 {
+   [JsonPropertyName("_id")]
    public string Id { get; set; }
    public string Bio { get; set; }
    public string Avatar { get; set; }

@@ -7,6 +7,7 @@ public class Post
 {
    [BsonId]
    [BsonRepresentation(BsonType.ObjectId)]
+   [JsonPropertyName("_id")]
    public string Id { get; set; }
    [BsonElement("title")]
    public string Title { get; set; }
