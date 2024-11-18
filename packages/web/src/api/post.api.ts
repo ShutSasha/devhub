@@ -8,6 +8,12 @@ export const api = createApi({
   reducerPath: 'postApi',
   baseQuery: baseQueryWithReauth,
   endpoints: builder => ({
+    getPostById: builder.query<IPost, { id: string | undefined }>({
+      query: ({ id }) => ({
+        url: `posts/${id}`,
+        method: 'GET',
+      }),
+    }),
     getPosts: builder.query<IPost[], { page: number; limit: number }>({
       query: ({ page, limit }) => ({
         url: 'posts',
@@ -25,4 +31,4 @@ export const api = createApi({
   }),
 })
 
-export const { useGetPostsQuery, useLazyGetPostsQuery, useCreatePostMutation } = api
+export const { useGetPostsQuery, useLazyGetPostsQuery, useCreatePostMutation, useGetPostByIdQuery } = api

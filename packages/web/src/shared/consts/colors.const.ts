@@ -8,4 +8,5 @@ export const colors = Object.freeze({
   textSecondary: '#CFCFCF',
   black300: '#B3B3B3',
   black600: '#666666',
+  white300: '#B3B3B3',
 })

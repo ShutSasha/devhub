@@ -1,4 +1,6 @@
 import { FC } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { ROUTES } from '@pages/router/routes.enum'
 
 import * as S from './post.style'
 
@@ -9,8 +11,10 @@ interface PostProps {
 }
 
 export const Post: FC<PostProps> = ({ post }) => {
+  const navigate = useNavigate()
+
   return (
-    <S.Container>
+    <S.Container onClick={() => navigate(`${ROUTES.POST_VIEW.replace(':id', post._id)}`)}>
       {post.headerImage && (
         <S.HeaderImage src={'https://mydevhubimagebucket.s3.eu-west-3.amazonaws.com/' + post.headerImage} />
       )}
