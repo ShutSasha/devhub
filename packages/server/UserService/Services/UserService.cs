@@ -1,6 +1,9 @@
 using Microsoft.Extensions.Options;
+using MongoDB.Bson;
 using MongoDB.Driver;
+using MongoDB.Driver.Linq;
 using UserService.Abstracts;
+using UserService.Contracts.User;
 using UserService.Models.Database;
 using UserService.Models.User;
 
@@ -11,13 +14,18 @@ public class UserService : IUserService
    private readonly ILogger<UserService> _logger;
    private readonly IStorageService _storageService;
    private readonly IMongoCollection<User> _userCollection;
+   private readonly IMongoCollection<Post> _postCollection;
+   private readonly IMongoCollection<Comment> _commentCollection;
 
 
    public UserService(IMongoDatabase mongoDatabase, IOptions<MongoDbSettings> mongoDbSettings,
-      ILogger<UserService> logger, IStorageService storageService)
+      ILogger<UserService> logger, IStorageService storageService
+      )
    {
       _logger = logger;
       _storageService = storageService;
+      _commentCollection = mongoDatabase.GetCollection<Comment>("comments");
+      _postCollection = mongoDatabase.GetCollection<Post>("posts");
       _userCollection = mongoDatabase.GetCollection<User>(mongoDbSettings.Value.CollectionName);
    }
 
@@ -93,5 +101,48 @@ public class UserService : IUserService
       }
 
       throw new Exception("404: User with this id wasn't found");
+   }
+
+   public async Task<UserDetailsResponse> GetUserDetailsById(string id)
+   {
+      var user = await _userCollection.Find(u => u.Id == id)
+         .FirstOrDefaultAsync();
+      
+      var posts = await _postCollection
+         .Find(p => user.Posts.Contains(p.Id))
+         .Project(p => new Post // Создаем проекцию
+         {
+            Id = p.Id,
+            Title = p.Title,
+            Content = p.Content,
+            HeaderImage = p.HeaderImage,
+            Likes = p.Likes,
+            Dislikes = p.Dislikes,
+            Tags = p.Tags,
+            CreatedAt = p.CreatedAt
+         })
+         .ToListAsync();
+
+      var comments = await _commentCollection
+         .Find(c => user.Comments.Contains(c.Id))
+         .Project(c => new Comment
+         {
+            Id = c.Id,
+            CommentText = c.CommentText,
+            CreatedAt = c.CreatedAt,
+            PostId = c.PostId,
+         })
+         .ToListAsync();
+
+      return new UserDetailsResponse
+      {
+         Id = user.Id,
+         Bio = user.Bio,
+         Avatar = user.Avatar,
+         CreatedAt = user.CreatedAt,
+         Name = user.Name,
+         Comments = comments,
+         Posts = posts
+      };
    }
 }

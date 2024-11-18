@@ -65,4 +65,19 @@ public class UserController : ControllerBase
             ex.Message.Split(":")[1]);
       }
    }
+
+   [HttpGet("user-details/{userId}")]
+   public async Task<IActionResult> GetUserDetails(string userId)
+   {
+      try
+      {
+         var userDetails = await _userService.GetUserDetailsById(userId);
+         return Ok(userDetails);
+      }
+      catch (Exception e)
+      {
+         return ErrorResponseHelper.CreateErrorResponse(400, nameof(GetUserDetails), e.Message);
+      }
+   }
+   
 }
