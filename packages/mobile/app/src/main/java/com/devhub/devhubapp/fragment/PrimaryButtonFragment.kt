@@ -7,6 +7,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import com.devhub.devhubapp.R
+import com.devhub.devhubapp.databinding.FragmentPrimaryButtonBinding
+import com.devhub.devhubapp.databinding.FragmentTitleBinding
 
 
 class PrimaryButtonFragment : Fragment() {
@@ -14,21 +16,22 @@ class PrimaryButtonFragment : Fragment() {
     private lateinit var button: Button
     private var text: String? = null
     private var buttonAction: (() -> Unit)? = null
+    private lateinit var binding: FragmentPrimaryButtonBinding
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_primary_button, container, false)
+        binding = FragmentPrimaryButtonBinding.inflate(layoutInflater, container, false)
 
-        button = view.findViewById(R.id.primarybtn)
+        button = binding.primarybtn
         button.text = this.text
 
         button.setOnClickListener {
             buttonAction?.invoke()
         }
 
-        return view
+        return binding.root
     }
 
     fun setButtonText(text: String) {
@@ -41,4 +44,9 @@ class PrimaryButtonFragment : Fragment() {
     fun setButtonAction(action: () -> Unit) {
         this.buttonAction = action
     }
+
+//    fun setHeightAndWidth(heightSize: String, widthSize: String){
+//        binding.primarybtn.height = heightSize
+//
+//    }
 }
