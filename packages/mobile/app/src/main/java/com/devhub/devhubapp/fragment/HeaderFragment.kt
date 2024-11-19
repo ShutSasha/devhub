@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.devhub.devhubapp.R
 import com.devhub.devhubapp.activity.CreatePostActivity
+import com.devhub.devhubapp.activity.UserProfileActivity
 import com.devhub.devhubapp.classes.EncryptedPreferencesManager
 
 class HeaderFragment : Fragment() {
@@ -22,6 +23,7 @@ class HeaderFragment : Fragment() {
 
         val avatarImageView = view.findViewById<ImageView>(R.id.user_avatar)
         val createPostButton = view.findViewById<ImageView>(R.id.create_post_button)
+        val avatar = view.findViewById<ImageView>(R.id.user_avatar)
 
         val encryptedPreferencesManager = EncryptedPreferencesManager(requireContext())
         val user = encryptedPreferencesManager.getUserData()
@@ -34,6 +36,12 @@ class HeaderFragment : Fragment() {
 
         createPostButton.setOnClickListener {
             val intent = Intent(requireContext(), CreatePostActivity::class.java)
+            startActivity(intent)
+        }
+
+        avatar.setOnClickListener {
+            val intent = Intent(requireContext(), UserProfileActivity::class.java)
+            intent.putExtra("USER_ID", user._id)
             startActivity(intent)
         }
 

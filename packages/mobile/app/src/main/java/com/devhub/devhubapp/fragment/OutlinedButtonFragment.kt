@@ -1,30 +1,28 @@
 package com.devhub.devhubapp.fragment
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import com.devhub.devhubapp.R
-import com.devhub.devhubapp.databinding.FragmentPrimaryButtonBinding
-import com.devhub.devhubapp.databinding.FragmentTitleBinding
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
+import com.devhub.devhubapp.databinding.FragmentOutlinedButtonBinding
 
-
-class PrimaryButtonFragment : Fragment() {
+class OutlinedButtonFragment : Fragment() {
 
     private lateinit var button: Button
     private var text: String? = null
     private var buttonAction: (() -> Unit)? = null
-    private lateinit var binding: FragmentPrimaryButtonBinding
+    private lateinit var binding: FragmentOutlinedButtonBinding
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = FragmentPrimaryButtonBinding.inflate(layoutInflater, container, false)
+        binding = FragmentOutlinedButtonBinding.inflate(inflater, container, false)
 
-        button = binding.primarybtn
+        button = binding.outlinedbtn
         button.text = this.text
 
         button.setOnClickListener {
@@ -44,9 +42,5 @@ class PrimaryButtonFragment : Fragment() {
     fun setButtonAction(action: () -> Unit) {
         this.buttonAction = action
     }
-
-//    fun setHeightAndWidth(heightSize: String, widthSize: String){
-//        binding.primarybtn.height = heightSize
-//
-//    }
 }
+

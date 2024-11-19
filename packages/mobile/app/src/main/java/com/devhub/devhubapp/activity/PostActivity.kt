@@ -92,7 +92,7 @@ class PostActivity : AppCompatActivity() {
         commentCount = findViewById(R.id.comment_count)
         commentsRecyclerView = findViewById(R.id.comments_recycler_view)
         commentsRecyclerView.layoutManager = LinearLayoutManager(this)
-        val sortedComments = post.comments.sortedByDescending { it.createdAt }
+        val sortedComments = post.comments!!.sortedByDescending { it.createdAt }
         val commentAdapter = CommentFragment(sortedComments)
         commentsRecyclerView.adapter = commentAdapter
         commentsRecyclerView.overScrollMode = View.OVER_SCROLL_NEVER

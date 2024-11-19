@@ -1,73 +1,76 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/confirm_email"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@drawable/shape_background_gradient"
-    android:elevation="8dp"
-    android:orientation="vertical"
-    android:translationZ="4dp">
+<LinearLayout
+android:id="@+id/confirm_email"
+xmlns:android="http://schemas.android.com/apk/res/android"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+android:background="@drawable/shape_background_gradient"
+android:elevation="8dp"
+android:translationZ="4dp"
+android:orientation="vertical">
 
     <ImageView
         android:id="@+id/devhubLogo"
+        android:contentDescription="@string/devhub_logo"
+        android:src="@drawable/ic_devhub_logo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
         android:layout_marginTop="150dp"
         android:layout_marginBottom="55dp"
-        android:src="@drawable/ic_devhub_logo" />
+        android:layout_gravity="center_horizontal"/>
 
     <LinearLayout
+        android:orientation="vertical"
+        android:background="@drawable/shape_auth_container_background"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="15dp"
-        android:background="@drawable/shape_auth_container_background"
-        android:orientation="vertical">
+        android:layout_marginHorizontal="15dp">
 
-        <FrameLayout
-            android:id="@+id/title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="31dp" />
+            <FrameLayout
+                android:id="@+id/title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="31dp"/>
 
-        <TextView
-            android:id="@+id/result"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="15dp"
-            android:layout_marginBottom="20dp"
-            android:alpha="0.6"
-            android:fontFamily="@font/montserrat_semibold_font"
-            android:textSize="14sp" />
+            <TextView
+                android:id="@+id/result"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:layout_marginBottom="20dp"
+                android:layout_marginStart="10dp"
+                android:fontFamily="@font/montserrat_semibold_font"
+                android:textSize="14sp"
+                android:alpha="0.6"/>
 
-        <FrameLayout
-            android:id="@+id/codeInputContainer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            <FrameLayout
+                android:id="@+id/codeInputContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
 
-        <TextView
-            android:id="@+id/subtitleTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="9dp"
-            android:alpha="0.6"
-            android:fontFamily="@font/montserrat_semibold_font"
-            android:text="@string/code_has_been_sent_to_your_email"
-            android:textColor="@color/text"
-            android:textSize="14sp" />
+            <TextView
+                android:id="@+id/subtitleTextView"
+                android:text="@string/code_has_been_sent_to_your_email"
+                android:fontFamily="@font/montserrat_semibold_font"
+                android:textColor="@color/text"
+                android:alpha="0.6"
+                android:textSize="14sp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="9dp"
+                android:layout_marginStart="10dp"/>
 
-        <FrameLayout
-            android:id="@+id/activationError"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            <FrameLayout
+                android:id="@+id/activationError"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
 
-        <FrameLayout
-            android:id="@+id/primaryButtonContainer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp" />
+            <FrameLayout
+                android:layout_marginTop="9dp"
+                android:id="@+id/primaryButtonContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"/>
 
     </LinearLayout>
 

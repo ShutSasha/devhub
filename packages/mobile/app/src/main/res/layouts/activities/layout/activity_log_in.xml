@@ -59,6 +59,7 @@
             android:layout_height="wrap_content" />
 
         <FrameLayout
+            android:layout_marginTop="9dp"
             android:id="@+id/primaryButtonContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />

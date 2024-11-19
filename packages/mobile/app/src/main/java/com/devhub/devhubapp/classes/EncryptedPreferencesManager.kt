@@ -14,7 +14,9 @@ import com.devhub.devhubapp.dataClasses.User
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.text.SimpleDateFormat
 import java.util.Date
+import java.util.Locale
 
 class EncryptedPreferencesManager(context: Context) {
     private val sharedPreferences: SharedPreferences
@@ -40,7 +42,7 @@ class EncryptedPreferencesManager(context: Context) {
         saveData("username", userData.username ?: "")
         saveData("email", userData.email ?: "")
         saveData("avatar", userData.avatar ?: "")
-        saveData("createdAt", userData.createdAt?.toString() ?: "")
+        saveData("createdAt", userData.createdAt.time)
         saveData("devPoints", userData.devPoints.toString())
         saveData("activationCode", userData.activationCode ?: "")
         saveData("isActivated", userData.isActivated.toString())
@@ -49,7 +51,7 @@ class EncryptedPreferencesManager(context: Context) {
 
     fun getUserData(): User {
 
-        val createdAtLong = sharedPreferences.getLong("createdAt", 0)
+        val createdAtLong = sharedPreferences.getLong("createdAt", 0L)
         val createdAt = Date(createdAtLong)
 
         return User(
@@ -79,8 +81,18 @@ class EncryptedPreferencesManager(context: Context) {
         return sharedPreferences.getString("refresh_token", null)
     }
 
-    fun saveData(key: String, value: String) {
-        sharedPreferences.edit().putString(key, value).apply()
+    fun saveData(key: String, value: Any) {
+        val editor = sharedPreferences.edit()
+
+        when (value) {
+            is String -> editor.putString(key, value)
+            is Long -> editor.putLong(key, value)
+            is Int -> editor.putInt(key, value)
+            is Boolean -> editor.putBoolean(key, value)
+            else -> throw IllegalArgumentException("Unsupported data type")
+        }
+
+        editor.apply()
     }
 
     fun getData(key: String): String? {
