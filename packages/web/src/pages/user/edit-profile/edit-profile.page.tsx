@@ -4,9 +4,12 @@ import { UserProfileLayout } from '@shared/layouts/user/user-profile.layout'
 import { useAppDispatch, useAppSelector } from '@app/store/store'
 import userSVG from '@assets/images/user/user-ic.svg'
 import { useEditUserDataMutation, useEditUserPhotoMutation } from '@api/user.api'
-import { setUserAvatar } from '@features/user/user.slice'
+import { setUser, setUserAvatar } from '@features/user/user.slice'
+import { handleServerException } from '@utils/handleServerException.util'
 
 import * as _ from './edit-profile.style'
+
+import { ErrorException } from '~types/error/error.type'
 
 export const UserEditProfile = () => {
   const dispatch = useAppDispatch()
@@ -55,11 +58,12 @@ export const UserEditProfile = () => {
 
   const handleChangeUserData = async () => {
     try {
-      await editUserData({ id: user?._id, name, bio }).unwrap()
-      toast.success('User has been updated')
+      const { user: userRes } = await editUserData({ id: user?._id, name, bio }).unwrap()
+      dispatch(setUser(userRes))
+      toast.success('User has been updated', { autoClose: 1000 })
     } catch (e) {
       console.error(e)
-      toast.error('smth went wrong')
+      toast.error(handleServerException(e as ErrorException)?.join(', '))
     }
   }
 

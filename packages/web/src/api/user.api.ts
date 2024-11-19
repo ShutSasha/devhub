@@ -2,7 +2,7 @@ import { createApi } from '@reduxjs/toolkit/query/react'
 
 import baseQueryWithReauth from './baseQueryWithReauth'
 
-import { ReqEditUserData, UserDetailsResponse } from '~types/user/user.type'
+import { IUser, ReqEditUserData, UserDetailsResponse } from '~types/user/user.type'
 
 export const api = createApi({
   reducerPath: 'userApi',
@@ -20,7 +20,7 @@ export const api = createApi({
         method: 'GET',
       }),
     }),
-    editUserData: builder.mutation<{ message: string }, ReqEditUserData>({
+    editUserData: builder.mutation<{ user: IUser }, ReqEditUserData>({
       query: body => ({
         url: `users`,
         method: 'PATCH',

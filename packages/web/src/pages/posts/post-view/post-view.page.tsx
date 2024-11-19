@@ -48,6 +48,12 @@ export const PostView = () => {
         userId: user?._id,
       }).unwrap()
 
+      if (comment.current) {
+        comment.current.textContent = null
+        const event = new Event('input', { bubbles: true })
+        comment.current.dispatchEvent(event)
+      }
+
       if (response) refetch()
     } catch (e) {
       console.error(e)

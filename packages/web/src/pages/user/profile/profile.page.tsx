@@ -4,18 +4,28 @@ import { useGetUserDetailsQuery } from '@api/user.api'
 import postCreatedSVG from '@assets/images/user/post-created-icon.svg'
 import commentWrittenSVG from '@assets/images/user/comment-written-icon.svg'
 import { ROUTES } from '@pages/router/routes.enum'
+import { useAppSelector } from '@app/store/store'
 
 import * as _ from './profile.style'
 
 export const UserProfile = () => {
   const { id } = useParams()
   const navigate = useNavigate()
-  const { data: userDetails } = useGetUserDetailsQuery({ userId: id }, { refetchOnMountOrArgChange: true })
+  const user = useAppSelector(state => state.userSlice.user)
+  const { data: userDetails, isLoading } = useGetUserDetailsQuery({ userId: id }, { refetchOnMountOrArgChange: true })
 
   if (!id) {
     return (
       <UserProfileLayout>
         <p>loading or error</p>
+      </UserProfileLayout>
+    )
+  }
+
+  if (isLoading) {
+    return (
+      <UserProfileLayout>
+        <p>Loading...</p>
       </UserProfileLayout>
     )
   }
@@ -35,9 +45,11 @@ export const UserProfile = () => {
         <_.Username>{userDetails.username}</_.Username>
         {userDetails.name && <_.Name>{userDetails.name}</_.Name>}
         {userDetails.bio && <_.UserDescription>{userDetails.bio}</_.UserDescription>}
-        <_.EditProfileBtn onClick={() => navigate(`${ROUTES.USER_EDIT_PROFILE.replace(':id', userDetails._id)}`)}>
-          Edit profile
-        </_.EditProfileBtn>
+        {user?._id === userDetails._id && (
+          <_.EditProfileBtn onClick={() => navigate(`${ROUTES.USER_EDIT_PROFILE.replace(':id', userDetails._id)}`)}>
+            Edit profile
+          </_.EditProfileBtn>
+        )}
       </_.UserProfileInfoContainer>
       <_.UserProfileContentContainer>
         <_.UserCountAchivmentContainer>

@@ -45,7 +45,7 @@ export const Comment: FC<CommentProps> = ({ comment }) => {
             }
           }),
         )
-        toast.success('Comment deleted successfully!')
+        toast.success('Comment deleted successfully!', { autoClose: 600 })
       }
     } catch (e) {
       console.error(e)

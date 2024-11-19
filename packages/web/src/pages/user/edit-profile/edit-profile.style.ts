@@ -7,6 +7,7 @@ export const UserEditProfileContainer = styled.div`
   grid-template-columns: 1fr 2fr;
   align-items: start;
   margin-top: 120px;
+  margin-bottom: 120px;
 `
 
 export const UserOptionsContainer = styled.div`
