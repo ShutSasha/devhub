@@ -55,9 +55,9 @@ public class UserController : ControllerBase
          await using var fileStream = file.OpenReadStream();
          var fileName = file.FileName;
          var contentType = file.ContentType;
-         await _userService.EditUserIcon(userId, fileName, fileStream, contentType);
+         var updateUserIconResult = await _userService.EditUserIcon(userId, fileName, fileStream, contentType);
 
-         return Ok(new { Message = "User photo updated successfully." });
+         return Ok(new{ Avatar = updateUserIconResult});
       }
       catch (Exception ex)
       {
