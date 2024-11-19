@@ -1,4 +1,5 @@
 import { FC } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { StyledAvatar } from '@shared/components/post/post.style'
 import { parseDate } from '@utils/parseDate.util'
 import { useDeleteCommentByIdMutation } from '@api/comment.api'
@@ -6,6 +7,7 @@ import { handleServerException } from '@utils/handleServerException.util'
 import { toast } from 'react-toastify'
 import { useAppDispatch, useAppSelector } from '@app/store/store'
 import { api } from '@api/post.api'
+import { ROUTES } from '@pages/router/routes.enum'
 
 import {
   CommentContainer,
@@ -29,6 +31,7 @@ export const Comment: FC<CommentProps> = ({ comment }) => {
   const userId = useAppSelector(state => state.userSlice.user?._id)
   const dispatch = useAppDispatch()
   const [deleteComment] = useDeleteCommentByIdMutation()
+  const navigate = useNavigate()
 
   const handleDeleteComment = async () => {
     try {
@@ -42,7 +45,7 @@ export const Comment: FC<CommentProps> = ({ comment }) => {
             }
           }),
         )
-        toast.success('Comment deleted successfully!')
+        toast.success('Comment deleted successfully!', { autoClose: 600 })
       }
     } catch (e) {
       console.error(e)
@@ -52,7 +55,11 @@ export const Comment: FC<CommentProps> = ({ comment }) => {
 
   return (
     <CommentContainer>
-      <StyledAvatar style={{ height: '40px', width: '40px' }} src={comment.user.avatar} />
+      <StyledAvatar
+        onClick={() => navigate(ROUTES.USER_PROFILE.replace(':id', comment.user._id))}
+        style={{ height: '40px', width: '40px', cursor: 'pointer' }}
+        src={comment.user.avatar}
+      />
       <CommentInnerContainer>
         <CommentHeaderContainer>
           <CommentHeaderInnerContainer>
