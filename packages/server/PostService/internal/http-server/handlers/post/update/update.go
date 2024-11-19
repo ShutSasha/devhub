@@ -57,6 +57,18 @@ func New(log *slog.Logger, postUpdater interfaces.PostUpdater, postProvider inte
 			slog.String("request_id", middleware.GetReqID(r.Context())),
 		)
 
+		if r.FormValue("title") == "" && r.FormValue("content") == "" && (r.FormValue("tags") == "" || r.FormValue("tags") == "[]") {
+			if _, _, err := r.FormFile("headerImage"); err == http.ErrMissingFile {
+				utils.HandleError(log, w, r, "no fields provided for update", nil, http.StatusBadRequest, "body", "At least one field must be provided")
+				return
+			}
+		}
+
+		if r.Header.Get("Content-Type") == "" || !strings.HasPrefix(r.Header.Get("Content-Type"), "multipart/form-data") {
+			utils.HandleError(log, w, r, "Content-Type must be multipart/form-data", fmt.Errorf("invalid content type"), http.StatusBadRequest, "headerImage", "no fields provided")
+			return
+		}
+
 		if err := r.ParseMultipartForm(10 << 20); err != nil {
 			utils.HandleError(log, w, r, "failed to parse multipart form", err, http.StatusInternalServerError, "headerImage", "Failed to parse multipart form")
 			return
