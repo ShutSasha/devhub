@@ -5,6 +5,7 @@ import (
 	"errors"
 	"log/slog"
 	"net/http"
+	"sort"
 
 	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/domain/interfaces"
 	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/http-server/utils"
@@ -64,6 +65,10 @@ func New(log *slog.Logger, postProvider interfaces.PostProvider, fileProvider in
 			render.JSON(w, r, map[string]interface{}{})
 			return
 		}
+
+		sort.Slice(post.Comments, func(i, j int) bool {
+			return post.Comments[i].CreatedAt.After(post.Comments[j].CreatedAt)
+		})
 
 		render.JSON(w, r, post)
 	}
