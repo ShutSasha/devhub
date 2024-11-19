@@ -1,13 +1,12 @@
 package com.devhub.devhubapp.api
 
 import com.devhub.devhubapp.dataClasses.ChangePasswordRequest
-import com.devhub.devhubapp.dataClasses.LoginResponse
-import com.devhub.devhubapp.dataClasses.TokenResponse
-import com.devhub.devhubapp.dataClasses.RegistrationRequest
-import com.devhub.devhubapp.dataClasses.User
 import com.devhub.devhubapp.dataClasses.LoginRequest
+import com.devhub.devhubapp.dataClasses.LoginResponse
 import com.devhub.devhubapp.dataClasses.PasswordVerificationRequest
+import com.devhub.devhubapp.dataClasses.RegistrationRequest
 import com.devhub.devhubapp.dataClasses.RegistrationResponse
+import com.devhub.devhubapp.dataClasses.TokenResponse
 import com.devhub.devhubapp.dataClasses.VerifyEmailRequest
 import okhttp3.ResponseBody
 import retrofit2.Call
