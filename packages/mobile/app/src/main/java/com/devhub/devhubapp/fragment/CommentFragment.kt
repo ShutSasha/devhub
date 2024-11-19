@@ -1,3 +1,5 @@
+package com.devhub.devhubapp.fragment
+
 import android.icu.text.SimpleDateFormat
 import android.icu.util.TimeZone
 import android.view.LayoutInflater
@@ -11,7 +13,7 @@ import com.devhub.devhubapp.R
 import com.devhub.devhubapp.dataClasses.Comment
 import java.util.Locale
 
-class CommentFragment(private val comments: List<Comment>) :
+class CommentFragment(val comments: List<Comment>) :
     RecyclerView.Adapter<CommentFragment.CommentViewHolder>() {
 
     class CommentViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -46,7 +48,6 @@ class CommentFragment(private val comments: List<Comment>) :
         holder.likeCount.text = comment.likes.toString()
         holder.dislikeCount.text = comment.dislikes.toString()
     }
-
 
     override fun getItemCount(): Int = comments.size
 
