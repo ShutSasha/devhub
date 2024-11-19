@@ -42,6 +42,7 @@ services.AddSingleton<IMongoDatabase>(sp =>
    return mongoClient.GetDatabase(settings.DatabaseName);
 });
 
+services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 services.AddGrpc();
 services.Configure<AwsOptions>(configuration.GetSection("AWS"));
 services.AddSingleton<IAmazonS3>(AwsS3ClientFactory.CreateS3Client(configuration));

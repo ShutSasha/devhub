@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using UserService.Abstracts;
 using UserService.Contracts.Posts;
 using UserService.Contracts.User;
+using UserService.Dto;
 using UserService.Helpers.Errors;
 using UserService.Helpers.Response;
 using ZstdSharp.Unsafe;
@@ -21,12 +22,13 @@ public class UserController : ControllerBase
    }
 
    [HttpPatch]
+   [ProducesResponseType(200,Type = typeof(UserDto))]
    public async Task<IActionResult> EditUser([FromBody] EditUserRequest request)
    {
       try
       {
-         await _userService.EditUser(request.Id, request.Name, request.Bio);
-         return StatusCode(200, new { Message = "Successfully updated" });
+         var userInformation = await _userService.EditUser(request.Id, request.Name, request.Bio);
+         return Ok(new { User = userInformation });
       }
       catch (Exception e)
       {

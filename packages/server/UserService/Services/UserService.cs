@@ -1,3 +1,4 @@
+using AutoMapper;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -5,6 +6,7 @@ using MongoDB.Driver.Linq;
 using UserService.Abstracts;
 using UserService.Contracts.Posts;
 using UserService.Contracts.User;
+using UserService.Dto;
 using UserService.Models.Database;
 using UserService.Models.User;
 
@@ -14,23 +16,25 @@ public class UserService : IUserService
 {
    private readonly ILogger<UserService> _logger;
    private readonly IStorageService _storageService;
+   private readonly IMapper _mapper;
    private readonly IMongoCollection<User> _userCollection;
    private readonly IMongoCollection<Post> _postCollection;
    private readonly IMongoCollection<Comment> _commentCollection;
 
 
    public UserService(IMongoDatabase mongoDatabase, IOptions<MongoDbSettings> mongoDbSettings,
-      ILogger<UserService> logger, IStorageService storageService
+      ILogger<UserService> logger, IStorageService storageService, IMapper mapper
       )
    {
       _logger = logger;
       _storageService = storageService;
+      _mapper = mapper;
       _commentCollection = mongoDatabase.GetCollection<Comment>("comments");
       _postCollection = mongoDatabase.GetCollection<Post>("posts");
       _userCollection = mongoDatabase.GetCollection<User>(mongoDbSettings.Value.CollectionName);
    }
 
-   public async Task EditUser(string id, string name, string bio)
+   public async Task<UserDto> EditUser(string id, string name, string bio)
    {
       var filter = Builders<User>.Filter.Eq(u => u.Id, id);
       var user = await _userCollection.Find(filter).FirstOrDefaultAsync();
@@ -52,8 +56,9 @@ public class UserService : IUserService
          _logger.LogWarning($"No changes were made to user with ID {id}.");
          throw new Exception($"400:No changes were made to user with ID {id}.");
       }
-
+      var updatedUser = await _userCollection.Find(filter).FirstOrDefaultAsync();
       _logger.LogInformation($"User with ID {id} updated successfully.");
+      return _mapper.Map<User, UserDto>(updatedUser);
    }
 
    public async Task<string> EditUserIcon(string id, string fileName, Stream fileStream, string contentType)
