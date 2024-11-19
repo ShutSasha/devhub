@@ -24,6 +24,7 @@ export const UserAvatat = styled.img`
   width: 110px;
   height: 110px;
   border-radius: 50%;
+  border: 5px solid ${colors.bgPage};
 `
 
 export const Username = styled.p`

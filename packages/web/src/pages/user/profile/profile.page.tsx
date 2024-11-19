@@ -35,7 +35,7 @@ export const UserProfile = () => {
         <_.Username>{userDetails.username}</_.Username>
         {userDetails.name && <_.Name>userDetails.name</_.Name>}
         {userDetails.bio && <_.UserDescription>{userDetails.bio}</_.UserDescription>}
-        <_.EditProfileBtn>edit btn</_.EditProfileBtn>
+        <_.EditProfileBtn>Edit profile</_.EditProfileBtn>
       </_.UserProfileInfoContainer>
       <_.UserProfileContentContainer>
         <_.UserCountAchivmentContainer>
