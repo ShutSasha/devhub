@@ -2,18 +2,20 @@ package com.devhub.devhubapp.fragment
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.devhub.devhubapp.R
+import com.devhub.devhubapp.activity.MainActivity
 import com.devhub.devhubapp.activity.PostActivity
 import com.devhub.devhubapp.dataClasses.Post
 import com.google.android.flexbox.FlexboxLayout
@@ -29,6 +31,16 @@ class PostFragment : Fragment() {
     private lateinit var likeCountTextView: TextView
     private lateinit var dislikeCountTextView: TextView
     private lateinit var commentCountTextView: TextView
+
+    private val postDetailLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == AppCompatActivity.RESULT_OK) {
+                val shouldUpdate = result.data?.getBooleanExtra("UPDATE_POSTS", false) ?: false
+                if (shouldUpdate) {
+                    (activity as? MainActivity)?.refreshPosts()
+                }
+            }
+        }
 
     companion object {
         private const val ARG_POST = "arg_post"
@@ -82,7 +94,7 @@ class PostFragment : Fragment() {
     private fun openPostDetailActivity() {
         val intent = Intent(requireContext(), PostActivity::class.java)
         intent.putExtra("post", Gson().toJson(post))
-        startActivity(intent)
+        postDetailLauncher.launch(intent)
     }
 
     private fun displayPost(post: Post) {
@@ -92,8 +104,6 @@ class PostFragment : Fragment() {
             .into(avatar)
 
         username.text = post.user.username
-
-        Log.d("PostFragment", "Username: ${post.user.username}")
 
         postTitle.text = post.title
 
