@@ -10,4 +10,5 @@ export enum ROUTES {
   CREATE_POST = '/create-post',
   POST_VIEW = '/posts/:id',
   USER_PROFILE = '/user-profile/:id',
+  USER_EDIT_PROFILE = '/user-edit-profile/:id',
 }

@@ -35,7 +35,9 @@ export const UserProfile = () => {
         <_.Username>{userDetails.username}</_.Username>
         {userDetails.name && <_.Name>userDetails.name</_.Name>}
         {userDetails.bio && <_.UserDescription>{userDetails.bio}</_.UserDescription>}
-        <_.EditProfileBtn>Edit profile</_.EditProfileBtn>
+        <_.EditProfileBtn onClick={() => navigate(`${ROUTES.USER_EDIT_PROFILE.replace(':id', userDetails._id)}`)}>
+          Edit profile
+        </_.EditProfileBtn>
       </_.UserProfileInfoContainer>
       <_.UserProfileContentContainer>
         <_.UserCountAchivmentContainer>

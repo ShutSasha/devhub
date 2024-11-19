@@ -10,6 +10,7 @@ import { EnterNewPassword } from '@pages/auth/forgot-password/enter-new-password
 import { CreatePost } from '@pages/posts/create-post/create-post.page'
 import { PostView } from '@pages/posts/post-view/post-view.page'
 import { UserProfile } from '@pages/user/profile/profile.page'
+import { UserEditProfile } from '@pages/user/edit-profile/edit-profile.page'
 
 import { ROUTES } from './routes.enum'
 
@@ -57,6 +58,10 @@ const router = createBrowserRouter([
   {
     path: `${ROUTES.USER_PROFILE}`,
     element: <UserProfile />,
+  },
+  {
+    path: `${ROUTES.USER_EDIT_PROFILE}`,
+    element: <UserEditProfile />,
   },
 ])
 
