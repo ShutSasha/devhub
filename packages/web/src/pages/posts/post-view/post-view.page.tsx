@@ -2,13 +2,14 @@ import { useRef } from 'react'
 import { useGetPostByIdQuery } from '@api/post.api'
 import { StyledAvatar, StyledUserCredentialsContainer, Username } from '@shared/components/post/post.style'
 import { PostViewLayout } from '@shared/layouts/posts/post-view.layout'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { parseDate } from '@utils/parseDate.util'
 import { parseTagsToUI } from '@utils/parseTagsToUI.util'
 import { useAppSelector } from '@app/store/store'
 import { useCreateCommentMutation } from '@api/comment.api'
 import { handleServerException } from '@utils/handleServerException.util'
 import { toast } from 'react-toastify'
+import { ROUTES } from '@pages/router/routes.enum'
 
 import {
   ActionContainer,
@@ -33,6 +34,7 @@ import { ErrorException } from '~types/error/error.type'
 
 export const PostView = () => {
   const { id } = useParams()
+  const navigate = useNavigate()
   const { data: post, error, isLoading, refetch } = useGetPostByIdQuery({ id })
   const user = useAppSelector(state => state.userSlice.user)
   const comment = useRef<HTMLSpanElement>(null)
@@ -80,7 +82,11 @@ export const PostView = () => {
   return (
     <PostViewLayout>
       <StyledUserCredentialsContainer style={{ marginBottom: '20px' }}>
-        <StyledAvatar style={{ height: '60px', width: '60px' }} src={post.user.avatar} />
+        <StyledAvatar
+          onClick={() => navigate(ROUTES.USER_PROFILE.replace(':id', post.user._id))}
+          style={{ height: '60px', width: '60px', cursor: 'pointer' }}
+          src={post.user.avatar}
+        />
         <Username style={{ fontSize: '26px', lineHeight: '36px', fontWeight: '500' }}>{post.user.username}</Username>
       </StyledUserCredentialsContainer>
       <PostTitle>{post.title}</PostTitle>
