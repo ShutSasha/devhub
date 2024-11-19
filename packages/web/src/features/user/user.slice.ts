@@ -31,6 +31,11 @@ const userSlice = createSlice({
     setLoading: (state, action: PayloadAction<boolean>) => {
       state.loading = action.payload
     },
+    setUserAvatar: (state, action: PayloadAction<string>) => {
+      if (state.user) {
+        state.user.avatar = action.payload
+      }
+    },
   },
   selectors: {
     getUserToken: state => state.accessToken,
@@ -39,5 +44,5 @@ const userSlice = createSlice({
 
 export default userSlice
 
-export const { login, logout, setUser, setAccessToken, setLoading } = userSlice.actions
+export const { login, logout, setUser, setAccessToken, setLoading, setUserAvatar } = userSlice.actions
 export const { getUserToken } = userSlice.selectors

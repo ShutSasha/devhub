@@ -10,6 +10,7 @@ export interface IUser {
   devPoints: number
   activationCode: string
   isActivated: false
+  bio?: string | null
   roles: string[]
   userRole: number[]
 }
@@ -31,7 +32,7 @@ export interface UserDetailsResponse {
 }
 
 export interface ReqEditUserData {
-  id: string
+  id: string | undefined
   name: string
   bio: string
 }

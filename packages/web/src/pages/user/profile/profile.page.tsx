@@ -33,7 +33,7 @@ export const UserProfile = () => {
       <_.UserProfileInfoContainer>
         <_.UserAvatat src={userDetails.avatar} />
         <_.Username>{userDetails.username}</_.Username>
-        {userDetails.name && <_.Name>userDetails.name</_.Name>}
+        {userDetails.name && <_.Name>{userDetails.name}</_.Name>}
         {userDetails.bio && <_.UserDescription>{userDetails.bio}</_.UserDescription>}
         <_.EditProfileBtn onClick={() => navigate(`${ROUTES.USER_EDIT_PROFILE.replace(':id', userDetails._id)}`)}>
           Edit profile
@@ -53,7 +53,7 @@ export const UserProfile = () => {
         <_.UserActivityContainer>
           {userDetails.posts &&
             userDetails.posts.map(post => (
-              <_.PostContainer onClick={() => navigate(`${ROUTES.POST_VIEW.replace(':id', post._id)}`)}>
+              <_.PostContainer key={post._id} onClick={() => navigate(`${ROUTES.POST_VIEW.replace(':id', post._id)}`)}>
                 <_.PostHeaderContainer>
                   <_.PostUserAvatar src={userDetails.avatar} />
                   <_.PostUsername>@{userDetails.username}</_.PostUsername>

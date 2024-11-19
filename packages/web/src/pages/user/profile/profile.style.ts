@@ -40,6 +40,7 @@ export const Name = styled.p`
   font-size: 20px;
   font-weight: 500;
   color: #fff;
+  margin-bottom: 6px;
 `
 
 export const UserDescription = styled.p`

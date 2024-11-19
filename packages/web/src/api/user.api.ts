@@ -27,7 +27,7 @@ export const api = createApi({
         body: body,
       }),
     }),
-    editUserPhoto: builder.mutation<{ message: string }, { id: string | undefined; body: FormData }>({
+    editUserPhoto: builder.mutation<{ avatar: string }, { id: string | undefined; body: FormData }>({
       query: ({ id, body }) => ({
         url: `users/update-photo/${id}`,
         method: 'POST',
