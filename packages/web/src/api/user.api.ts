@@ -14,9 +14,9 @@ export const api = createApi({
         method: 'GET',
       }),
     }),
-    getUserReactions: builder.query<{ likePosts: string[]; dislikePosts: string[] }, { userId: string }>({
+    getUserReactions: builder.query<{ likedPosts: string[]; dislikedPosts: string[] }, { userId: string | undefined }>({
       query: ({ userId }) => ({
-        url: `users/user-reaction/${userId}`,
+        url: `users/user-reactions/${userId}`,
         method: 'GET',
       }),
     }),
@@ -37,9 +37,5 @@ export const api = createApi({
   }),
 })
 
-export const {
-  useGetUserDetailsQuery,
-  useLazyGetUserReactionsQuery,
-  useEditUserDataMutation,
-  useEditUserPhotoMutation,
-} = api
+export const { useGetUserDetailsQuery, useGetUserReactionsQuery, useEditUserDataMutation, useEditUserPhotoMutation } =
+  api

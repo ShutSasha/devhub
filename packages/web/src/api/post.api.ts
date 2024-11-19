@@ -28,7 +28,28 @@ export const api = createApi({
         body,
       }),
     }),
+    dislike: builder.mutation<{ status: string }, { postId: string; userId: string | undefined }>({
+      query: ({ postId, userId }) => ({
+        url: `posts/${postId}/dislike`,
+        method: 'POST',
+        body: userId,
+      }),
+    }),
+    like: builder.mutation<{ post: IPost }, { postId: string; userId: string | undefined }>({
+      query: ({ postId, userId }) => ({
+        url: `posts/${postId}/like`,
+        method: 'POST',
+        body: { userId },
+      }),
+    }),
   }),
 })
 
-export const { useGetPostsQuery, useLazyGetPostsQuery, useCreatePostMutation, useGetPostByIdQuery } = api
+export const {
+  useGetPostsQuery,
+  useLazyGetPostsQuery,
+  useCreatePostMutation,
+  useGetPostByIdQuery,
+  useDislikeMutation,
+  useLikeMutation,
+} = api

@@ -140,15 +140,15 @@ export const ReactionImage = styled.div`
 `
 
 interface StyledLikeProps {
-  isLiked?: boolean
+  $isLiked?: boolean
 }
 
 export const Like = styled(ReactionImage)<StyledLikeProps>`
-  background-image: ${({ isLiked }) => (isLiked ? `url(${likePressed})` : `url(${like})`)};
+  background-image: ${({ $isLiked }) => ($isLiked ? `url(${likePressed})` : `url(${like})`)};
   transition: all 0.25s ease-in;
 
   &:hover {
-    background-image: ${({ isLiked }) => (isLiked ? `url(${likePressed})` : `url(${likeHover})`)};
+    background-image: ${({ $isLiked }) => ($isLiked ? `url(${likePressed})` : `url(${likeHover})`)};
   }
 `
 
