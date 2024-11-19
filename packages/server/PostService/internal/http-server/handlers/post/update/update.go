@@ -37,10 +37,13 @@ type Request struct {
 // @Summary Update an existing post
 // @Description This endpoint allows a user to update an existing post with a new title, content, header image, and tags.
 // @Tags posts
-// @Accept json
+// @Accept multipart/form-data
 // @Produce json
 // @Param id path string true "Post ID"
-// @Param request body Request true "Update post request body"
+// @Param title formData string false "Title of the post"
+// @Param content formData string false "Content of the post"
+// @Param headerImage formData file false "Header image for the post"
+// @Param tags formData string false "Optional tags associated with the post (e.g., [tag1,tag2])"
 // @Success 200 {object} map[string]interface{} "Model of the updated post"
 // @Failure 400 {object} map[string]interface{} "Validation errors or request decoding failures"
 // @Router /api/posts/{id} [patch]
