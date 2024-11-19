@@ -9,8 +9,8 @@ import (
 	"time"
 
 	_ "github.com/ShutSasha/devhub/tree/main/packages/server/PostService/docs"
-	pb "github.com/ShutSasha/devhub/tree/main/packages/server/PostService/gen/go/user"
 	cb "github.com/ShutSasha/devhub/tree/main/packages/server/PostService/gen/go/comment"
+	pb "github.com/ShutSasha/devhub/tree/main/packages/server/PostService/gen/go/user"
 	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/domain/interfaces"
 	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/http-server/handlers/post/delete"
 	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/http-server/handlers/post/get/paginate"
@@ -82,8 +82,8 @@ func New(
 		r.Delete("/{id}", delete.New(log, postStorage, postStorage, fileStorage, fileStorage, grpcUserClient, grpcCommentClient))
 		r.Patch("/{id}", update.New(log, postStorage, postStorage, fileStorage, fileStorage, fileStorage))
 
-		r.Post("/{id}/like", react.NewLike(log, postStorage,grpcUserClient))
-		r.Post("/{id}/dislike", react.NewDislike(log, postStorage,grpcUserClient))
+		r.Post("/{id}/like", react.NewLike(log, postStorage, postStorage, fileStorage, grpcUserClient))
+		r.Post("/{id}/dislike", react.NewDislike(log, postStorage, postStorage, fileStorage, grpcUserClient))
 
 		r.Get("/search", search.New(log, postStorage, fileStorage))
 	})
