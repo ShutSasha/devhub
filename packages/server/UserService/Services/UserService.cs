@@ -3,6 +3,7 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
 using UserService.Abstracts;
+using UserService.Contracts.Posts;
 using UserService.Contracts.User;
 using UserService.Models.Database;
 using UserService.Models.User;
@@ -29,7 +30,7 @@ public class UserService : IUserService
       _userCollection = mongoDatabase.GetCollection<User>(mongoDbSettings.Value.CollectionName);
    }
 
-   public async Task EditUser(string id, string name, string bio, List<string> tags)
+   public async Task EditUser(string id, string name, string bio)
    {
       var filter = Builders<User>.Filter.Eq(u => u.Id, id);
       var user = await _userCollection.Find(filter).FirstOrDefaultAsync();
@@ -42,8 +43,7 @@ public class UserService : IUserService
 
       var update = Builders<User>.Update
          .Set(u => u.Name, name)
-         .Set(u => u.Bio, bio)
-         .Set(u => u.Tags, tags);
+         .Set(u => u.Bio, bio);
 
       var result = await _userCollection.UpdateOneAsync(filter, update);
 
@@ -103,10 +103,19 @@ public class UserService : IUserService
       throw new Exception("404: User with this id wasn't found");
    }
 
+   public async Task<UserReactionsResponse> GetUserReaction(string userId)
+   {
+      var candidate = await GetById(userId);
+      return new UserReactionsResponse
+      {
+         DislikedPosts = candidate.DislikedPosts,
+         LikedPosts = candidate.LikedPosts,
+      };
+   }
+
    public async Task<UserDetailsResponse> GetUserDetailsById(string id)
    {
-      var user = await _userCollection.Find(u => u.Id == id)
-         .FirstOrDefaultAsync();
+      var user = await GetById(id);
       
       var posts = await _postCollection
          .Find(p => user.Posts.Contains(p.Id))
@@ -140,6 +149,7 @@ public class UserService : IUserService
          Bio = user.Bio,
          Avatar = user.Avatar,
          CreatedAt = user.CreatedAt,
+         Username = user.UserName,
          Name = user.Name,
          Comments = comments,
          Posts = posts

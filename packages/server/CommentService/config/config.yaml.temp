@@ -6,3 +6,4 @@ http:
 grpc:
   user_service_port: 5228
   post_service_port: 5226
+  comment_service_port: 5224

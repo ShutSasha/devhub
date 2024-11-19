@@ -92,11 +92,13 @@ func (s *Storage) GetById(
 	}
 	defer cursor.Close(ctx)
 
+	if !cursor.Next(ctx) {
+		return nil, nil
+	}
+
 	post := &storage.PostModel{}
-	if cursor.Next(ctx) {
-		if err := cursor.Decode(post); err != nil {
-			return nil, fmt.Errorf("%s: %w", op, err)
-		}
+	if err := cursor.Decode(post); err != nil {
+		return nil, fmt.Errorf("%s: %w", op, err)
 	}
 
 	return post, nil

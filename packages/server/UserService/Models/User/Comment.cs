@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
@@ -7,6 +8,7 @@ public class Comment
 {
    [BsonId]
    [BsonRepresentation(BsonType.ObjectId)]
+   [JsonPropertyName("_id")]
    public string Id { get; set; }
    [BsonElement("post")]
    [BsonRepresentation(BsonType.ObjectId)]

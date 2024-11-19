@@ -46,6 +46,7 @@ require (
 	github.com/go-chi/chi/v5 v5.1.0
 	github.com/go-chi/render v1.0.3
 	github.com/golang/snappy v0.0.4 // indirect
+	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.1.0
 	github.com/ilyakaznacheev/cleanenv v1.5.0
 	github.com/klauspost/compress v1.13.6 // indirect
 	github.com/montanaflynn/stats v0.7.1 // indirect

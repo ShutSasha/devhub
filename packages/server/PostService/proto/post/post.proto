@@ -14,10 +14,10 @@ message  AddCommentRequest{
   string commentId = 2;
 }
 
-message AddCommentToPostResponse{
-  bool success = 1;
-  string message = 2;
-}
+  message AddCommentToPostResponse{
+    bool success = 1;
+    string message = 2;
+  }
 
 message  RemoveCommentRequest{
   string postId = 1;

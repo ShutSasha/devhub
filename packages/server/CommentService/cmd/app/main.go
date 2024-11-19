@@ -32,6 +32,7 @@ func main() {
 		cfg.Http.Timeout,
 		cfg.Grpc.PostServicePort,
 		cfg.Grpc.UserServicePort,
+		cfg.Grpc.CommentServicePort,
 	)
 
 	done := make(chan os.Signal, 1)
@@ -44,6 +45,14 @@ func main() {
 	}()
 
 	log.Info("commentService: http server started")
+
+	go func() {
+		if err := application.GrpcApp.Run(); err != nil {
+			log.Error("commentService: failed to start grpc server", sl.Err(err))
+		}
+	}()
+
+	log.Info("commentService: grpc server started")
 
 	<-done
 	log.Info("commentService: stopping server")

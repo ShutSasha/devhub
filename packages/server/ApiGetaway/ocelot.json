@@ -182,6 +182,18 @@
          "UpstreamPathTemplate": "/api/users",
          "UpstreamHttpMethod": ["PATCH"]
       },
+      {
+         "DownstreamPathTemplate": "/api/users/user-details/{userId}",
+         "DownstreamScheme": "http",
+         "DownstreamHostAndPorts": [
+            {
+               "Host": "localhost",
+               "Port": 5229
+            }
+         ],
+         "UpstreamPathTemplate": "/api/users/user-details/{userId}",
+         "UpstreamHttpMethod": ["GET"]
+      },
       
       {
          "DownstreamPathTemplate": "/api/comments",
@@ -218,7 +230,7 @@
             }
          ],
          "UpstreamPathTemplate": "/api/posts/{id}/like",
-         "UpstreamHttpMethod": ["POST", "DELETE"]
+         "UpstreamHttpMethod": ["POST"]
       },
       {
          "DownstreamPathTemplate": "/api/posts/{id}/dislike",
@@ -230,7 +242,7 @@
             }
          ],
          "UpstreamPathTemplate": "/api/posts/{id}/dislike",
-         "UpstreamHttpMethod": ["POST", "DELETE"]
+         "UpstreamHttpMethod": ["POST"]
       }
    ],
    "GlobalConfiguration": {
