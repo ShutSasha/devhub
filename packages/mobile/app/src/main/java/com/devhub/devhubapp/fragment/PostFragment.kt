@@ -2,6 +2,7 @@ package com.devhub.devhubapp.fragment
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,6 +18,7 @@ import com.bumptech.glide.Glide
 import com.devhub.devhubapp.R
 import com.devhub.devhubapp.activity.MainActivity
 import com.devhub.devhubapp.activity.PostActivity
+import com.devhub.devhubapp.activity.UserProfileActivity
 import com.devhub.devhubapp.dataClasses.Post
 import com.google.android.flexbox.FlexboxLayout
 import com.google.gson.Gson
@@ -31,6 +33,7 @@ class PostFragment : Fragment() {
     private lateinit var likeCountTextView: TextView
     private lateinit var dislikeCountTextView: TextView
     private lateinit var commentCountTextView: TextView
+    private lateinit var commentIcon: ImageView
 
     private val postDetailLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -79,6 +82,7 @@ class PostFragment : Fragment() {
         likeCountTextView = view.findViewById(R.id.like_count)
         dislikeCountTextView = view.findViewById(R.id.dislike_count)
         commentCountTextView = view.findViewById(R.id.comment_count)
+        commentIcon = view.findViewById(R.id.comment_icon)
         postImage = view.findViewById(R.id.post_image)
 
         arguments?.getString(ARG_POST)?.let {
@@ -128,7 +132,20 @@ class PostFragment : Fragment() {
         }
         likeCountTextView.text = formatCount(post.likes)
         dislikeCountTextView.text = formatCount(post.dislikes)
-        commentCountTextView.text = formatCount(post.comments.size)
+        if (post.comments != null && post.comments.isNotEmpty()) {
+            commentCountTextView.text = formatCount(post.comments.size)
+        } else {
+            commentCountTextView.visibility = View.GONE
+            commentIcon.visibility = View.GONE
+        }
+
+        avatar.setOnClickListener {
+            val intent = Intent(requireContext(), UserProfileActivity::class.java)
+            Log.e("UserId", post.toString())
+            intent.putExtra("USER_ID", post.user._id)
+            startActivity(intent)
+        }
+
     }
 
     private fun formatCount(reaction: Int): String {
