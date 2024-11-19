@@ -56,7 +56,7 @@ public class UserService : IUserService
       _logger.LogInformation($"User with ID {id} updated successfully.");
    }
 
-   public async Task EditUserIcon(string id, string fileName, Stream fileStream, string contentType)
+   public async Task<string> EditUserIcon(string id, string fileName, Stream fileStream, string contentType)
    {
       var candidate = await _userCollection.Find(u => u.Id == id)
          .FirstOrDefaultAsync();
@@ -83,7 +83,8 @@ public class UserService : IUserService
 
       if (result.ModifiedCount > 0)
       {
-         _logger.LogInformation($"404:User {id} avatar updated successfully.");
+         _logger.LogInformation($"User {id} avatar updated successfully.");
+         return candidate.Avatar;
       }
       else
       {
