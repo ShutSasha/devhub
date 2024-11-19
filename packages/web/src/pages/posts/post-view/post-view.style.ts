@@ -96,28 +96,28 @@ export const ReactionImage = styled.div`
 `
 
 interface StyledLikeProps {
-  isLiked?: boolean
+  $isLiked?: boolean
 }
 
 export const Like = styled(ReactionImage)<StyledLikeProps>`
-  background-image: ${({ isLiked }) => (isLiked ? `url(${likePressed})` : `url(${like})`)};
+  background-image: ${({ $isLiked }) => ($isLiked ? `url(${likePressed})` : `url(${like})`)};
   transition: all 0.25s ease-in;
 
   &:hover {
-    background-image: ${({ isLiked }) => (isLiked ? `url(${likePressed})` : `url(${likeHover})`)};
+    background-image: ${({ $isLiked }) => ($isLiked ? `url(${likePressed})` : `url(${likeHover})`)};
   }
 `
 
 interface StyledDislikeProps {
-  isDisliked?: boolean
+  $isDisliked?: boolean
 }
 
 export const Dislike = styled(ReactionImage)<StyledDislikeProps>`
-  background-image: ${({ isDisliked }) => (isDisliked ? `url(${dislikePressed})` : `url(${dislike})`)};
+  background-image: ${({ $isDisliked }) => ($isDisliked ? `url(${dislikePressed})` : `url(${dislike})`)};
   transition: all 0.25s ease-in;
 
   &:hover {
-    background-image: ${({ isDisliked }) => (isDisliked ? `url(${dislikePressed})` : `url(${dislikeHover})`)};
+    background-image: ${({ $isDisliked }) => ($isDisliked ? `url(${dislikePressed})` : `url(${dislikeHover})`)};
   }
 `
 
