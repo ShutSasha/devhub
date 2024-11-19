@@ -11,8 +11,7 @@ export interface IUser {
   activationCode: string
   isActivated: false
   bio?: string | null
-  roles: string[]
-  userRole: number[]
+  userRole: string[]
 }
 
 export interface UserDetailsResponse {
