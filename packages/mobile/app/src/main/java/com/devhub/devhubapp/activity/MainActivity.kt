@@ -74,7 +74,18 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun refreshPosts() {
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (resultCode == RESULT_OK) {
+            val updatePosts = data?.getBooleanExtra("UPDATE_POSTS", false) ?: false
+            if (updatePosts) {
+                refreshPosts()
+            }
+        }
+    }
+
+    fun refreshPosts() {
         currentPage = 1
         findViewById<LinearLayout>(R.id.posts_container).removeAllViews()
         fetchPostsAndDisplay(currentPage)
@@ -85,7 +96,10 @@ class MainActivity : AppCompatActivity() {
         GlobalScope.launch(Dispatchers.Main) {
             try {
                 val posts = withContext(Dispatchers.IO) {
-                    RetrofitClient.getInstance(applicationContext).postAPI.getPosts(limit = 10, page = page)
+                    RetrofitClient.getInstance(applicationContext).postAPI.getPosts(
+                        limit = 10,
+                        page = page
+                    )
                 }
                 if (posts.isNotEmpty()) {
                     displayPosts(posts)

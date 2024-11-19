@@ -1,6 +1,7 @@
 package com.devhub.devhubapp.activity
 
-import CommentFragment
+import com.devhub.devhubapp.fragment.CommentFragment
+import android.content.Intent
 import android.icu.text.SimpleDateFormat
 import android.icu.util.TimeZone
 import android.os.Bundle
@@ -18,7 +19,6 @@ import androidx.fragment.app.FragmentTransaction
 import com.bumptech.glide.Glide
 import com.devhub.devhubapp.R
 import com.devhub.devhubapp.dataClasses.Post
-import com.devhub.devhubapp.fragment.FooterFragment
 import com.devhub.devhubapp.fragment.HeaderFragment
 import com.google.android.flexbox.FlexboxLayout
 import com.google.gson.Gson
@@ -26,10 +26,14 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.devhub.devhubapp.dataClasses.Comment
+import com.devhub.devhubapp.fragment.AddCommentFragment
 import java.util.Locale
 
 
 class PostActivity : AppCompatActivity() {
+    private lateinit var commentsRecyclerView: RecyclerView
+    private lateinit var commentCount: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,12 +44,24 @@ class PostActivity : AppCompatActivity() {
         val fragmentTransaction: FragmentTransaction = fragmentManager.beginTransaction()
         if (savedInstanceState == null) {
             fragmentTransaction.replace(R.id.header_container_post, HeaderFragment())
-            fragmentTransaction.replace(R.id.footer_container_post, FooterFragment())
             fragmentTransaction.commit()
         }
 
         val postJson = intent.getStringExtra("post")
         val post = Gson().fromJson(postJson, Post::class.java)
+
+        val addCommentFragment = AddCommentFragment().apply {
+            arguments = Bundle().apply {
+                putString("postId", post._id)
+            }
+            onCommentAdded = { newComment ->
+                updateCommentsList(newComment)
+            }
+        }
+
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.add_comment_container, addCommentFragment)
+            .commit()
 
         post?.let { displayPost(it) }
 
@@ -54,13 +70,17 @@ class PostActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+
         findViewById<LinearLayout>(R.id.back_button_container).setOnClickListener {
+            val intent = Intent()
+            intent.putExtra("UPDATE_POSTS", true)
+            setResult(RESULT_OK, intent)
             finish()
         }
+
     }
 
     private fun displayPost(post: Post) {
-
         val profileImage: ImageView = findViewById(R.id.profile_image)
         val username: TextView = findViewById(R.id.username)
         val postTitle: TextView = findViewById(R.id.post_title)
@@ -69,13 +89,13 @@ class PostActivity : AppCompatActivity() {
         val postContent: TextView = findViewById(R.id.post_content)
         val likeCount: TextView = findViewById(R.id.like_count)
         val dislikeCount: TextView = findViewById(R.id.dislike_count)
-        /*        val starCount: TextView = findViewById(R.id.star_count)*/
-        val commentCount: TextView = findViewById(R.id.comment_count)
-        val hashtagsContainer: FlexboxLayout = findViewById(R.id.hashtags_container)
-        val commentsRecyclerView: RecyclerView = findViewById(R.id.comments_recycler_view)
+        commentCount = findViewById(R.id.comment_count)
+        commentsRecyclerView = findViewById(R.id.comments_recycler_view)
         commentsRecyclerView.layoutManager = LinearLayoutManager(this)
-        val commentAdapter = CommentFragment(post.comments)
+        val sortedComments = post.comments.sortedByDescending { it.createdAt }
+        val commentAdapter = CommentFragment(sortedComments)
         commentsRecyclerView.adapter = commentAdapter
+        commentsRecyclerView.overScrollMode = View.OVER_SCROLL_NEVER
 
         postImage.visibility = if (post.headerImage == "") View.GONE else View.VISIBLE
 
@@ -92,6 +112,7 @@ class PostActivity : AppCompatActivity() {
             .load("https://mydevhubimagebucket.s3.eu-west-3.amazonaws.com/" + post.headerImage)
             .into(postImage)
 
+        val hashtagsContainer: FlexboxLayout = findViewById(R.id.hashtags_container)
         hashtagsContainer.removeAllViews()
         post.tags?.forEach { tag ->
             val textView = TextView(this)
@@ -109,9 +130,21 @@ class PostActivity : AppCompatActivity() {
         }
         likeCount.text = formatCount(post.likes)
         dislikeCount.text = formatCount(post.dislikes)
-        /*        starCount.text = formatCount(post.stars)*/
         commentCount.text = formatCount(post.comments.size)
     }
+
+    private fun updateCommentsList(newComment: Comment) {
+        val currentComments =
+            (commentsRecyclerView.adapter as CommentFragment).comments.toMutableList()
+        currentComments.add(0, newComment)
+
+        val commentAdapter = CommentFragment(currentComments)
+        commentsRecyclerView.adapter = commentAdapter
+        commentsRecyclerView.adapter?.notifyDataSetChanged()
+
+        commentCount.text = formatCount(currentComments.size)
+    }
+
 
     private fun formatCount(reaction: Int): String {
         return when {
@@ -129,3 +162,4 @@ class PostActivity : AppCompatActivity() {
     }
 
 }
+

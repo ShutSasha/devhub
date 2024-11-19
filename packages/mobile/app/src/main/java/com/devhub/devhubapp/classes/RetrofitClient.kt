@@ -6,6 +6,7 @@ import okhttp3.OkHttpClient
 import android.content.Context
 import com.devhub.devhubapp.api.AuthAPI
 import com.devhub.devhubapp.api.PostAPI
+import com.devhub.devhubapp.api.CommentAPI
 import com.devhub.devhubapp.interceptors.AuthInterceptor
 import com.google.gson.GsonBuilder
 import java.util.Date
@@ -18,6 +19,7 @@ class RetrofitClient private constructor(context: Context) {
     private val encryptedPreferencesManager = EncryptedPreferencesManager(context)
     private val authAPI: AuthAPI
     val postAPI: PostAPI
+    val commentAPI: CommentAPI
 
     init {
         val gson = GsonBuilder()
@@ -45,6 +47,7 @@ class RetrofitClient private constructor(context: Context) {
             .build()
 
         postAPI = retrofit.create(PostAPI::class.java)
+        commentAPI = retrofit.create(CommentAPI::class.java)
     }
 
     fun getRetrofit(): Retrofit {
