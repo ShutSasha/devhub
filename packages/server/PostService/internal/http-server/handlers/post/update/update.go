@@ -2,8 +2,11 @@ package update
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 	"net/http"
+	"regexp"
+	"strings"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -63,10 +66,39 @@ func New(log *slog.Logger, postUpdater interfaces.PostUpdater, postProvider inte
 			return
 		}
 
+		tagsString := r.FormValue("tags")
+
+		tagsArray := []string{}
+		if strings.TrimSpace(tagsString) != "" && tagsString != "[]" {
+			cleanedString := strings.Trim(tagsString, "[]")
+
+			re := regexp.MustCompile(`[^#\+\w\s,]`)
+			cleanedString = re.ReplaceAllString(cleanedString, "")
+			tagsArray = strings.Split(cleanedString, ",")
+
+			for i := range tagsArray {
+				tagsArray[i] = strings.TrimSpace(tagsArray[i])
+			}
+
+			var nonEmptyTags []string
+			for _, tag := range tagsArray {
+				if tag != "" {
+					nonEmptyTags = append(nonEmptyTags, tag)
+				}
+			}
+			tagsArray = nonEmptyTags
+
+			if len(tagsArray) > 4 {
+				utils.HandleError(log, w, r, "the number of tags should be less than 4", fmt.Errorf("%v: too many tags", op),
+					http.StatusBadRequest, "body", "the number of tags should be less than 4")
+				return
+			}
+		}
+
 		req := Request{
 			Title:   r.FormValue("title"),
 			Content: r.FormValue("content"),
-			Tags:    r.Form["tags"],
+			Tags:    tagsArray,
 		}
 		if err := validator.New().Struct(req); err != nil {
 			validateErr := err.(validator.ValidationErrors)
@@ -121,7 +153,6 @@ func New(log *slog.Logger, postUpdater interfaces.PostUpdater, postProvider inte
 			return
 		}
 
-		//Todo proceed case when not updated (upload back old header image)
 		err = postUpdater.Update(
 			context.TODO(),
 			postId,
