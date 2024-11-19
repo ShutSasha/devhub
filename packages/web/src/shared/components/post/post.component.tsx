@@ -2,7 +2,7 @@ import { FC, MouseEvent, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import { ROUTES } from '@pages/router/routes.enum'
-import { useLikeMutation } from '@api/post.api'
+import { useDislikeMutation, useLikeMutation } from '@api/post.api'
 import { handleServerException } from '@utils/handleServerException.util'
 
 import * as S from './post.style'
@@ -21,14 +21,27 @@ interface PostProps {
 export const Post: FC<PostProps> = ({ post, userReactions, currentUserId, updateUserReactions, updatePost }) => {
   const navigate = useNavigate()
   const [isLiked, setLiked] = useState<boolean>(false)
+  const [isDisliked, setDisliked] = useState<boolean>(false)
   const [like] = useLikeMutation()
+  const [dislike] = useDislikeMutation()
 
   const handleLikeClick = async (e: MouseEvent<HTMLElement>) => {
     try {
       e.stopPropagation()
-      const { post: updatedPost } = await like({ postId: post._id, userId: currentUserId }).unwrap()
+      const response = await like({ postId: post._id, userId: currentUserId }).unwrap()
+      updatePost(response)
+      updateUserReactions()
+    } catch (e) {
+      console.error(e)
+      toast.error(handleServerException(e as ErrorException)?.join(', '))
+    }
+  }
 
-      updatePost(updatedPost)
+  const handleDislikeClick = async (e: MouseEvent<HTMLElement>) => {
+    try {
+      e.stopPropagation()
+      const response = await dislike({ postId: post._id, userId: currentUserId }).unwrap()
+      updatePost(response)
       updateUserReactions()
     } catch (e) {
       console.error(e)
@@ -39,6 +52,9 @@ export const Post: FC<PostProps> = ({ post, userReactions, currentUserId, update
   useEffect(() => {
     if (userReactions?.likedPosts) {
       setLiked(userReactions.likedPosts.some(like => like === post._id))
+    }
+    if (userReactions?.dislikedPosts) {
+      setDisliked(userReactions.dislikedPosts.some(dislike => dislike === post._id))
     }
   }, [userReactions])
 
@@ -63,7 +79,7 @@ export const Post: FC<PostProps> = ({ post, userReactions, currentUserId, update
             <S.StyledCount>{post.likes}</S.StyledCount>
           </S.ReactionContainer>
           <S.ReactionContainer>
-            <S.Dislike />
+            <S.Dislike $isDisliked={isDisliked} onClick={handleDislikeClick} />
             <S.StyledCount>{post.dislikes}</S.StyledCount>
           </S.ReactionContainer>
         </S.LikesDislikesContainer>

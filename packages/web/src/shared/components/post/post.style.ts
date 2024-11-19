@@ -153,15 +153,15 @@ export const Like = styled(ReactionImage)<StyledLikeProps>`
 `
 
 interface StyledDislikeProps {
-  isDisliked?: boolean
+  $isDisliked?: boolean
 }
 
 export const Dislike = styled(ReactionImage)<StyledDislikeProps>`
-  background-image: ${({ isDisliked }) => (isDisliked ? `url(${dislikePressed})` : `url(${dislike})`)};
+  background-image: ${({ $isDisliked }) => ($isDisliked ? `url(${dislikePressed})` : `url(${dislike})`)};
   transition: all 0.25s ease-in;
 
   &:hover {
-    background-image: ${({ isDisliked }) => (isDisliked ? `url(${dislikePressed})` : `url(${dislikeHover})`)};
+    background-image: ${({ $isDisliked }) => ($isDisliked ? `url(${dislikePressed})` : `url(${dislikeHover})`)};
   }
 `
 
