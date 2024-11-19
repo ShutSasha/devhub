@@ -8,6 +8,7 @@
   
   
   <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="13.0.1" />
     <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="3.7.301" />
     <PackageReference Include="AWSSDK.S3" Version="3.7.405.12" />
     <PackageReference Include="Grpc.AspNetCore.Web" Version="2.66.0" />
