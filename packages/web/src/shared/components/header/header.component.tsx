@@ -9,6 +9,7 @@ import { ROUTES } from '@pages/router/routes.enum'
 import { useAppDispatch, useAppSelector } from '@app/store/store'
 import { useLogoutMutation } from '@api/auth.api'
 import { logout as logoutStore } from '@features/user/user.slice'
+import { toast } from 'react-toastify'
 
 import {
   AuthContainer,
@@ -52,12 +53,19 @@ const AuthDisplay = () => {
     }
   }
 
+  const handleClickAvatar = () => {
+    if (user?._id) navigate(ROUTES.USER_PROFILE.replace(':id', user?._id))
+    else {
+      toast.error('Try to refresh your page or log in one more time')
+    }
+  }
+
   return (
     <>
       {user ? (
         <>
           <CreatePost onClick={handleCreatePostBtn}>Create Post</CreatePost>
-          <UserAvatar src={user.avatar} />
+          <UserAvatar src={user.avatar} onClick={handleClickAvatar} />
           <Logout onClick={handleLogout} />
         </>
       ) : (

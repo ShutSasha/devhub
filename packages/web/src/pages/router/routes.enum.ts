@@ -9,4 +9,5 @@ export enum ROUTES {
   ENTER_NEW_PASSWORD = '/forgot-password/verify/enter-new-password',
   CREATE_POST = '/create-post',
   POST_VIEW = '/posts/:id',
+  USER_PROFILE = '/user-profile/:id',
 }
