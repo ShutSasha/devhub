@@ -5,18 +5,30 @@ import { MainLayout } from '@shared/layouts/main.layout'
 import { useLazyGetPostsQuery } from '@api/post.api'
 import { useAppDispatch, useAppSelector } from '@app/store/store'
 import { setPosts } from '@features/posts/posts.slice'
+import { useGetUserReactionsQuery } from '@api/user.api'
 
 import { PostsContainer } from './home.style'
+
+import { IPost } from '~types/post/post.type'
 
 export const Home = () => {
   const posts = useAppSelector(state => state.postsSlice.posts)
   const isLoading = useAppSelector(state => state.postsSlice.isLoading)
+  const userId = useAppSelector(state => state.userSlice.user?._id)
   const dispatch = useAppDispatch()
   const [getPosts] = useLazyGetPostsQuery()
+  const { data: userReactions, isLoading: userReactionsLoading, refetch } = useGetUserReactionsQuery({ userId })
   const page = useRef(1)
   const isInitialFetch = useRef(true)
   const [limit] = useState(10)
   const [fetching, setFetching] = useState<boolean>(true)
+
+  const updatePost = (updatedPost: IPost) => {
+    if (posts) {
+      const updatedPosts = posts.map(post => (post._id === updatedPost._id ? { ...post, ...updatedPost } : post))
+      dispatch(setPosts(updatedPosts))
+    }
+  }
 
   const scrollHandler = (e: Event) => {
     const target = e.target as Document
@@ -64,6 +76,27 @@ export const Home = () => {
     }
   }, [scrollHandler])
 
+  if (isLoading || userReactionsLoading) {
+    return (
+      <MainLayout>
+        <div>
+          Lorem ipsum, dolor sit amet consectetur adipisicing elit. Libero odio est asperiores nulla non rem tempore.
+          Accusamus qui voluptatem repellendus necessitatibus esse, consequatur perspiciatis voluptas totam quaerat
+          veritatis dolores eveniet!
+        </div>
+        <PostsContainer>
+          <SearchInput placeholder="Search by post title..." />
+          {isLoading && <p>Loading...</p>}
+        </PostsContainer>
+        <div>
+          Lorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis dicta sed ullam quidem dolorem et
+          voluptates itaque quaerat. Sunt deserunt asperiores nobis officiis odio suscipit cum veritatis vero officia
+          magnam.
+        </div>
+      </MainLayout>
+    )
+  }
+
   return (
     <MainLayout>
       <div>
@@ -75,7 +108,16 @@ export const Home = () => {
         <SearchInput placeholder="Search by post title..." />
         {isLoading && <p>Loading...</p>}
         {Array.isArray(posts) && posts.length > 0 ? (
-          posts.map(post => <Post key={post._id} post={post} />)
+          posts.map(post => (
+            <Post
+              key={post._id}
+              updatePost={updatePost}
+              currentUserId={userId}
+              userReactions={userReactions}
+              post={post}
+              updateUserReactions={refetch}
+            />
+          ))
         ) : (
           <p>No posts available.</p>
         )}

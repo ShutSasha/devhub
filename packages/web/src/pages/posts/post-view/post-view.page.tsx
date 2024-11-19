@@ -1,5 +1,5 @@
-import { useRef } from 'react'
-import { useGetPostByIdQuery } from '@api/post.api'
+import { MouseEvent, useEffect, useRef, useState } from 'react'
+import { useDislikeMutation, useGetPostByIdQuery, useLikeMutation } from '@api/post.api'
 import { StyledAvatar, StyledUserCredentialsContainer, Username } from '@shared/components/post/post.style'
 import { PostViewLayout } from '@shared/layouts/posts/post-view.layout'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -10,6 +10,7 @@ import { useCreateCommentMutation } from '@api/comment.api'
 import { handleServerException } from '@utils/handleServerException.util'
 import { toast } from 'react-toastify'
 import { ROUTES } from '@pages/router/routes.enum'
+import { useGetUserReactionsQuery } from '@api/user.api'
 
 import {
   ActionContainer,
@@ -39,6 +40,48 @@ export const PostView = () => {
   const user = useAppSelector(state => state.userSlice.user)
   const comment = useRef<HTMLSpanElement>(null)
   const [createComment] = useCreateCommentMutation()
+  const { data: userReactions, refetch: refetchReactions } = useGetUserReactionsQuery({ userId: user?._id })
+  const [like] = useLikeMutation()
+  const [dislike] = useDislikeMutation()
+  const [isLiked, setLiked] = useState<boolean>(false)
+  const [isDisliked, setDisliked] = useState<boolean>(false)
+
+  useEffect(() => {
+    if (post && userReactions) {
+      setLiked(userReactions.likedPosts.includes(post._id))
+      setDisliked(userReactions.dislikedPosts.includes(post._id))
+    }
+  }, [post, userReactions])
+
+  const handleLikeClick = async (e: MouseEvent<HTMLElement>) => {
+    try {
+      e.stopPropagation()
+      if (!user) return toast.error('Log in for leaving reactions')
+      if (post) {
+        await like({ postId: post._id, userId: user?._id }).unwrap()
+        refetch()
+        refetchReactions()
+      }
+    } catch (e) {
+      console.error(e)
+      toast.error(handleServerException(e as ErrorException)?.join(', '))
+    }
+  }
+
+  const handleDislikeClick = async (e: MouseEvent<HTMLElement>) => {
+    try {
+      e.stopPropagation()
+      if (!user) return toast.error('Log in for leaving reactions')
+      if (post) {
+        await dislike({ postId: post._id, userId: user?._id }).unwrap()
+        refetch()
+        refetchReactions()
+      }
+    } catch (e) {
+      console.error(e)
+      toast.error(handleServerException(e as ErrorException)?.join(', '))
+    }
+  }
 
   const handlePostComment = async () => {
     try {
@@ -111,12 +154,12 @@ export const PostView = () => {
       <GrayLine />
       <ActionContainer>
         <ActionInnerContainer>
-          <Like />
+          <Like $isLiked={isLiked} onClick={handleLikeClick} />
           <p>{post.likes} likes</p>
         </ActionInnerContainer>
         <ActionInnerContainer>
-          <Dislike />
-          <p>{post.likes} likes</p>
+          <Dislike $isDisliked={isDisliked} onClick={handleDislikeClick} />
+          <p>{post.dislikes} dislikes</p>
         </ActionInnerContainer>
         <ActionInnerContainer></ActionInnerContainer>
         <ActionInnerContainer>
