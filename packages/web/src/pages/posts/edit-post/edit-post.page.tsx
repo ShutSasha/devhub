@@ -103,10 +103,10 @@ export const EditPost = () => {
       const formData = editFormData(postData)
       dispatch(setLoading(true))
 
-      const res = await editPost({ postId: id, body: formData }).unwrap()
-      console.log(res)
-      // navigate(ROUTES.HOME)
-      // window.scrollTo(0, 0)
+      await editPost({ postId: id, body: formData }).unwrap()
+
+      navigate(ROUTES.HOME)
+      window.scrollTo(0, 0)
 
       refretchPostById()
     } catch (e) {
@@ -138,7 +138,7 @@ export const EditPost = () => {
         try {
           setHeaderImageUrl('https://mydevhubimagebucket.s3.eu-west-3.amazonaws.com/' + post.headerImage)
 
-          const response = await fetch(post.headerImage)
+          const response = await fetch('https://mydevhubimagebucket.s3.eu-west-3.amazonaws.com/' + post.headerImage)
           const blob = await response.blob()
 
           const file = new File([blob], 'headerImage.jpg', { type: blob.type })
