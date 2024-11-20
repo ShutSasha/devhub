@@ -42,6 +42,11 @@ export const PostHeader = styled.div`
 
   margin-bottom: 18px;
 `
+export const StyledUserCredentialsContainerWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+`
 
 export const StyledUserCredentialsContainer = styled.div`
   display: flex;
@@ -145,7 +150,7 @@ interface StyledLikeProps {
 
 export const Like = styled(ReactionImage)<StyledLikeProps>`
   background-image: ${({ $isLiked }) => ($isLiked ? `url(${likePressed})` : `url(${like})`)};
-  transition: all 0.25s ease-in;
+  transition: all 0.1s ease-in;
 
   &:hover {
     background-image: ${({ $isLiked }) => ($isLiked ? `url(${likePressed})` : `url(${likeHover})`)};
@@ -158,7 +163,7 @@ interface StyledDislikeProps {
 
 export const Dislike = styled(ReactionImage)<StyledDislikeProps>`
   background-image: ${({ $isDisliked }) => ($isDisliked ? `url(${dislikePressed})` : `url(${dislike})`)};
-  transition: all 0.25s ease-in;
+  transition: all 0.1s ease-in;
 
   &:hover {
     background-image: ${({ $isDisliked }) => ($isDisliked ? `url(${dislikePressed})` : `url(${dislikeHover})`)};
@@ -167,7 +172,7 @@ export const Dislike = styled(ReactionImage)<StyledDislikeProps>`
 
 export const Comment = styled(ReactionImage)`
   background-image: url(${comment});
-  transition: all 0.25s ease-in;
+  transition: all 0.1s ease-in;
 
   &:hover {
     background-image: url(${commentHover});

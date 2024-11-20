@@ -42,6 +42,19 @@ export const api = createApi({
         body: { userId },
       }),
     }),
+    editPost: builder.mutation<IPost, { postId: string | undefined; body: FormData }>({
+      query: ({ postId, body }) => ({
+        url: `posts/${postId}`,
+        method: 'PATCH',
+        body,
+      }),
+    }),
+    deletePost: builder.mutation<void, { id: string | undefined }>({
+      query: ({ id }) => ({
+        url: `posts/${id}`,
+        method: 'DELETE',
+      }),
+    }),
   }),
 })
 
@@ -52,4 +65,6 @@ export const {
   useGetPostByIdQuery,
   useDislikeMutation,
   useLikeMutation,
+  useEditPostMutation,
+  useDeletePostMutation,
 } = api
