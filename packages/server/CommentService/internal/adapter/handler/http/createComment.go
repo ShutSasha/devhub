@@ -53,9 +53,14 @@ func (ch *CommentHandler) Create() http.HandlerFunc {
 				fmt.Errorf("user id is not provided"), http.StatusBadRequest, "body", "user is not authorized")
 			return
 		}
+		if request.PostId == "" {
+			utils.HandleError(log, w, r, "wrong post id",
+				fmt.Errorf("wrong post id"), http.StatusBadRequest, "body", "post id is not provided")
+			return
+		}
 		if err := validator.New().Struct(request); err != nil {
 			utils.HandleError(log, w, r, err.Error(),
-				err, http.StatusBadRequest, "body", err.Error())
+				err, http.StatusBadRequest, "body", "Content is not provided")
 			return
 		}
 
