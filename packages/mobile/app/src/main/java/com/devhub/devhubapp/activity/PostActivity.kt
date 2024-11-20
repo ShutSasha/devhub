@@ -12,6 +12,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -25,6 +26,7 @@ import com.google.android.flexbox.FlexboxLayout
 import com.google.gson.Gson
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.devhub.devhubapp.dataClasses.Comment
@@ -38,17 +40,33 @@ import com.devhub.devhubapp.classes.EncryptedPreferencesManager
 import com.devhub.devhubapp.classes.RetrofitClient
 import com.devhub.devhubapp.dataClasses.UserIdRequest
 import com.devhub.devhubapp.dataClasses.UserReactions
+import kotlinx.coroutines.launch
 
 class PostActivity : AppCompatActivity() {
     private lateinit var commentsRecyclerView: RecyclerView
     private lateinit var commentCount: TextView
     private lateinit var likeIcon: ImageView
     private lateinit var dislikeIcon: ImageView
+    private lateinit var editPostButton: ImageView
     private lateinit var likeCountTextView: TextView
     private lateinit var dislikeCountTextView: TextView
     private lateinit var userReactions: UserReactions
     private lateinit var encryptedPreferencesManager: EncryptedPreferencesManager
     private lateinit var postAPI: PostAPI
+    private lateinit var post: Post
+    private lateinit var usernameTextView: TextView
+    private lateinit var currentUserId: String
+    private val REQUEST_CODE_EDIT_POST = 100
+    private val postDetailLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == AppCompatActivity.RESULT_OK) {
+                val updatedPostJson = result.data?.getStringExtra(EditPostActivity.RESULT_UPDATED_POST)
+                updatedPostJson?.let {
+                    post = Gson().fromJson(it, Post::class.java)
+                    displayPost(post)
+                }
+            }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,8 +80,11 @@ class PostActivity : AppCompatActivity() {
             fragmentTransaction.commit()
         }
 
+        encryptedPreferencesManager = EncryptedPreferencesManager(this)
+        postAPI = RetrofitClient.getInstance(this).postAPI
+        currentUserId = encryptedPreferencesManager.getUserData()._id
         val postJson = intent.getStringExtra("post")
-        val post = Gson().fromJson(postJson, Post::class.java)
+        post = Gson().fromJson(postJson, Post::class.java)
 
         val addCommentFragment = AddCommentFragment().apply {
             arguments = Bundle().apply {
@@ -86,9 +107,18 @@ class PostActivity : AppCompatActivity() {
             insets
         }
 
-        encryptedPreferencesManager = EncryptedPreferencesManager(this)
-        postAPI = RetrofitClient.getInstance(this).postAPI
+        editPostButton = findViewById(R.id.edit_post_button)
+        editPostButton.setOnClickListener {
+            val intent = Intent(this, EditPostActivity::class.java).apply {
+                putExtra("post", Gson().toJson(post))
+            }
+            postDetailLauncher.launch(intent)
+        }
+
         userReactions = encryptedPreferencesManager.getUserReactions()
+        usernameTextView = findViewById(R.id.username)
+
+        setupPostUI()
 
         likeIcon = findViewById(R.id.like_icon)
         dislikeIcon = findViewById(R.id.dislike_icon)
@@ -98,10 +128,8 @@ class PostActivity : AppCompatActivity() {
         likeCountTextView.text = post.likes.toString()
         dislikeCountTextView.text = post.dislikes.toString()
 
-        // Update reaction icons based on user reactions
         updateReactionIcons(post._id)
 
-        // Set click listeners for like and dislike
         likeIcon.setOnClickListener {
             handleLikeDislike(post._id, true)
         }
@@ -174,6 +202,24 @@ class PostActivity : AppCompatActivity() {
             commentCount.text = formatCount(post.comments.size)
         }
 
+    }
+
+    private fun setupPostUI() {
+        if (currentUserId == post.user._id) {
+            editPostButton.visibility = View.VISIBLE
+            editPostButton.setOnClickListener {
+                openEditPostActivity()
+            }
+        } else {
+            editPostButton.visibility = View.GONE
+        }
+    }
+
+    private fun openEditPostActivity() {
+        val intent = Intent(this, EditPostActivity::class.java)
+        intent.putExtra("post", Gson().toJson(post))
+        postDetailLauncher.launch(intent)
+        finish()
     }
 
     private fun updateCommentsList(newComment: Comment) {
@@ -251,6 +297,41 @@ class PostActivity : AppCompatActivity() {
         })
     }
 
+    private fun refreshPost() {
+        postAPI.getPostById(post._id).enqueue(object : Callback<Post> {
+            override fun onResponse(call: Call<Post>, response: Response<Post>) {
+                if (response.isSuccessful) {
+                    response.body()?.let { updatedPost ->
+                        post = updatedPost
+                        displayPost(post)
+                    }
+                } else {
+                    Log.e("PostActivity", "Failed to refresh post: ${response.errorBody()?.string()}")
+                }
+            }
+
+            override fun onFailure(call: Call<Post>, t: Throwable) {
+                Log.e("PostActivity", "Failed to refresh post: ${t.message}")
+            }
+        })
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Здесь можно выполнить повторный запрос к серверу
+        refreshPost()
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == REQUEST_CODE_EDIT_POST && resultCode == RESULT_OK) {
+            val updatedPostJson = data?.getStringExtra(EditPostActivity.RESULT_UPDATED_POST)
+            updatedPostJson?.let {
+                post = Gson().fromJson(it, Post::class.java)
+                displayPost(post)
+            }
+        }
+    }
 
     private fun formatCount(reaction: Int?): String {
         return when {

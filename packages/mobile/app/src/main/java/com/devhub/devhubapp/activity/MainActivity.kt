@@ -30,6 +30,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var encryptedPreferencesManager: EncryptedPreferencesManager
     private lateinit var userReactions: UserReactions
     private val existingPostsIds = mutableSetOf<String>()
+    private val REQUEST_CODE_CREATE_POST = 101
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,7 +55,6 @@ class MainActivity : AppCompatActivity() {
         val fragmentManager = supportFragmentManager
         if (savedInstanceState == null) {
             fetchUserReactions()
-            fetchPostsAndDisplay(currentPage)
             fragmentManager.beginTransaction()
                 .replace(R.id.header_container, HeaderFragment())
                 .replace(R.id.footer_container, FooterFragment())
@@ -100,11 +100,15 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        currentPage = 1
+        fetchPostsAndDisplay(currentPage)
+    }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-
-        if (resultCode == RESULT_OK) {
+        if (requestCode == REQUEST_CODE_CREATE_POST && resultCode == RESULT_OK) {
             val updatePosts = data?.getBooleanExtra("UPDATE_POSTS", false) ?: false
             if (updatePosts) {
                 refreshPosts()
@@ -114,7 +118,7 @@ class MainActivity : AppCompatActivity() {
 
     fun refreshPosts() {
         currentPage = 1
-
+        isLoading = false
         val fragmentManager = supportFragmentManager
         val fragments = fragmentManager.fragments
         for (fragment in fragments) {
@@ -122,9 +126,9 @@ class MainActivity : AppCompatActivity() {
                 fragmentManager.beginTransaction().remove(fragment).commit()
             }
         }
+        existingPostsIds.clear()
 
         findViewById<LinearLayout>(R.id.posts_container).removeAllViews()
-        existingPostsIds.clear()
 
         fetchPostsAndDisplay(currentPage)
     }
@@ -147,8 +151,9 @@ class MainActivity : AppCompatActivity() {
                         page = page
                     )
                 }
-
+                Log.e("aboba", postResponse.toString())
                 val posts = postResponse
+
                 if (posts.isNotEmpty()) {
                     displayPosts(posts, userReactions)
                 }
@@ -159,19 +164,19 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-
     private fun displayPosts(posts: List<Post>, reactions: UserReactions?) {
+        Log.d("MainActivity", "Displaying posts: $posts")
         val fragmentManager = supportFragmentManager
         val container = findViewById<LinearLayout>(R.id.posts_container)
 
         for (post in posts) {
-            if (existingPostsIds.contains(post._id)) continue
+/*            if (existingPostsIds.contains(post._id)) continue*/
 
             val postFragment = PostFragment.newInstance(post, reactions)
             fragmentManager.beginTransaction()
                 .add(container.id, postFragment)
                 .commit()
-
+            Log.d("aboba", "new post fragment added")
             existingPostsIds.add(post._id)
         }
     }
