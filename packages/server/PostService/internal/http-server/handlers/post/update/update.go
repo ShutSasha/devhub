@@ -148,6 +148,9 @@ func New(log *slog.Logger, postUpdater interfaces.PostUpdater, postProvider inte
 		} else if err != http.ErrMissingFile {
 			utils.HandleError(log, w, r, "failed to retrieve file", err, http.StatusBadRequest, "headerImage", "Failed to retrieve file")
 			return
+		} else {
+			utils.HandleError(log, w, r, "missing file", http.ErrMissingFile, http.StatusBadRequest, "headerImage", http.ErrMissingFile.Error())
+			return
 		}
 
 		if req.Title == "" && req.Content == "" && len(req.Tags) == 0 && req.HeaderImage == "" {
