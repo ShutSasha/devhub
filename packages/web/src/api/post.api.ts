@@ -42,6 +42,13 @@ export const api = createApi({
         body: { userId },
       }),
     }),
+    editPost: builder.mutation<IPost, { postId: string | undefined; body: FormData }>({
+      query: ({ postId, body }) => ({
+        url: `posts/${postId}`,
+        method: 'PATCH',
+        body,
+      }),
+    }),
   }),
 })
 
@@ -52,4 +59,5 @@ export const {
   useGetPostByIdQuery,
   useDislikeMutation,
   useLikeMutation,
+  useEditPostMutation,
 } = api

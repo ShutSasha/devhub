@@ -42,6 +42,11 @@ export const PostHeader = styled.div`
 
   margin-bottom: 18px;
 `
+export const StyledUserCredentialsContainerWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+`
 
 export const StyledUserCredentialsContainer = styled.div`
   display: flex;

@@ -1,6 +1,11 @@
 import { MouseEvent, useEffect, useRef, useState } from 'react'
 import { useDislikeMutation, useGetPostByIdQuery, useLikeMutation } from '@api/post.api'
-import { StyledAvatar, StyledUserCredentialsContainer, Username } from '@shared/components/post/post.style'
+import {
+  StyledAvatar,
+  StyledUserCredentialsContainer,
+  StyledUserCredentialsContainerWrapper,
+  Username,
+} from '@shared/components/post/post.style'
 import { PostViewLayout } from '@shared/layouts/posts/post-view.layout'
 import { useNavigate, useParams } from 'react-router-dom'
 import { parseDate } from '@utils/parseDate.util'
@@ -11,6 +16,7 @@ import { handleServerException } from '@utils/handleServerException.util'
 import { toast } from 'react-toastify'
 import { ROUTES } from '@pages/router/routes.enum'
 import { useGetUserReactionsQuery } from '@api/user.api'
+import editPostSVG from '@assets/images/post/edit-post-icon.svg'
 
 import {
   ActionContainer,
@@ -130,14 +136,23 @@ export const PostView = () => {
 
   return (
     <PostViewLayout>
-      <StyledUserCredentialsContainer style={{ marginBottom: '20px' }}>
-        <StyledAvatar
-          onClick={() => navigate(ROUTES.USER_PROFILE.replace(':id', post.user._id))}
-          style={{ height: '60px', width: '60px', cursor: 'pointer' }}
-          src={post.user.avatar}
-        />
-        <Username style={{ fontSize: '26px', lineHeight: '36px', fontWeight: '500' }}>{post.user.username}</Username>
-      </StyledUserCredentialsContainer>
+      <StyledUserCredentialsContainerWrapper>
+        <StyledUserCredentialsContainer style={{ marginBottom: '20px' }}>
+          <StyledAvatar
+            onClick={() => navigate(ROUTES.USER_PROFILE.replace(':id', post.user._id))}
+            style={{ height: '60px', width: '60px', cursor: 'pointer' }}
+            src={post.user.avatar}
+          />
+          <Username style={{ fontSize: '26px', lineHeight: '36px', fontWeight: '500' }}>{post.user.username}</Username>
+        </StyledUserCredentialsContainer>
+        {user?._id === post.user._id && (
+          <img
+            onClick={() => navigate(ROUTES.EDIT_POST.replace(':id', post._id))}
+            style={{ alignSelf: 'flex-start', cursor: 'pointer' }}
+            src={editPostSVG}
+          />
+        )}
+      </StyledUserCredentialsContainerWrapper>
       <PostTitle>{post.title}</PostTitle>
       {post.headerImage && (
         <PostImage src={'https://mydevhubimagebucket.s3.eu-west-3.amazonaws.com/' + post.headerImage} />
