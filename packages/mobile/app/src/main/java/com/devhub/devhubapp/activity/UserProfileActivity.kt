@@ -115,6 +115,7 @@ class UserProfileActivity : AppCompatActivity() {
             post.user = User(
                 _id = user._id,
                 name = user.name,
+                bio = user.bio,
                 username = user.username,
                 avatar = user.avatar,
                 email = "",
@@ -122,7 +123,7 @@ class UserProfileActivity : AppCompatActivity() {
                 devPoints = 0,
                 activationCode = "",
                 isActivated = true,
-                roles = emptyArray()
+                userRole = emptyArray()
             )
             val postFragment = PostFragment.newInstance(post)
             fragmentManager.beginTransaction()
@@ -157,10 +158,5 @@ class UserProfileActivity : AppCompatActivity() {
         })
     }
 
-    private fun String.toDate(): Date {
-        val format = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
-        format.timeZone = TimeZone.getTimeZone("UTC")
-        return format.parse(this) ?: Date()
-    }
 }
 
