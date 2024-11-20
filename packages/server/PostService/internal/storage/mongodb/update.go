@@ -35,13 +35,9 @@ func (s *Storage) Update(
 		updateFields["content"] = content
 	}
 
-	if headerImage != "" {
-		updateFields["headerImage"] = headerImage
-	}
+	updateFields["headerImage"] = headerImage
 
-	if tags != nil {
-		updateFields["tags"] = tags
-	}
+	updateFields["tags"] = tags
 
 	update := bson.M{}
 	if len(updateFields) > 0 {

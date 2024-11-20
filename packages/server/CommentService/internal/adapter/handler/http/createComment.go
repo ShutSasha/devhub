@@ -44,12 +44,18 @@ func (ch *CommentHandler) Create() http.HandlerFunc {
 		var request createCommentRequest
 		if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 			utils.HandleError(log, w, r, "failed to devode request body",
-				err, http.StatusBadRequest, "comment", err.Error())
+				err, http.StatusBadRequest, "body", err.Error())
+			return
+		}
+
+		if request.UserId == "" {
+			utils.HandleError(log, w, r, "user id is not provided",
+				fmt.Errorf("user id is not provided"), http.StatusBadRequest, "body", "user is not authorized")
 			return
 		}
 		if err := validator.New().Struct(request); err != nil {
-			utils.HandleError(log, w, r, "invalid request",
-				fmt.Errorf("the user is not authorised"), http.StatusBadRequest, "user", "The user is not authorised")
+			utils.HandleError(log, w, r, err.Error(),
+				err, http.StatusBadRequest, "body", err.Error())
 			return
 		}
 
