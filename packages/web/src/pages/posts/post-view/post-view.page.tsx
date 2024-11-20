@@ -51,6 +51,7 @@ export const PostView = () => {
   const [dislike] = useDislikeMutation()
   const [isLiked, setLiked] = useState<boolean>(false)
   const [isDisliked, setDisliked] = useState<boolean>(false)
+  const [isDisableBtn, setDisabledBtn] = useState<boolean>(false)
 
   useEffect(() => {
     if (post && userReactions) {
@@ -91,6 +92,7 @@ export const PostView = () => {
 
   const handlePostComment = async () => {
     try {
+      setDisabledBtn(true)
       const response = await createComment({
         content: comment.current?.textContent,
         postId: id,
@@ -107,6 +109,8 @@ export const PostView = () => {
     } catch (e) {
       console.error(e)
       toast.error(handleServerException(e as ErrorException)?.join(', '))
+    } finally {
+      setDisabledBtn(false)
     }
   }
 
@@ -186,7 +190,9 @@ export const PostView = () => {
       <WriteCommentContainer>
         <StyledAvatar src={user?.avatar || 'https://i.pinimg.com/736x/ed/af/52/edaf52b72775ebb5d6fa004bed32526b.jpg'} />
         <InputContainer ref={comment} />
-        <PostBtn onClick={handlePostComment}>Post</PostBtn>
+        <PostBtn disabled={isDisableBtn} onClick={handlePostComment}>
+          Post
+        </PostBtn>
       </WriteCommentContainer>
 
       {Array.isArray(post.comments) &&
