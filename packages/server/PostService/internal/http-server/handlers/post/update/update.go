@@ -127,24 +127,14 @@ func New(log *slog.Logger, postUpdater interfaces.PostUpdater, postProvider inte
 			return
 		}
 
-		if _, _, err := r.FormFile("headerImage"); err == nil {
+		if _, fileHeader, err := r.FormFile("headerImage"); err == nil && fileHeader != nil && fileHeader.Filename != "" {
 			fileRemoveErr := fileRemover.Remove(context.TODO(), post.HeaderImage)
 			if fileRemoveErr != nil {
 				log.Error("failed to delete post image from aws", sl.Err(fileRemoveErr))
 			} else {
 				log.Info("header image successfuly deleted from aws")
 			}
-		} else if err != http.ErrMissingFile {
-			utils.HandleError(log, w, r, "error retrieving file", err, http.StatusBadRequest, "headerImage", "Failed to retrieve file")
-			return
-		}
 
-		if headerImageValue := r.FormValue("headerImage"); headerImageValue != "" {
-			log.Info("headerImageValue " + headerImageValue)
-			if headerImageValue == post.HeaderImage {
-				req.HeaderImage = post.HeaderImage
-			}
-		} else if _, _, err := r.FormFile("headerImage"); err == nil {
 			newImageKey, err := utils.HandleFileUpload(log, r, post.User.Id, fileSaver)
 			if err != nil {
 				utils.HandleError(log, w, r, "file upload error", err, http.StatusBadRequest, "headerImage", "Failed to retrieve or save file")
@@ -168,6 +158,8 @@ func New(log *slog.Logger, postUpdater interfaces.PostUpdater, postProvider inte
 			utils.HandleError(log, w, r, "no fields provided for update", nil, http.StatusBadRequest, "body", "At least one field must be provided")
 			return
 		}
+
+		log.Info("headerImage: " + req.HeaderImage)
 
 		err = postUpdater.Update(
 			context.TODO(),
