@@ -91,6 +91,18 @@
                     app:layout_constraintStart_toEndOf="@id/profile_image"
                     app:layout_constraintTop_toTopOf="@id/profile_image" />
 
+
+
+                <ImageView
+                    android:id="@+id/edit_post_button"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_edit"
+                    android:visibility="gone"
+                    android:clickable="true"
+                    android:focusable="true"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/username" />
                 <!--                <ImageView
                                     android:id="@+id/star_icon"
                                     android:layout_width="24dp"
