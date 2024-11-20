@@ -9,6 +9,7 @@ import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Multipart
+import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Part
 import retrofit2.http.Path
@@ -31,6 +32,21 @@ interface PostAPI {
         @Part headerImage: MultipartBody.Part?
     ): Call<Post>
 
+    @Multipart
+    @PATCH("posts/{id}")
+    fun updatePost(
+        @Path("id") postId: String,
+        @Part("title") title: RequestBody,
+        @Part("content") content: RequestBody,
+        @Part("tags") tags: RequestBody,
+        @Part headerImage: MultipartBody.Part?
+    ): Call<Post>
+
+    @GET("posts/{id}")
+    fun getPostById(
+        @Path("id") postId: String
+    ): Call<Post>
+
     @POST("posts/{id}/like")
     fun likePost(
         @Path("id") postId: String,
@@ -42,4 +58,5 @@ interface PostAPI {
         @Path("id") postId: String,
         @Body requestBody: UserIdRequest
     ): Call<Post>
+
 }
