@@ -140,6 +140,7 @@ func New(log *slog.Logger, postUpdater interfaces.PostUpdater, postProvider inte
 		}
 
 		if headerImageValue := r.FormValue("headerImage"); headerImageValue != "" {
+			log.Info("headerImageValue " + headerImageValue)
 			if headerImageValue == post.HeaderImage {
 				req.HeaderImage = post.HeaderImage
 			}
