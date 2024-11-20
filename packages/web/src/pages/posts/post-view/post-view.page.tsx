@@ -1,5 +1,5 @@
 import { MouseEvent, useEffect, useRef, useState } from 'react'
-import { useDislikeMutation, useGetPostByIdQuery, useLikeMutation } from '@api/post.api'
+import { useDeletePostMutation, useDislikeMutation, useGetPostByIdQuery, useLikeMutation } from '@api/post.api'
 import {
   StyledAvatar,
   StyledUserCredentialsContainer,
@@ -17,6 +17,7 @@ import { toast } from 'react-toastify'
 import { ROUTES } from '@pages/router/routes.enum'
 import { useGetUserReactionsQuery } from '@api/user.api'
 import editPostSVG from '@assets/images/post/edit-post-icon.svg'
+import deletePostSVG from '@assets/images/post/delete-post-ic.svg'
 
 import {
   ActionContainer,
@@ -46,6 +47,7 @@ export const PostView = () => {
   const user = useAppSelector(state => state.userSlice.user)
   const comment = useRef<HTMLSpanElement>(null)
   const [createComment] = useCreateCommentMutation()
+  const [deletePost] = useDeletePostMutation()
   const { data: userReactions, refetch: refetchReactions } = useGetUserReactionsQuery({ userId: user?._id })
   const [like] = useLikeMutation()
   const [dislike] = useDislikeMutation()
@@ -114,6 +116,18 @@ export const PostView = () => {
     }
   }
 
+  const handleDeletePost = async () => {
+    try {
+      await deletePost({ id }).unwrap()
+      toast.success('Post has been deleted', { autoClose: 1300 })
+
+      navigate(ROUTES.HOME)
+      window.scrollTo(0, 0)
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
   if (error) {
     return (
       <PostViewLayout>
@@ -149,13 +163,22 @@ export const PostView = () => {
           />
           <Username style={{ fontSize: '26px', lineHeight: '36px', fontWeight: '500' }}>{post.user.username}</Username>
         </StyledUserCredentialsContainer>
-        {user?._id === post.user._id && (
-          <img
-            onClick={() => navigate(ROUTES.EDIT_POST.replace(':id', post._id))}
-            style={{ alignSelf: 'flex-start', cursor: 'pointer' }}
-            src={editPostSVG}
-          />
-        )}
+        <div style={{ alignSelf: 'flex-start' }}>
+          {user?._id === post.user._id && (
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <img
+                onClick={() => navigate(ROUTES.EDIT_POST.replace(':id', post._id))}
+                style={{ cursor: 'pointer' }}
+                src={editPostSVG}
+              />
+              <img
+                onClick={handleDeletePost}
+                style={{ alignSelf: 'flex-start', cursor: 'pointer' }}
+                src={deletePostSVG}
+              />
+            </div>
+          )}
+        </div>
       </StyledUserCredentialsContainerWrapper>
       <PostTitle>{post.title}</PostTitle>
       {post.headerImage && (

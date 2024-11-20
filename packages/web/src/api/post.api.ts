@@ -49,6 +49,12 @@ export const api = createApi({
         body,
       }),
     }),
+    deletePost: builder.mutation<void, { id: string | undefined }>({
+      query: ({ id }) => ({
+        url: `posts/${id}`,
+        method: 'DELETE',
+      }),
+    }),
   }),
 })
 
@@ -60,4 +66,5 @@ export const {
   useDislikeMutation,
   useLikeMutation,
   useEditPostMutation,
+  useDeletePostMutation,
 } = api
