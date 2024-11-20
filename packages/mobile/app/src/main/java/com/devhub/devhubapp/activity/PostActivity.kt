@@ -5,6 +5,7 @@ import android.content.Intent
 import android.icu.text.SimpleDateFormat
 import android.icu.util.TimeZone
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -29,11 +30,25 @@ import androidx.recyclerview.widget.RecyclerView
 import com.devhub.devhubapp.dataClasses.Comment
 import com.devhub.devhubapp.fragment.AddCommentFragment
 import java.util.Locale
-
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import com.devhub.devhubapp.api.PostAPI
+import com.devhub.devhubapp.classes.EncryptedPreferencesManager
+import com.devhub.devhubapp.classes.RetrofitClient
+import com.devhub.devhubapp.dataClasses.UserIdRequest
+import com.devhub.devhubapp.dataClasses.UserReactions
 
 class PostActivity : AppCompatActivity() {
     private lateinit var commentsRecyclerView: RecyclerView
     private lateinit var commentCount: TextView
+    private lateinit var likeIcon: ImageView
+    private lateinit var dislikeIcon: ImageView
+    private lateinit var likeCountTextView: TextView
+    private lateinit var dislikeCountTextView: TextView
+    private lateinit var userReactions: UserReactions
+    private lateinit var encryptedPreferencesManager: EncryptedPreferencesManager
+    private lateinit var postAPI: PostAPI
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,6 +84,29 @@ class PostActivity : AppCompatActivity() {
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
+        }
+
+        encryptedPreferencesManager = EncryptedPreferencesManager(this)
+        postAPI = RetrofitClient.getInstance(this).postAPI
+        userReactions = encryptedPreferencesManager.getUserReactions()
+
+        likeIcon = findViewById(R.id.like_icon)
+        dislikeIcon = findViewById(R.id.dislike_icon)
+        likeCountTextView = findViewById(R.id.like_count)
+        dislikeCountTextView = findViewById(R.id.dislike_count)
+
+        likeCountTextView.text = post.likes.toString()
+        dislikeCountTextView.text = post.dislikes.toString()
+
+        // Update reaction icons based on user reactions
+        updateReactionIcons(post._id)
+
+        // Set click listeners for like and dislike
+        likeIcon.setOnClickListener {
+            handleLikeDislike(post._id, true)
+        }
+        dislikeIcon.setOnClickListener {
+            handleLikeDislike(post._id, false)
         }
 
         findViewById<LinearLayout>(R.id.back_button_container).setOnClickListener {
@@ -130,7 +168,12 @@ class PostActivity : AppCompatActivity() {
         }
         likeCount.text = formatCount(post.likes)
         dislikeCount.text = formatCount(post.dislikes)
-        commentCount.text = formatCount(post.comments.size)
+        if (post.comments.isNullOrEmpty()) {
+            commentCount.text = "0"
+        } else {
+            commentCount.text = formatCount(post.comments.size)
+        }
+
     }
 
     private fun updateCommentsList(newComment: Comment) {
@@ -145,9 +188,73 @@ class PostActivity : AppCompatActivity() {
         commentCount.text = formatCount(currentComments.size)
     }
 
+    private fun updateReactionIcons(postId: String) {
+        val liked = userReactions.likedPosts?.contains(postId) == true
+        val disliked = userReactions.dislikedPosts?.contains(postId) == true
 
-    private fun formatCount(reaction: Int): String {
+        likeIcon.setImageResource(if (liked) R.drawable.ic_like_active else R.drawable.ic_like)
+        dislikeIcon.setImageResource(if (disliked) R.drawable.ic_dislike_active else R.drawable.ic_dislike)
+    }
+
+    private fun handleLikeDislike(postId: String, isLike: Boolean) {
+        val userId = encryptedPreferencesManager.getUserData()._id
+        val requestBody = UserIdRequest(userId)
+
+        val call = if (isLike) {
+            postAPI.likePost(postId, requestBody)
+        } else {
+            postAPI.dislikePost(postId, requestBody)
+        }
+
+        call.enqueue(object : Callback<Post> {
+            override fun onResponse(call: Call<Post>, response: Response<Post>) {
+                if (response.isSuccessful) {
+                    response.body()?.let { updatedPost ->
+                        val updatedLikedPosts = userReactions.likedPosts?.toMutableList() ?: mutableListOf()
+                        val updatedDislikedPosts = userReactions.dislikedPosts?.toMutableList() ?: mutableListOf()
+
+                        if (isLike) {
+                            if (updatedLikedPosts.contains(postId)) {
+                                updatedLikedPosts.remove(postId)
+                            } else {
+                                updatedLikedPosts.add(postId)
+                                updatedDislikedPosts.remove(postId)
+                            }
+                        } else {
+                            if (updatedDislikedPosts.contains(postId)) {
+                                updatedDislikedPosts.remove(postId)
+                            } else {
+                                updatedDislikedPosts.add(postId)
+                                updatedLikedPosts.remove(postId)
+                            }
+                        }
+
+                        userReactions = userReactions.copy(
+                            likedPosts = updatedLikedPosts,
+                            dislikedPosts = updatedDislikedPosts
+                        )
+                        encryptedPreferencesManager.saveUserReactions(userReactions)
+
+                        updateReactionIcons(postId)
+
+                        likeCountTextView.text = formatCount(updatedPost.likes)
+                        dislikeCountTextView.text = formatCount(updatedPost.dislikes)
+                    }
+                } else {
+                    Log.e("PostActivity", "Failed to update reaction: ${response.errorBody()?.string()}")
+                }
+            }
+
+            override fun onFailure(call: Call<Post>, t: Throwable) {
+                Log.e("PostActivity", "Error updating reaction: ${t.message}", t)
+            }
+        })
+    }
+
+
+    private fun formatCount(reaction: Int?): String {
         return when {
+            reaction == null || reaction == 0 -> "0"
             reaction >= 1000 -> String.format("%.1fK", reaction / 1000.0)
             else -> reaction.toString()
         }
@@ -160,6 +267,4 @@ class PostActivity : AppCompatActivity() {
         val date = inputFormat.parse(dateString)
         return outputFormat.format(date)
     }
-
 }
-

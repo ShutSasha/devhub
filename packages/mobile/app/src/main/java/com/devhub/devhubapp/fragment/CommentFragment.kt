@@ -21,10 +21,10 @@ class CommentFragment(val comments: List<Comment>) :
         val username: TextView = itemView.findViewById(R.id.comment_username)
         val commentTime: TextView = itemView.findViewById(R.id.comment_time)
         val commentText: TextView = itemView.findViewById(R.id.comment_text)
-        val likeIcon: ImageView = itemView.findViewById(R.id.comment_like_icon)
+/*        val likeIcon: ImageView = itemView.findViewById(R.id.comment_like_icon)
         val dislikeIcon: ImageView = itemView.findViewById(R.id.comment_dislike_icon)
         val likeCount: TextView = itemView.findViewById(R.id.comment_like_count)
-        val dislikeCount: TextView = itemView.findViewById(R.id.comment_dislike_count)
+        val dislikeCount: TextView = itemView.findViewById(R.id.comment_dislike_count)*/
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CommentViewHolder {
@@ -45,8 +45,8 @@ class CommentFragment(val comments: List<Comment>) :
         holder.username.text = comment.user.username
         holder.commentTime.text = formatDate(comment.createdAt)
         holder.commentText.text = comment.commentText
-        holder.likeCount.text = comment.likes.toString()
-        holder.dislikeCount.text = comment.dislikes.toString()
+/*        holder.likeCount.text = comment.likes.toString()
+        holder.dislikeCount.text = comment.dislikes.toString()*/
     }
 
     override fun getItemCount(): Int = comments.size
