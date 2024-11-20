@@ -97,6 +97,12 @@ func handleReaction(
 			utils.HandleError(log, w, r, "failed to decode from request", err, http.StatusBadRequest, "postId", "failed to decode from request")
 			return
 		}
+
+		if request.UserId == "" {
+			utils.HandleError(log, w, r, "wrong user id", fmt.Errorf("wrong user id"), http.StatusUnauthorized, "user", "user unauthorized")
+			return
+		}
+
 		if err := validator.New().Struct(request); err != nil {
 			validateErr := err.(validator.ValidationErrors)
 			utils.HandleValidatorError(log, w, r, "invalid request", err, validateErr, http.StatusBadRequest)

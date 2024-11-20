@@ -57,6 +57,8 @@ func New(log *slog.Logger, postUpdater interfaces.PostUpdater, postProvider inte
 			slog.String("request_id", middleware.GetReqID(r.Context())),
 		)
 
+		utils.LogRequestBody(r, log)
+
 		if r.FormValue("title") == "" && r.FormValue("content") == "" && (r.FormValue("tags") == "" || r.FormValue("tags") == "[]") {
 			if _, _, err := r.FormFile("headerImage"); err == http.ErrMissingFile {
 				utils.HandleError(log, w, r, "no fields provided for update", nil, http.StatusBadRequest, "body", "At least one field must be provided")
@@ -149,8 +151,7 @@ func New(log *slog.Logger, postUpdater interfaces.PostUpdater, postProvider inte
 			utils.HandleError(log, w, r, "failed to retrieve file", err, http.StatusBadRequest, "headerImage", "Failed to retrieve file")
 			return
 		} else {
-			utils.HandleError(log, w, r, "missing file", http.ErrMissingFile, http.StatusBadRequest, "headerImage", http.ErrMissingFile.Error())
-			return
+			log.Info(http.ErrMissingFile.Error())
 		}
 
 		if req.Title == "" && req.Content == "" && len(req.Tags) == 0 && req.HeaderImage == "" {
