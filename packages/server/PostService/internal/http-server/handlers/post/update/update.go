@@ -26,8 +26,8 @@ import (
 // - HeaderImage: Optional image URL to update the post header.
 // - Tags: Optional list of tags associated with the post.
 type Request struct {
-	Title       string   `json:"title,omitempty" validate:"omitempty,max=128,min=1"`
-	Content     string   `json:"content,omitempty" validate:"omitempty,min=1,max=62792"`
+	Title       string   `json:"title" validate:"required,max=128,min=1"`
+	Content     string   `json:"content" validate:"required,max=62792"`
 	HeaderImage string   `json:"headerImage,omitempty"`
 	Tags        []string `json:"tags,omitempty"`
 }
@@ -65,7 +65,7 @@ func New(log *slog.Logger, postUpdater interfaces.PostUpdater, postProvider inte
 		}
 
 		if r.Header.Get("Content-Type") == "" || !strings.HasPrefix(r.Header.Get("Content-Type"), "multipart/form-data") {
-			utils.HandleError(log, w, r, "Content-Type must be multipart/form-data", fmt.Errorf("invalid content type"), http.StatusBadRequest, "headerImage", "no fields provided")
+			utils.HandleError(log, w, r, "Content-Type must be multipart/form-data", fmt.Errorf("invalid content type"), http.StatusBadRequest, "body", "no fields provided")
 			return
 		}
 

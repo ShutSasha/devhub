@@ -1,10 +1,8 @@
 package com.devhub.devhubapp.activity
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import android.widget.LinearLayout
-import android.widget.ScrollView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -12,20 +10,15 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import com.devhub.devhubapp.R
-import com.devhub.devhubapp.classes.EncryptedPreferencesManager
 import com.devhub.devhubapp.classes.RetrofitClient
-import com.devhub.devhubapp.dataClasses.Post
 import com.devhub.devhubapp.dataClasses.User
 import com.devhub.devhubapp.dataClasses.UserDetail
+import com.devhub.devhubapp.dataClasses.UserReactions
 import com.devhub.devhubapp.fragment.FooterFragment
 import com.devhub.devhubapp.fragment.HeaderFragment
 import com.devhub.devhubapp.fragment.IconAndTextFragment
 import com.devhub.devhubapp.fragment.PostFragment
 import com.devhub.devhubapp.fragment.UserInfoFragment
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -37,11 +30,14 @@ import java.util.TimeZone
 class UserProfileActivity : AppCompatActivity() {
     private lateinit var user: UserDetail
     private lateinit var userId: String
+    private lateinit var userReactions: UserReactions
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_user_profile)
+
+        userReactions = UserReactions(emptyList(), emptyList())
 
         user = UserDetail(
             _id = "",
@@ -78,6 +74,36 @@ class UserProfileActivity : AppCompatActivity() {
 
     }
 
+    private fun fetchUserReactions(id: String) {
+        RetrofitClient.getInstance(applicationContext).userAPI.getUserReactions(id)
+            .enqueue(object : Callback<UserReactions> {
+                override fun onResponse(
+                    call: Call<UserReactions>,
+                    response: Response<UserReactions>
+                ) {
+                    if (response.isSuccessful) {
+                        val reactions = response.body()
+                        if (reactions != null) {
+                            userReactions = reactions
+                            Log.i("UserReactions", "User reactions successfully retrieved")
+                            setUpFragments()
+                        } else {
+                            Log.e("UserReactions", "Response body is null")
+                        }
+                    } else {
+                        Log.e(
+                            "UserReactions",
+                            "Failed with error: ${response.errorBody()?.string()}"
+                        )
+                    }
+                }
+
+                override fun onFailure(call: Call<UserReactions>, t: Throwable) {
+                    Log.e("UserReactions", "Request failed: ${t.message}")
+                }
+            })
+    }
+
     private fun setUpFragments() {
         val fragmentManager: FragmentManager = supportFragmentManager
         val fragmentTransaction: FragmentTransaction = fragmentManager.beginTransaction()
@@ -105,7 +131,8 @@ class UserProfileActivity : AppCompatActivity() {
         } else {
             "${user.comments?.size} comments written"
         }
-        val commentsNumberFragment = IconAndTextFragment.newInstance(commentsText, R.drawable.ic_comment)
+        val commentsNumberFragment =
+            IconAndTextFragment.newInstance(commentsText, R.drawable.ic_comment)
         fragmentTransaction.add(R.id.commentsNumberContainer, commentsNumberFragment)
 
         val container = findViewById<LinearLayout>(R.id.posts_container)
@@ -124,7 +151,7 @@ class UserProfileActivity : AppCompatActivity() {
                 isActivated = true,
                 roles = emptyArray()
             )
-            val postFragment = PostFragment.newInstance(post)
+            val postFragment = PostFragment.newInstance(post, userReactions)
             fragmentManager.beginTransaction()
                 .add(container.id, postFragment)
                 .commit()
@@ -134,28 +161,31 @@ class UserProfileActivity : AppCompatActivity() {
     }
 
     private fun getUserData(id: String) {
-        RetrofitClient.getInstance(applicationContext).userAPI.getUserDetail(id).enqueue(object : Callback<UserDetail> {
-            override fun onResponse(call: Call<UserDetail>, response: Response<UserDetail>) {
-                if (response.isSuccessful) {
-                    val data = response.body()
-                    if (data != null) {
-                        user = data
-                        Log.i("UserDetail", "UserDetail successfully retrieved")
-                        Log.e("UserDetail", user.posts.toString())
-                        setUpFragments()
-                    } else {
-                        Log.e("UserDetail", "Response body is null")
-                    }
-                } else {
-                    Log.e("UserDetail", "Failed with error: ${response.errorBody()?.string()}")
-                }
-            }
+        RetrofitClient.getInstance(applicationContext).userAPI.getUserDetail(id)
+            .enqueue(object : Callback<UserDetail> {
+                override fun onResponse(call: Call<UserDetail>, response: Response<UserDetail>) {
+                    if (response.isSuccessful) {
+                        val data = response.body()
+                        if (data != null) {
+                            user = data
+                            Log.i("UserDetail", "UserDetail successfully retrieved")
+                            Log.e("UserDetail", user.posts.toString())
 
-            override fun onFailure(call: Call<UserDetail>, t: Throwable) {
-                Log.e("UserDetail", "Request failed: ${t.message}")
-            }
-        })
+                            fetchUserReactions(id)
+                        } else {
+                            Log.e("UserDetail", "Response body is null")
+                        }
+                    } else {
+                        Log.e("UserDetail", "Failed with error: ${response.errorBody()?.string()}")
+                    }
+                }
+
+                override fun onFailure(call: Call<UserDetail>, t: Throwable) {
+                    Log.e("UserDetail", "Request failed: ${t.message}")
+                }
+            })
     }
+
 
     private fun String.toDate(): Date {
         val format = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())

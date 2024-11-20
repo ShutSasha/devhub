@@ -28,7 +28,7 @@ import (
 type Request struct {
 	UserId      string   `json:"userId" validate:"required"`
 	Title       string   `json:"title" validate:"required,max=128,min=1"`
-	Content     string   `json:"content" validate:"required,max=62792"`
+	Content     string   `json:"content" validate:"required,max=62792,min=1"`
 	HeaderImage string   `json:"headerImage,omitempty"`
 	Tags        []string `json:"tags,omitempty"`
 }
