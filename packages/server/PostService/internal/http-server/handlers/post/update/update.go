@@ -127,46 +127,39 @@ func New(log *slog.Logger, postUpdater interfaces.PostUpdater, postProvider inte
 			return
 		}
 
-		if _, _, err := r.FormFile("headerImage"); err == nil {
+		if _, fileHeader, err := r.FormFile("headerImage"); err == nil && fileHeader != nil && fileHeader.Filename != "" {
 			fileRemoveErr := fileRemover.Remove(context.TODO(), post.HeaderImage)
 			if fileRemoveErr != nil {
 				log.Error("failed to delete post image from aws", sl.Err(fileRemoveErr))
 			} else {
 				log.Info("header image successfuly deleted from aws")
 			}
-		} else if err != http.ErrMissingFile {
-			utils.HandleError(log, w, r, "error retrieving file", err, http.StatusBadRequest, "headerImage", "Failed to retrieve file")
-			return
-		}
 
-		_, _, err = r.FormFile("headerImage")
-		if err != nil {
-			if err != http.ErrMissingFile {
-				utils.HandleError(log, w, r, "failed to retrieve file", err, http.StatusBadRequest, "headerImage", "Failed to retrieve file")
-				return
-			}
-		} else {
 			newImageKey, err := utils.HandleFileUpload(log, r, post.User.Id, fileSaver)
 			if err != nil {
 				utils.HandleError(log, w, r, "file upload error", err, http.StatusBadRequest, "headerImage", "Failed to retrieve or save file")
 				return
 			}
-			log.Info("new post image successfuly saved to aws")
+			log.Info("new post image successfully saved to AWS")
 
-			err = fileRemover.Remove(context.TODO(), post.HeaderImage)
-			if err != nil {
-				log.Error("failed to delete previous post image from aws", sl.Err(err))
+			if err := fileRemover.Remove(context.TODO(), post.HeaderImage); err != nil {
+				log.Error("failed to delete previous post image from AWS", sl.Err(err))
 			} else {
-				log.Info("previous post image successfuly deleted from aws")
+				log.Info("previous post image successfully deleted from AWS")
 			}
 
 			req.HeaderImage = newImageKey
+		} else if err != http.ErrMissingFile {
+			utils.HandleError(log, w, r, "failed to retrieve file", err, http.StatusBadRequest, "headerImage", "Failed to retrieve file")
+			return
 		}
 
 		if req.Title == "" && req.Content == "" && len(req.Tags) == 0 && req.HeaderImage == "" {
 			utils.HandleError(log, w, r, "no fields provided for update", nil, http.StatusBadRequest, "body", "At least one field must be provided")
 			return
 		}
+
+		log.Info("headerImage: " + req.HeaderImage)
 
 		err = postUpdater.Update(
 			context.TODO(),
