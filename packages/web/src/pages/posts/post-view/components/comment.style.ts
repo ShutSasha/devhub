@@ -7,6 +7,10 @@ export const CommentContainer = styled.div`
   gap: 12px;
   padding: 12px 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+
+  &:last-child {
+    border: none;
+  }
 `
 
 export const CommentInnerContainer = styled.div`

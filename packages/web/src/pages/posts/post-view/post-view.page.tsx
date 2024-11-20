@@ -1,6 +1,11 @@
 import { MouseEvent, useEffect, useRef, useState } from 'react'
-import { useDislikeMutation, useGetPostByIdQuery, useLikeMutation } from '@api/post.api'
-import { StyledAvatar, StyledUserCredentialsContainer, Username } from '@shared/components/post/post.style'
+import { useDeletePostMutation, useDislikeMutation, useGetPostByIdQuery, useLikeMutation } from '@api/post.api'
+import {
+  StyledAvatar,
+  StyledUserCredentialsContainer,
+  StyledUserCredentialsContainerWrapper,
+  Username,
+} from '@shared/components/post/post.style'
 import { PostViewLayout } from '@shared/layouts/posts/post-view.layout'
 import { useNavigate, useParams } from 'react-router-dom'
 import { parseDate } from '@utils/parseDate.util'
@@ -11,6 +16,8 @@ import { handleServerException } from '@utils/handleServerException.util'
 import { toast } from 'react-toastify'
 import { ROUTES } from '@pages/router/routes.enum'
 import { useGetUserReactionsQuery } from '@api/user.api'
+import editPostSVG from '@assets/images/post/edit-post-icon.svg'
+import deletePostSVG from '@assets/images/post/delete-post-ic.svg'
 
 import {
   ActionContainer,
@@ -40,13 +47,17 @@ export const PostView = () => {
   const user = useAppSelector(state => state.userSlice.user)
   const comment = useRef<HTMLSpanElement>(null)
   const [createComment] = useCreateCommentMutation()
+  const [deletePost] = useDeletePostMutation()
   const { data: userReactions, refetch: refetchReactions } = useGetUserReactionsQuery({ userId: user?._id })
   const [like] = useLikeMutation()
   const [dislike] = useDislikeMutation()
   const [isLiked, setLiked] = useState<boolean>(false)
   const [isDisliked, setDisliked] = useState<boolean>(false)
+  const [isDisableBtn, setDisabledBtn] = useState<boolean>(false)
 
   useEffect(() => {
+    refetchReactions()
+    refetch()
     if (post && userReactions) {
       setLiked(userReactions.likedPosts.includes(post._id))
       setDisliked(userReactions.dislikedPosts.includes(post._id))
@@ -85,6 +96,7 @@ export const PostView = () => {
 
   const handlePostComment = async () => {
     try {
+      setDisabledBtn(true)
       const response = await createComment({
         content: comment.current?.textContent,
         postId: id,
@@ -101,6 +113,20 @@ export const PostView = () => {
     } catch (e) {
       console.error(e)
       toast.error(handleServerException(e as ErrorException)?.join(', '))
+    } finally {
+      setDisabledBtn(false)
+    }
+  }
+
+  const handleDeletePost = async () => {
+    try {
+      await deletePost({ id }).unwrap()
+      toast.success('Post has been deleted', { autoClose: 1300 })
+
+      navigate(ROUTES.HOME)
+      window.scrollTo(0, 0)
+    } catch (e) {
+      console.error(e)
     }
   }
 
@@ -130,14 +156,32 @@ export const PostView = () => {
 
   return (
     <PostViewLayout>
-      <StyledUserCredentialsContainer style={{ marginBottom: '20px' }}>
-        <StyledAvatar
-          onClick={() => navigate(ROUTES.USER_PROFILE.replace(':id', post.user._id))}
-          style={{ height: '60px', width: '60px', cursor: 'pointer' }}
-          src={post.user.avatar}
-        />
-        <Username style={{ fontSize: '26px', lineHeight: '36px', fontWeight: '500' }}>{post.user.username}</Username>
-      </StyledUserCredentialsContainer>
+      <StyledUserCredentialsContainerWrapper>
+        <StyledUserCredentialsContainer style={{ marginBottom: '20px' }}>
+          <StyledAvatar
+            onClick={() => navigate(ROUTES.USER_PROFILE.replace(':id', post.user._id))}
+            style={{ height: '60px', width: '60px', cursor: 'pointer' }}
+            src={post.user.avatar}
+          />
+          <Username style={{ fontSize: '26px', lineHeight: '36px', fontWeight: '500' }}>{post.user.username}</Username>
+        </StyledUserCredentialsContainer>
+        <div style={{ alignSelf: 'flex-start' }}>
+          {user?._id === post.user._id && (
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <img
+                onClick={() => navigate(ROUTES.EDIT_POST.replace(':id', post._id))}
+                style={{ cursor: 'pointer' }}
+                src={editPostSVG}
+              />
+              <img
+                onClick={handleDeletePost}
+                style={{ alignSelf: 'flex-start', cursor: 'pointer' }}
+                src={deletePostSVG}
+              />
+            </div>
+          )}
+        </div>
+      </StyledUserCredentialsContainerWrapper>
       <PostTitle>{post.title}</PostTitle>
       {post.headerImage && (
         <PostImage src={'https://mydevhubimagebucket.s3.eu-west-3.amazonaws.com/' + post.headerImage} />
@@ -171,7 +215,9 @@ export const PostView = () => {
       <WriteCommentContainer>
         <StyledAvatar src={user?.avatar || 'https://i.pinimg.com/736x/ed/af/52/edaf52b72775ebb5d6fa004bed32526b.jpg'} />
         <InputContainer ref={comment} />
-        <PostBtn onClick={handlePostComment}>Post</PostBtn>
+        <PostBtn disabled={isDisableBtn} onClick={handlePostComment}>
+          Post
+        </PostBtn>
       </WriteCommentContainer>
 
       {Array.isArray(post.comments) &&
