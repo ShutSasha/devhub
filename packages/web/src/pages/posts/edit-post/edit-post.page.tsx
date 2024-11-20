@@ -103,10 +103,10 @@ export const EditPost = () => {
       const formData = editFormData(postData)
       dispatch(setLoading(true))
 
-      await editPost({ postId: id, body: formData }).unwrap()
-
-      navigate(ROUTES.HOME)
-      window.scrollTo(0, 0)
+      const res = await editPost({ postId: id, body: formData }).unwrap()
+      console.log(res)
+      // navigate(ROUTES.HOME)
+      // window.scrollTo(0, 0)
 
       refretchPostById()
     } catch (e) {
