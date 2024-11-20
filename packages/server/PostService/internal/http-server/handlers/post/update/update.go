@@ -65,7 +65,7 @@ func New(log *slog.Logger, postUpdater interfaces.PostUpdater, postProvider inte
 		}
 
 		if r.Header.Get("Content-Type") == "" || !strings.HasPrefix(r.Header.Get("Content-Type"), "multipart/form-data") {
-			utils.HandleError(log, w, r, "Content-Type must be multipart/form-data", fmt.Errorf("invalid content type"), http.StatusBadRequest, "headerImage", "no fields provided")
+			utils.HandleError(log, w, r, "Content-Type must be multipart/form-data", fmt.Errorf("invalid content type"), http.StatusBadRequest, "body", "no fields provided")
 			return
 		}
 
