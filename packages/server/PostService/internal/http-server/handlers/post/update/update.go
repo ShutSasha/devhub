@@ -127,7 +127,8 @@ func New(log *slog.Logger, postUpdater interfaces.PostUpdater, postProvider inte
 			return
 		}
 
-		if _, fileHeader, err := r.FormFile("headerImage"); err == nil && fileHeader != nil && fileHeader.Filename != "" {
+		if _, _, err := r.FormFile("headerImage"); err == nil {
+			log.Info("removing image")
 			fileRemoveErr := fileRemover.Remove(context.TODO(), post.HeaderImage)
 			if fileRemoveErr != nil {
 				log.Error("failed to delete post image from aws", sl.Err(fileRemoveErr))
@@ -135,18 +136,13 @@ func New(log *slog.Logger, postUpdater interfaces.PostUpdater, postProvider inte
 				log.Info("header image successfuly deleted from aws")
 			}
 
+			log.Info("uploading image")
 			newImageKey, err := utils.HandleFileUpload(log, r, post.User.Id, fileSaver)
 			if err != nil {
 				utils.HandleError(log, w, r, "file upload error", err, http.StatusBadRequest, "headerImage", "Failed to retrieve or save file")
 				return
 			}
 			log.Info("new post image successfully saved to AWS")
-
-			if err := fileRemover.Remove(context.TODO(), post.HeaderImage); err != nil {
-				log.Error("failed to delete previous post image from AWS", sl.Err(err))
-			} else {
-				log.Info("previous post image successfully deleted from AWS")
-			}
 
 			req.HeaderImage = newImageKey
 		} else if err != http.ErrMissingFile {
