@@ -41,8 +41,7 @@ class CreatePostActivity : AppCompatActivity() {
         setContentView(R.layout.activity_create_post)
 
         encryptedPreferencesManager = EncryptedPreferencesManager(this)
-        postAPI = RetrofitClient.getInstance(this).getRetrofit().create(PostAPI::class.java)
-
+        postAPI = RetrofitClient.getInstance(this).postAPI
         val userAvatarView = findViewById<ImageView>(R.id.user_avatar)
         val usernameView = findViewById<TextView>(R.id.username)
         val createPostButton = findViewById<TextView>(R.id.create_post_button)
@@ -84,7 +83,7 @@ class CreatePostActivity : AppCompatActivity() {
             contentErrorView.visibility = View.GONE
             tagsErrorView.visibility = View.GONE
 
-            var isValid = true
+            var isValid = validateInputs(titleText, contentText, tagsText)
 
             if (titleText.isEmpty()) {
                 titleErrorView.visibility = View.VISIBLE
@@ -105,6 +104,8 @@ class CreatePostActivity : AppCompatActivity() {
             }
 
             if (isValid) {
+                val tagsList =
+                    tagsText.split(",").map { it.trim() }.filter { it.isNotEmpty() }.take(MAX_TAGS)
                 createNewPost(
                     userId = user._id,
                     title = titleText,
@@ -128,10 +129,11 @@ class CreatePostActivity : AppCompatActivity() {
         tags: List<String>,
         imageUri: Uri?
     ) {
-        val userIdBody = userId.toRequestBody("multipart/form-data".toMediaTypeOrNull())
-        val titleBody = title.toRequestBody("multipart/form-data".toMediaTypeOrNull())
-        val contentBody = content.toRequestBody("multipart/form-data".toMediaTypeOrNull())
-        val tagsBody = tags.toString().toRequestBody("multipart/form-data".toMediaTypeOrNull())
+
+        val userIdPart = userId.toRequestBody("multipart/form-data".toMediaTypeOrNull())
+        val titlePart = title.toRequestBody("multipart/form-data".toMediaTypeOrNull())
+        val contentPart = content.toRequestBody("multipart/form-data".toMediaTypeOrNull())
+        val tagsPart = tags.toString().toRequestBody("multipart/form-data".toMediaTypeOrNull())
 
         var imagePart: MultipartBody.Part? = null
         if (imageUri != null) {
@@ -146,44 +148,52 @@ class CreatePostActivity : AppCompatActivity() {
             }
         }
 
-        postAPI.createPost(userIdBody, titleBody, contentBody, tagsBody, imagePart)
-            .enqueue(object : Callback<Post> {
-                override fun onResponse(call: Call<Post>, response: Response<Post>) {
-                    if (response.isSuccessful) {
-                        val intent = Intent(this@CreatePostActivity, MainActivity::class.java)
-                        intent.flags =
-                            Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
-                        intent.putExtra("UPDATE_POSTS", true)
-                        startActivity(intent)
-                        finish()
-                    } else {
-                        response.errorBody()?.string()?.let { errorBody ->
-                            if (errorBody.contains("Field validation for 'Title' failed")) {
-                                findViewById<TextView>(R.id.title_error).apply {
-                                    text = "Title is required"
-                                    visibility = View.VISIBLE
-                                }
+        val call = postAPI.createPost(
+            userId = userIdPart,
+            title = titlePart,
+            content = contentPart,
+            tags = tagsPart,
+            headerImage = imagePart
+        )
+        call.enqueue(object : Callback<Post> {
+            override fun onResponse(call: Call<Post>, response: Response<Post>) {
+                if (response.isSuccessful) {
+                    val intent = Intent()
+                    intent.putExtra("UPDATE_POSTS", true)
+                    setResult(RESULT_OK, intent)
+                    finish()
+                } else {
+                    Log.e(
+                        "CreatePostActivity",
+                        "Ошибка создания поста: ${response.errorBody()?.string()}"
+                    )
+                    response.errorBody()?.string()?.let { errorBody ->
+                        if (errorBody.contains("Field validation for 'Title' failed")) {
+                            findViewById<TextView>(R.id.title_error).apply {
+                                text = "Title is required"
+                                visibility = View.VISIBLE
                             }
-                            if (errorBody.contains("Field validation for 'Content' failed")) {
-                                findViewById<TextView>(R.id.content_error).apply {
-                                    text = "Content is required"
-                                    visibility = View.VISIBLE
-                                }
+                        }
+                        if (errorBody.contains("Field validation for 'Content' failed")) {
+                            findViewById<TextView>(R.id.content_error).apply {
+                                text = "Content is required"
+                                visibility = View.VISIBLE
                             }
-                            if (errorBody.contains("too many tags")) {
-                                findViewById<TextView>(R.id.tags_error).apply {
-                                    text = "Too many tags! Please use $MAX_TAGS or fewer."
-                                    visibility = View.VISIBLE
-                                }
+                        }
+                        if (errorBody.contains("too many tags")) {
+                            findViewById<TextView>(R.id.tags_error).apply {
+                                text = "Too many tags! Please use $MAX_TAGS or fewer."
+                                visibility = View.VISIBLE
                             }
                         }
                     }
                 }
+            }
 
-                override fun onFailure(call: Call<Post>, t: Throwable) {
-                    Log.e("CreatePostActivity", "Error creating post: ${t.message}", t)
-                }
-            })
+            override fun onFailure(call: Call<Post>, t: Throwable) {
+                Log.e("CreatePostActivity", "Error creating post: ${t.message}", t)
+            }
+        })
     }
 
     private fun openImagePicker() {
@@ -221,7 +231,6 @@ class CreatePostActivity : AppCompatActivity() {
                 Glide.with(this)
                     .load(selectedImageUri)
                     .into(selectedImageView)
-
                 updateBackgroundControls(showChangeButton = true)
             }
         }
@@ -243,5 +252,34 @@ class CreatePostActivity : AppCompatActivity() {
             }
         }
         return null
+    }
+
+    private fun validateInputs(title: String, content: String, tags: String): Boolean {
+        var isValid = true
+        val titleErrorView = findViewById<TextView>(R.id.title_error)
+        val contentErrorView = findViewById<TextView>(R.id.content_error)
+        val tagsErrorView = findViewById<TextView>(R.id.tags_error)
+        if (title.isEmpty()) {
+            titleErrorView.visibility = View.VISIBLE
+            isValid = false
+        } else {
+            titleErrorView.visibility = View.GONE
+        }
+
+        if (content.isEmpty()) {
+            contentErrorView.visibility = View.VISIBLE
+            isValid = false
+        } else {
+            contentErrorView.visibility = View.GONE
+        }
+
+        if (tags.split(",").any { it.trim().isEmpty() }) {
+            tagsErrorView.visibility = View.VISIBLE
+            isValid = false
+        } else {
+            tagsErrorView.visibility = View.GONE
+        }
+
+        return isValid
     }
 }
