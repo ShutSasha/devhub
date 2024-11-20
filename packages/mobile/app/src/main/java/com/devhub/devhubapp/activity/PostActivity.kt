@@ -130,7 +130,12 @@ class PostActivity : AppCompatActivity() {
         }
         likeCount.text = formatCount(post.likes)
         dislikeCount.text = formatCount(post.dislikes)
-        commentCount.text = formatCount(post.comments.size)
+        if (post.comments.isNullOrEmpty()) {
+            commentCount.text = "0"
+        } else {
+            commentCount.text = formatCount(post.comments.size)
+        }
+
     }
 
     private fun updateCommentsList(newComment: Comment) {
@@ -146,12 +151,14 @@ class PostActivity : AppCompatActivity() {
     }
 
 
-    private fun formatCount(reaction: Int): String {
+    private fun formatCount(reaction: Int?): String {
         return when {
+            reaction == null || reaction == 0 -> "0"
             reaction >= 1000 -> String.format("%.1fK", reaction / 1000.0)
             else -> reaction.toString()
         }
     }
+
 
     private fun formatDate(dateString: String): String {
         val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
