@@ -139,28 +139,28 @@ func New(log *slog.Logger, postUpdater interfaces.PostUpdater, postProvider inte
 			return
 		}
 
-		_, _, err = r.FormFile("headerImage")
-		if err != nil {
-			if err != http.ErrMissingFile {
-				utils.HandleError(log, w, r, "failed to retrieve file", err, http.StatusBadRequest, "headerImage", "Failed to retrieve file")
-				return
+		if headerImageValue := r.FormValue("headerImage"); headerImageValue != "" {
+			if headerImageValue == post.HeaderImage {
+				req.HeaderImage = post.HeaderImage
 			}
-		} else {
+		} else if _, _, err := r.FormFile("headerImage"); err == nil {
 			newImageKey, err := utils.HandleFileUpload(log, r, post.User.Id, fileSaver)
 			if err != nil {
 				utils.HandleError(log, w, r, "file upload error", err, http.StatusBadRequest, "headerImage", "Failed to retrieve or save file")
 				return
 			}
-			log.Info("new post image successfuly saved to aws")
+			log.Info("new post image successfully saved to AWS")
 
-			err = fileRemover.Remove(context.TODO(), post.HeaderImage)
-			if err != nil {
-				log.Error("failed to delete previous post image from aws", sl.Err(err))
+			if err := fileRemover.Remove(context.TODO(), post.HeaderImage); err != nil {
+				log.Error("failed to delete previous post image from AWS", sl.Err(err))
 			} else {
-				log.Info("previous post image successfuly deleted from aws")
+				log.Info("previous post image successfully deleted from AWS")
 			}
 
 			req.HeaderImage = newImageKey
+		} else if err != http.ErrMissingFile {
+			utils.HandleError(log, w, r, "failed to retrieve file", err, http.StatusBadRequest, "headerImage", "Failed to retrieve file")
+			return
 		}
 
 		if req.Title == "" && req.Content == "" && len(req.Tags) == 0 && req.HeaderImage == "" {
