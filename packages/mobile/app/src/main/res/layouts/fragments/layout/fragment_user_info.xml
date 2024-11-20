@@ -127,8 +127,7 @@
             android:layout_gravity="center"
             android:background="@drawable/shape_avatar_border"
             android:clipToOutline="true"
-            android:scaleType="centerCrop"
-            android:src="@drawable/landscape" />
+            android:scaleType="centerCrop" />
 
     </FrameLayout>
 
