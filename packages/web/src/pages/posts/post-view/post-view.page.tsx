@@ -56,6 +56,8 @@ export const PostView = () => {
   const [isDisableBtn, setDisabledBtn] = useState<boolean>(false)
 
   useEffect(() => {
+    refetchReactions()
+    refetch()
     if (post && userReactions) {
       setLiked(userReactions.likedPosts.includes(post._id))
       setDisliked(userReactions.dislikedPosts.includes(post._id))
