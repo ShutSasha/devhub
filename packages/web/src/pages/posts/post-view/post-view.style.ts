@@ -24,7 +24,7 @@ export const PostImage = styled.img`
   width: 100%;
 
   object-fit: cover;
-  object-position: 50% 0%;
+  object-position: 50% 50%;
   box-sizing: border-box;
   border-radius: 8px;
   margin-bottom: 18px;
