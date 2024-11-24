@@ -26,7 +26,6 @@ import com.google.android.flexbox.FlexboxLayout
 import com.google.gson.Gson
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.devhub.devhubapp.dataClasses.Comment
@@ -40,7 +39,6 @@ import com.devhub.devhubapp.classes.EncryptedPreferencesManager
 import com.devhub.devhubapp.classes.RetrofitClient
 import com.devhub.devhubapp.dataClasses.UserIdRequest
 import com.devhub.devhubapp.dataClasses.UserReactions
-import kotlinx.coroutines.launch
 
 class PostActivity : AppCompatActivity() {
     private lateinit var commentsRecyclerView: RecyclerView
@@ -48,6 +46,7 @@ class PostActivity : AppCompatActivity() {
     private lateinit var likeIcon: ImageView
     private lateinit var dislikeIcon: ImageView
     private lateinit var editPostButton: ImageView
+    private lateinit var deletePostButton: ImageView
     private lateinit var likeCountTextView: TextView
     private lateinit var dislikeCountTextView: TextView
     private lateinit var userReactions: UserReactions
@@ -60,7 +59,8 @@ class PostActivity : AppCompatActivity() {
     private val postDetailLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == AppCompatActivity.RESULT_OK) {
-                val updatedPostJson = result.data?.getStringExtra(EditPostActivity.RESULT_UPDATED_POST)
+                val updatedPostJson =
+                    result.data?.getStringExtra(EditPostActivity.RESULT_UPDATED_POST)
                 updatedPostJson?.let {
                     post = Gson().fromJson(it, Post::class.java)
                     displayPost(post)
@@ -72,6 +72,12 @@ class PostActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_post)
+
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.post)) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
 
         val fragmentManager: FragmentManager = supportFragmentManager
         val fragmentTransaction: FragmentTransaction = fragmentManager.beginTransaction()
@@ -85,6 +91,9 @@ class PostActivity : AppCompatActivity() {
         currentUserId = encryptedPreferencesManager.getUserData()._id
         val postJson = intent.getStringExtra("post")
         post = Gson().fromJson(postJson, Post::class.java)
+
+        commentsRecyclerView = findViewById(R.id.comments_recycler_view)
+        commentCount = findViewById(R.id.comment_count)
 
         val addCommentFragment = AddCommentFragment().apply {
             arguments = Bundle().apply {
@@ -101,18 +110,16 @@ class PostActivity : AppCompatActivity() {
 
         post?.let { displayPost(it) }
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.post)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
-
         editPostButton = findViewById(R.id.edit_post_button)
+        deletePostButton = findViewById(R.id.delete_post_button)
         editPostButton.setOnClickListener {
             val intent = Intent(this, EditPostActivity::class.java).apply {
                 putExtra("post", Gson().toJson(post))
             }
             postDetailLauncher.launch(intent)
+        }
+        deletePostButton.setOnClickListener {
+            finish()
         }
 
         userReactions = encryptedPreferencesManager.getUserReactions()
@@ -143,7 +150,6 @@ class PostActivity : AppCompatActivity() {
             setResult(RESULT_OK, intent)
             finish()
         }
-
     }
 
     private fun displayPost(post: Post) {
@@ -152,33 +158,23 @@ class PostActivity : AppCompatActivity() {
         val postTitle: TextView = findViewById(R.id.post_title)
         val postImage: ImageView = findViewById(R.id.post_image)
         val postCreateTime: TextView = findViewById(R.id.post_create_time)
+        val hashtagsContainer: FlexboxLayout = findViewById(R.id.hashtags_container)
         val postContent: TextView = findViewById(R.id.post_content)
         val likeCount: TextView = findViewById(R.id.like_count)
         val dislikeCount: TextView = findViewById(R.id.dislike_count)
-        commentCount = findViewById(R.id.comment_count)
-        commentsRecyclerView = findViewById(R.id.comments_recycler_view)
-        commentsRecyclerView.layoutManager = LinearLayoutManager(this)
-        val sortedComments = post.comments!!.sortedByDescending { it.createdAt }
-        val commentAdapter = CommentFragment(sortedComments)
-        commentsRecyclerView.adapter = commentAdapter
-        commentsRecyclerView.overScrollMode = View.OVER_SCROLL_NEVER
-
-        postImage.visibility = if (post.headerImage == "") View.GONE else View.VISIBLE
+        val commentCount: TextView = findViewById(R.id.comment_count)
+        val commentsRecyclerView: RecyclerView = findViewById(R.id.comments_recycler_view)
 
         Glide.with(this)
             .load(post.user.avatar)
             .into(profileImage)
-
         username.text = post.user.username
         postTitle.text = post.title
-        postCreateTime.text = formatDate(post.createdAt)
-        postContent.text = post.content
-
+        postImage.visibility = if (post.headerImage == "") View.GONE else View.VISIBLE
         Glide.with(this)
             .load("https://mydevhubimagebucket.s3.eu-west-3.amazonaws.com/" + post.headerImage)
             .into(postImage)
-
-        val hashtagsContainer: FlexboxLayout = findViewById(R.id.hashtags_container)
+        postCreateTime.text = formatDate(post.createdAt)
         hashtagsContainer.removeAllViews()
         post.tags?.forEach { tag ->
             val textView = TextView(this)
@@ -194,6 +190,7 @@ class PostActivity : AppCompatActivity() {
             textView.typeface = ResourcesCompat.getFont(this@PostActivity, R.font.inter_bold_font)
             hashtagsContainer.addView(textView)
         }
+        postContent.text = post.content
         likeCount.text = formatCount(post.likes)
         dislikeCount.text = formatCount(post.dislikes)
         if (post.comments.isNullOrEmpty()) {
@@ -201,19 +198,59 @@ class PostActivity : AppCompatActivity() {
         } else {
             commentCount.text = formatCount(post.comments.size)
         }
+        commentsRecyclerView.layoutManager = LinearLayoutManager(this)
+        val sortedComments =
+            post.comments?.sortedByDescending { it.createdAt }?.toMutableList() ?: mutableListOf()
+        val commentAdapter = CommentFragment(sortedComments, currentUserId) {
+            decrementCommentCount()
+        }
+        commentsRecyclerView.adapter = commentAdapter
+        commentsRecyclerView.overScrollMode = View.OVER_SCROLL_NEVER
+    }
 
+    private fun decrementCommentCount() {
+        val currentCount = commentCount.text.toString().toInt()
+        commentCount.text = (currentCount - 1).toString()
     }
 
     private fun setupPostUI() {
         if (currentUserId == post.user._id) {
             editPostButton.visibility = View.VISIBLE
+            deletePostButton.visibility = View.VISIBLE
             editPostButton.setOnClickListener {
                 openEditPostActivity()
             }
+            deletePostButton.setOnClickListener {
+                deletePost()
+            }
         } else {
             editPostButton.visibility = View.GONE
+            deletePostButton.visibility = View.GONE
         }
     }
+
+    private fun deletePost() {
+        postAPI.deletePost(post._id).enqueue(object : Callback<Void> {
+            override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                if (response.isSuccessful) {
+                    val intent = Intent()
+                    intent.putExtra("UPDATE_POSTS", true)
+                    setResult(RESULT_OK, intent)
+                    finish()
+                } else {
+                    Log.e(
+                        "PostActivity",
+                        "Failed to delete post: ${response.errorBody()?.string()}"
+                    )
+                }
+            }
+
+            override fun onFailure(call: Call<Void>, t: Throwable) {
+                Log.e("PostActivity", "Error deleting post: ${t.message}", t)
+            }
+        })
+    }
+
 
     private fun openEditPostActivity() {
         val intent = Intent(this, EditPostActivity::class.java)
@@ -223,11 +260,10 @@ class PostActivity : AppCompatActivity() {
     }
 
     private fun updateCommentsList(newComment: Comment) {
-        val currentComments =
-            (commentsRecyclerView.adapter as CommentFragment).comments.toMutableList()
+        val currentComments = (commentsRecyclerView.adapter as CommentFragment).commentsList
         currentComments.add(0, newComment)
 
-        val commentAdapter = CommentFragment(currentComments)
+        val commentAdapter = CommentFragment(currentComments, currentUserId)
         commentsRecyclerView.adapter = commentAdapter
         commentsRecyclerView.adapter?.notifyDataSetChanged()
 
@@ -256,8 +292,10 @@ class PostActivity : AppCompatActivity() {
             override fun onResponse(call: Call<Post>, response: Response<Post>) {
                 if (response.isSuccessful) {
                     response.body()?.let { updatedPost ->
-                        val updatedLikedPosts = userReactions.likedPosts?.toMutableList() ?: mutableListOf()
-                        val updatedDislikedPosts = userReactions.dislikedPosts?.toMutableList() ?: mutableListOf()
+                        val updatedLikedPosts =
+                            userReactions.likedPosts?.toMutableList() ?: mutableListOf()
+                        val updatedDislikedPosts =
+                            userReactions.dislikedPosts?.toMutableList() ?: mutableListOf()
 
                         if (isLike) {
                             if (updatedLikedPosts.contains(postId)) {
@@ -287,7 +325,10 @@ class PostActivity : AppCompatActivity() {
                         dislikeCountTextView.text = formatCount(updatedPost.dislikes)
                     }
                 } else {
-                    Log.e("PostActivity", "Failed to update reaction: ${response.errorBody()?.string()}")
+                    Log.e(
+                        "PostActivity",
+                        "Failed to update reaction: ${response.errorBody()?.string()}"
+                    )
                 }
             }
 
@@ -296,6 +337,7 @@ class PostActivity : AppCompatActivity() {
             }
         })
     }
+
 
     private fun refreshPost() {
         postAPI.getPostById(post._id).enqueue(object : Callback<Post> {
@@ -306,7 +348,10 @@ class PostActivity : AppCompatActivity() {
                         displayPost(post)
                     }
                 } else {
-                    Log.e("PostActivity", "Failed to refresh post: ${response.errorBody()?.string()}")
+                    Log.e(
+                        "PostActivity",
+                        "Failed to refresh post: ${response.errorBody()?.string()}"
+                    )
                 }
             }
 
@@ -318,7 +363,6 @@ class PostActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        // Здесь можно выполнить повторный запрос к серверу
         refreshPost()
     }
 
