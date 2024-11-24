@@ -3,7 +3,6 @@ package com.devhub.devhubapp.activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.provider.MediaStore
 import android.provider.OpenableColumns
 import android.util.Log
 import android.view.View
@@ -13,6 +12,7 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.devhub.devhubapp.R
 import com.devhub.devhubapp.api.PostAPI
@@ -20,6 +20,9 @@ import com.devhub.devhubapp.classes.EncryptedPreferencesManager
 import com.devhub.devhubapp.classes.RetrofitClient
 import com.devhub.devhubapp.dataClasses.Post
 import com.google.gson.Gson
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -29,6 +32,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.io.File
+import java.net.URL
 
 class EditPostActivity : AppCompatActivity() {
 
@@ -74,7 +78,6 @@ class EditPostActivity : AppCompatActivity() {
         postContent.setText(post.content)
         postTags.setText(post.tags?.joinToString(","))
 
-        Log.d("EditPostActivity", "Header Image URL: ${post.headerImage}")
         if (!post.headerImage.isNullOrEmpty()) {
             Glide.with(this)
                 .load("https://mydevhubimagebucket.s3.eu-west-3.amazonaws.com/" + post.headerImage)
@@ -97,7 +100,7 @@ class EditPostActivity : AppCompatActivity() {
         }
 
         updatePostButton.setOnClickListener {
-            updatePost(imageUri=headerImageUri)
+            updatePost(imageUri = headerImageUri)
         }
 
         val backButton = findViewById<ImageView>(R.id.back_button)
@@ -143,9 +146,8 @@ class EditPostActivity : AppCompatActivity() {
             changeBackgroundButton.visibility = View.INVISIBLE
         }
     }
-    private fun updatePost(imageUri: Uri?) {
 
-        Log.d("EditPostActivity", "Update Post function called")
+    private fun updatePost(imageUri: Uri?) {
         val titleInput = findViewById<EditText>(R.id.title_input).text.toString()
         val contentInput = findViewById<EditText>(R.id.content_input).text.toString()
         val tagsInput = findViewById<EditText>(R.id.tags_input).text.toString()
@@ -154,7 +156,9 @@ class EditPostActivity : AppCompatActivity() {
         val contentBody = contentInput.toRequestBody("text/plain".toMediaTypeOrNull())
         val tagsBody = tagsInput.toRequestBody("text/plain".toMediaTypeOrNull())
         val postId = post._id
+
         var imagePart: MultipartBody.Part? = null
+
         if (imageUri != null) {
             val imageFile = getFileFromUri(imageUri)
             if (imageFile != null) {
@@ -165,8 +169,54 @@ class EditPostActivity : AppCompatActivity() {
                     requestFile
                 )
             }
+        } else if (!post.headerImage.isNullOrEmpty()) {
+            lifecycleScope.launch {
+                try {
+                    val imageFile = downloadImageFromUrl(
+                        "https://mydevhubimagebucket.s3.eu-west-3.amazonaws.com/${post.headerImage}"
+                    )
+                    if (imageFile != null) {
+                        val requestFile = imageFile.asRequestBody("image/jpeg".toMediaTypeOrNull())
+                        imagePart = MultipartBody.Part.createFormData(
+                            "headerImage",
+                            "temp_header_image.jpg",
+                            requestFile
+                        )
+                    }
+                    updatePostAPI(postId, titleBody, contentBody, tagsBody, imagePart)
+                } catch (e: Exception) {
+                    Log.e("EditPostActivity", "Image download error: ${e.message}")
+                }
+            }
+            return
         }
 
+        updatePostAPI(postId, titleBody, contentBody, tagsBody, imagePart)
+    }
+
+    private suspend fun downloadImageFromUrl(url: String): File? {
+        return withContext(Dispatchers.IO) {
+            try {
+                val imageUrl = URL(url)
+                val connection = imageUrl.openConnection()
+                val inputStream = connection.getInputStream()
+                val file = File(cacheDir, "temp_header_image.jpg")
+                file.outputStream().use { output -> inputStream.copyTo(output) }
+                file
+            } catch (e: Exception) {
+                Log.e("EditPostActivity", "Error downloading image: ${e.message}")
+                null
+            }
+        }
+    }
+
+    private fun updatePostAPI(
+        postId: String,
+        titleBody: RequestBody,
+        contentBody: RequestBody,
+        tagsBody: RequestBody,
+        imagePart: MultipartBody.Part?
+    ) {
         val call = postAPI.updatePost(postId, titleBody, contentBody, tagsBody, imagePart)
         call.enqueue(object : Callback<Post> {
             override fun onResponse(call: Call<Post>, response: Response<Post>) {
@@ -185,6 +235,7 @@ class EditPostActivity : AppCompatActivity() {
             }
         })
     }
+
 
     private fun fetchUpdatedPost(postId: String) {
         postAPI.getPostById(postId).enqueue(object : Callback<Post> {

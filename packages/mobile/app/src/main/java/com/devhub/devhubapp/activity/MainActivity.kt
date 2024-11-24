@@ -151,7 +151,6 @@ class MainActivity : AppCompatActivity() {
                         page = page
                     )
                 }
-                Log.e("aboba", postResponse.toString())
                 val posts = postResponse
 
                 if (posts.isNotEmpty()) {
@@ -164,19 +163,17 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
     private fun displayPosts(posts: List<Post>, reactions: UserReactions?) {
-        Log.d("MainActivity", "Displaying posts: $posts")
         val fragmentManager = supportFragmentManager
         val container = findViewById<LinearLayout>(R.id.posts_container)
 
         for (post in posts) {
-/*            if (existingPostsIds.contains(post._id)) continue*/
-
+            if (existingPostsIds.contains(post._id)) continue
             val postFragment = PostFragment.newInstance(post, reactions)
             fragmentManager.beginTransaction()
                 .add(container.id, postFragment)
                 .commit()
-            Log.d("aboba", "new post fragment added")
             existingPostsIds.add(post._id)
         }
     }
