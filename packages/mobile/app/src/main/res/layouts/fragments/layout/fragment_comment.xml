@@ -1,5 +1,4 @@
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -12,15 +11,15 @@
         android:background="@drawable/shape_oval"
         android:clipToOutline="true"
         android:scaleType="centerCrop"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/comment_username"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="12dp"
         android:layout_marginStart="12dp"
+        android:layout_marginBottom="12dp"
         android:fontFamily="@font/montserrat_medium_font"
         android:textColor="@color/text_primary"
         android:textSize="16sp"
@@ -32,13 +31,24 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
-        android:fontFamily="@font/montserrat_medium_font"
-        android:textSize="16sp"
-        android:textColor="@color/textOnDark"
+        android:layout_marginEnd="16dp"
         android:alpha="0.6"
+        android:fontFamily="@font/montserrat_medium_font"
         android:paddingEnd="20dp"
+        android:textColor="@color/textOnDark"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="@id/comment_username"
+        app:layout_constraintEnd_toEndOf="@id/comment_delete_icon" />
+
+    <ImageView
+        android:id="@+id/comment_delete_icon"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:src="@drawable/ic_delete"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="@id/comment_username" />
+        app:layout_constraintTop_toTopOf="parent" />
+
 
     <TextView
         android:id="@+id/comment_text"
