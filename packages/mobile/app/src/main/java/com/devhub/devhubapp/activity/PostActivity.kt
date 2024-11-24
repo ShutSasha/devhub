@@ -42,7 +42,7 @@ import com.devhub.devhubapp.dataClasses.UserReactions
 
 class PostActivity : AppCompatActivity() {
     private lateinit var commentsRecyclerView: RecyclerView
-    private lateinit var commentCount: TextView
+    lateinit var commentCount: TextView
     private lateinit var likeIcon: ImageView
     private lateinit var dislikeIcon: ImageView
     private lateinit var editPostButton: ImageView

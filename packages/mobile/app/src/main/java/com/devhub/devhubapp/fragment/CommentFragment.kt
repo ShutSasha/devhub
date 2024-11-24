@@ -1,5 +1,6 @@
 package com.devhub.devhubapp.fragment
 
+import android.content.Context
 import android.icu.text.SimpleDateFormat
 import android.icu.util.TimeZone
 import android.view.LayoutInflater
@@ -11,6 +12,7 @@ import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.devhub.devhubapp.R
+import com.devhub.devhubapp.activity.PostActivity
 import com.devhub.devhubapp.api.CommentAPI
 import com.devhub.devhubapp.classes.RetrofitClient
 import com.devhub.devhubapp.dataClasses.Comment
@@ -80,8 +82,10 @@ class CommentFragment(
                 if (response.isSuccessful) {
                     commentsList.removeAt(position)
                     notifyItemRemoved(position)
+                    notifyItemRangeChanged(position, commentsList.size)
                     Toast.makeText(view.context, "Комментарий удален", Toast.LENGTH_SHORT).show()
                     onCommentDeleted?.invoke()
+                    updateCommentCount(view.context)
                 } else {
                     Toast.makeText(view.context, "Ошибка удаления", Toast.LENGTH_SHORT).show()
                 }
@@ -91,6 +95,12 @@ class CommentFragment(
                 Toast.makeText(view.context, "Ошибка сети", Toast.LENGTH_SHORT).show()
             }
         })
+    }
+
+    private fun updateCommentCount(context: Context) {
+        (context as? PostActivity)?.let {
+            it.commentCount.text = commentsList.size.toString()
+        }
     }
 
     private fun formatDate(dateString: String): String {
