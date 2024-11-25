@@ -10,8 +10,8 @@ public class User
 {
    [BsonId]
    [BsonRepresentation(BsonType.ObjectId)]
-   [BsonElement("id")] 
-   [JsonPropertyName("id")]
+   [BsonElement("_id")] 
+   [JsonPropertyName("_id")]
    public string Id { get; set; }
    
    [BsonElement("name")] 
@@ -28,6 +28,9 @@ public class User
    
    [BsonElement("email")] 
    public string Email { get; set; }
+   
+   [BsonElement("bio")] 
+   public string Bio { get; set; }
    
    [BsonElement("createdAt")] 
    [BsonRepresentation(BsonType.DateTime)]
@@ -73,6 +76,13 @@ public class User
    [BsonElement("reports")]
    [BsonRepresentation(BsonType.ObjectId)]
    public List<string> Reports { get; set; } = new List<string>();
+
+   [BsonElement("likedPosts")]
+   [BsonRepresentation(BsonType.ObjectId)]
+   public List<string> LikedPosts { get; set; } = new List<string>();
    
-   
+   [BsonElement("dislikedPosts")]
+   [BsonRepresentation(BsonType.ObjectId)]
+   public List<string> DislikedPosts { get; set; } = new List<string>();
+
 }

@@ -22,7 +22,9 @@ type HttpConfig struct {
 }
 
 type GrpcConfig struct {
-	UserServicePort int `yaml:"user_service_port"`
+	UserServicePort    int `yaml:"user_service_port"`
+	PostServicePort    int `yaml:"post_service_port"`
+	CommentServicePort int `yaml:"comment_service_port"`
 }
 
 type AwsConfig struct {

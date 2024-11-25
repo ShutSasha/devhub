@@ -5,6 +5,7 @@ import (
 	"errors"
 	"log/slog"
 	"net/http"
+	"sort"
 
 	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/domain/interfaces"
 	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/http-server/utils"
@@ -42,7 +43,7 @@ func New(log *slog.Logger, postProvider interfaces.PostProvider, fileProvider in
 
 		postId, err := primitive.ObjectIDFromHex(id)
 		if err != nil {
-			utils.HandleError(log, w, r, "failed to create objectId from postId", err, http.StatusBadRequest, "postId", "Invalid postId format")
+			utils.HandleError(log, w, r, "failed to create objectId from postId", err, http.StatusBadRequest, "post", storage.ErrPostNotFound.Error())
 			return
 		}
 
@@ -57,6 +58,17 @@ func New(log *slog.Logger, postProvider interfaces.PostProvider, fileProvider in
 		}
 
 		log.Info("post successfully found", slog.Any("id", postId))
+
+		if post == nil {
+			w.WriteHeader(http.StatusNotFound)
+
+			render.JSON(w, r, map[string]interface{}{})
+			return
+		}
+
+		sort.Slice(post.Comments, func(i, j int) bool {
+			return post.Comments[i].CreatedAt.After(post.Comments[j].CreatedAt)
+		})
 
 		render.JSON(w, r, post)
 	}

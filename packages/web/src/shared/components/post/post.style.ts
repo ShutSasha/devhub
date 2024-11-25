@@ -20,6 +20,7 @@ export const Container = styled.div`
   padding: 12px;
 
   border-radius: 10px;
+  cursor: pointer;
 `
 
 export const HeaderImage = styled.img`
@@ -40,6 +41,11 @@ export const PostHeader = styled.div`
   align-items: center;
 
   margin-bottom: 18px;
+`
+export const StyledUserCredentialsContainerWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 `
 
 export const StyledUserCredentialsContainer = styled.div`
@@ -139,34 +145,34 @@ export const ReactionImage = styled.div`
 `
 
 interface StyledLikeProps {
-  isLiked?: boolean
+  $isLiked?: boolean
 }
 
 export const Like = styled(ReactionImage)<StyledLikeProps>`
-  background-image: ${({ isLiked }) => (isLiked ? `url(${likePressed})` : `url(${like})`)};
-  transition: all 0.25s ease-in;
+  background-image: ${({ $isLiked }) => ($isLiked ? `url(${likePressed})` : `url(${like})`)};
+  transition: all 0.1s ease-in;
 
   &:hover {
-    background-image: ${({ isLiked }) => (isLiked ? `url(${likePressed})` : `url(${likeHover})`)};
+    background-image: ${({ $isLiked }) => ($isLiked ? `url(${likePressed})` : `url(${likeHover})`)};
   }
 `
 
-interface StyledLikeProps {
-  isDisliked?: boolean
+interface StyledDislikeProps {
+  $isDisliked?: boolean
 }
 
-export const Dislike = styled(ReactionImage)<StyledLikeProps>`
-  background-image: ${({ isDisliked }) => (isDisliked ? `url(${dislikePressed})` : `url(${dislike})`)};
-  transition: all 0.25s ease-in;
+export const Dislike = styled(ReactionImage)<StyledDislikeProps>`
+  background-image: ${({ $isDisliked }) => ($isDisliked ? `url(${dislikePressed})` : `url(${dislike})`)};
+  transition: all 0.1s ease-in;
 
   &:hover {
-    background-image: ${({ isDisliked }) => (isDisliked ? `url(${dislikePressed})` : `url(${dislikeHover})`)};
+    background-image: ${({ $isDisliked }) => ($isDisliked ? `url(${dislikePressed})` : `url(${dislikeHover})`)};
   }
 `
 
 export const Comment = styled(ReactionImage)`
   background-image: url(${comment});
-  transition: all 0.25s ease-in;
+  transition: all 0.1s ease-in;
 
   &:hover {
     background-image: url(${commentHover});
@@ -178,5 +184,5 @@ export const StyledCount = styled.p`
   font-family: ${FONTS.INTER};
   font-size: 16px;
   line-height: 18px;
-  font-weight: 4000;
+  font-weight: 400;
 `

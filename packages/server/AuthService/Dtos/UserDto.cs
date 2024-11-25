@@ -13,6 +13,7 @@ public class UserDto
    public string Username { get; set; }
    public string Avatar { get; set; }
    public string Email { get; set; }
+   public string Bio { get; set; }
    public DateTime CreatedAt { get; set; }
    public int DevPoints { get; set; } 
    public string? ActivationCode { get; set; }

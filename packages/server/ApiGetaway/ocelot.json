@@ -168,6 +168,106 @@
          ],
          "UpstreamPathTemplate": "/api/posts",
          "UpstreamHttpMethod": ["GET"]
+      },
+
+      {
+         "DownstreamPathTemplate": "/api/users",
+         "DownstreamScheme": "http",
+         "DownstreamHostAndPorts": [
+            {
+               "Host": "localhost",
+               "Port": 5229
+            }
+         ],
+         "UpstreamPathTemplate": "/api/users",
+         "UpstreamHttpMethod": ["PATCH"]
+      },
+      {
+         "DownstreamPathTemplate": "/api/users/update-photo/{userId}",
+         "DownstreamScheme": "http",
+         "DownstreamHostAndPorts": [
+            {
+               "Host": "localhost",
+               "Port": 5229
+            }
+         ],
+         "UpstreamPathTemplate": "/api/users/update-photo/{userId}",
+         "UpstreamHttpMethod": ["POST"]
+      },
+      {
+         "DownstreamPathTemplate": "/api/users/user-details/{userId}",
+         "DownstreamScheme": "http",
+         "DownstreamHostAndPorts": [
+            {
+               "Host": "localhost",
+               "Port": 5229
+            }
+         ],
+         "UpstreamPathTemplate": "/api/users/user-details/{userId}",
+         "UpstreamHttpMethod": ["GET"]
+      },
+      {
+         "DownstreamPathTemplate": "/api/users/user-reactions/{userId}",
+         "DownstreamScheme": "http",
+         "DownstreamHostAndPorts": [
+            {
+               "Host": "localhost",
+               "Port": 5229
+            }
+         ],
+         "UpstreamPathTemplate": "/api/users/user-reactions/{userId}",
+         "UpstreamHttpMethod": ["GET"]
+      },
+      
+      
+      {
+         "DownstreamPathTemplate": "/api/comments",
+         "DownstreamScheme": "http",
+         "DownstreamHostAndPorts": [
+            {
+               "Host": "localhost",
+               "Port": 8081
+            }
+         ],
+         "UpstreamPathTemplate": "/api/comments",
+         "UpstreamHttpMethod": ["POST"]
+      },
+
+      {
+         "DownstreamPathTemplate": "/api/comments/{id}",
+         "DownstreamScheme": "http",
+         "DownstreamHostAndPorts": [
+            {
+               "Host": "localhost",
+               "Port": 8081
+            }
+         ],
+         "UpstreamPathTemplate": "/api/comments/{id}",
+         "UpstreamHttpMethod": ["GET", "DELETE"]
+      },
+      {
+         "DownstreamPathTemplate": "/api/posts/{id}/like",
+         "DownstreamScheme": "http",
+         "DownstreamHostAndPorts": [
+            {
+               "Host": "localhost",
+               "Port": 8080
+            }
+         ],
+         "UpstreamPathTemplate": "/api/posts/{id}/like",
+         "UpstreamHttpMethod": ["POST"]
+      },
+      {
+         "DownstreamPathTemplate": "/api/posts/{id}/dislike",
+         "DownstreamScheme": "http",
+         "DownstreamHostAndPorts": [
+            {
+               "Host": "localhost",
+               "Port": 8080
+            }
+         ],
+         "UpstreamPathTemplate": "/api/posts/{id}/dislike",
+         "UpstreamHttpMethod": ["POST"]
       }
    ],
    "GlobalConfiguration": {

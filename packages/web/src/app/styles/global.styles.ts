@@ -33,7 +33,9 @@ const GlobalStyle = createGlobalStyle`
   }
 
   button {
-  outline: none !important;
+    cursor: pointer;
+    border: none;
+    outline: none !important;
   }
 
   input {

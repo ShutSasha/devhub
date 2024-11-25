@@ -9,21 +9,26 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.devhub.devhubapp.R
+import com.devhub.devhubapp.activity.MainActivity
 import com.devhub.devhubapp.activity.PostActivity
+import com.devhub.devhubapp.activity.UserProfileActivity
+import com.devhub.devhubapp.classes.EncryptedPreferencesManager
 import com.devhub.devhubapp.classes.RetrofitClient
 import com.devhub.devhubapp.dataClasses.Post
+import com.devhub.devhubapp.dataClasses.UserIdRequest
+import com.devhub.devhubapp.dataClasses.UserReactions
 import com.google.android.flexbox.FlexboxLayout
 import com.google.gson.Gson
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import kotlin.math.log
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class PostFragment : Fragment() {
     private lateinit var post: Post
@@ -35,20 +40,40 @@ class PostFragment : Fragment() {
     private lateinit var likeCountTextView: TextView
     private lateinit var dislikeCountTextView: TextView
     private lateinit var commentCountTextView: TextView
+    private lateinit var commentIcon: ImageView
+    private lateinit var likedPosts: List<String>
+    private lateinit var dislikedPosts: List<String>
+
+    private val postDetailLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == AppCompatActivity.RESULT_OK) {
+                val shouldUpdate = result.data?.getBooleanExtra("UPDATE_POSTS", false) ?: false
+                if (shouldUpdate) {
+                    (activity as? MainActivity)?.refreshPosts()
+                }
+            }
+        }
 
     companion object {
         private const val ARG_POST = "arg_post"
+        private const val ARG_LIKED_POSTS = "arg_liked_posts"
+        private const val ARG_DISLIKED_POSTS = "arg_disliked_posts"
         private const val BASE_URL = "https://mydevhubimagebucket.s3.eu-west-3.amazonaws.com/"
 
-        fun newInstance(post: Post): PostFragment {
+        fun newInstance(post: Post, reactions: UserReactions?): PostFragment {
             val fragment = PostFragment()
             val args = Bundle().apply {
                 putString(ARG_POST, Gson().toJson(post))
+                putStringArrayList(ARG_LIKED_POSTS, ArrayList(reactions?.likedPosts ?: emptyList()))
+                putStringArrayList(
+                    ARG_DISLIKED_POSTS,
+                    ArrayList(reactions?.dislikedPosts ?: emptyList())
+                )
             }
-
             fragment.arguments = args
             return fragment
         }
+
     }
 
     override fun onCreateView(
@@ -61,10 +86,14 @@ class PostFragment : Fragment() {
             post = Gson().fromJson(it, Post::class.java)
         }
 
+        arguments?.let {
+            likedPosts = it.getStringArrayList(ARG_LIKED_POSTS) ?: emptyList()
+            dislikedPosts = it.getStringArrayList(ARG_DISLIKED_POSTS) ?: emptyList()
+        }
+
         view.setOnClickListener {
             openPostDetailActivity()
         }
-
 
         avatar = view.findViewById(R.id.profile_image)
         username = view.findViewById(R.id.username)
@@ -73,6 +102,7 @@ class PostFragment : Fragment() {
         likeCountTextView = view.findViewById(R.id.like_count)
         dislikeCountTextView = view.findViewById(R.id.dislike_count)
         commentCountTextView = view.findViewById(R.id.comment_count)
+        commentIcon = view.findViewById(R.id.comment_icon)
         postImage = view.findViewById(R.id.post_image)
 
         arguments?.getString(ARG_POST)?.let {
@@ -85,10 +115,143 @@ class PostFragment : Fragment() {
         return view
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        avatar = view.findViewById(R.id.profile_image)
+        username = view.findViewById(R.id.username)
+        hashtagsContainer = view.findViewById(R.id.hashtags_container)
+        postTitle = view.findViewById(R.id.post_title)
+        likeCountTextView = view.findViewById(R.id.like_count)
+        dislikeCountTextView = view.findViewById(R.id.dislike_count)
+        commentCountTextView = view.findViewById(R.id.comment_count)
+        commentIcon = view.findViewById(R.id.comment_icon)
+        postImage = view.findViewById(R.id.post_image)
+
+        val likeIcon = view.findViewById<ImageView>(R.id.like_icon)
+        val dislikeIcon = view.findViewById<ImageView>(R.id.dislike_icon)
+
+        likeIcon.setOnClickListener {
+            toggleLike(post._id)
+        }
+
+        dislikeIcon.setOnClickListener {
+            toggleDislike(post._id)
+        }
+
+        displayPost(post)
+    }
+
+    private fun toggleLike(postId: String) {
+        val userId = EncryptedPreferencesManager(requireContext()).getUserData()._id
+
+        val request = UserIdRequest(userId)
+        RetrofitClient.getInstance(requireContext()).postAPI.likePost(postId, request)
+            .enqueue(object :
+                Callback<Post> {
+                override fun onResponse(call: Call<Post>, response: Response<Post>) {
+                    if (response.isSuccessful) {
+                        response.body()?.let {
+                            post.likes = it.likes
+                            post.dislikes = it.dislikes
+
+                            val reactions =
+                                EncryptedPreferencesManager(requireContext()).getUserReactions()
+                            val updatedLikedPosts = reactions.likedPosts?.toMutableList()
+                            val updatedDislikedPosts = reactions.dislikedPosts?.toMutableList()
+
+                            if (updatedLikedPosts != null) {
+                                if (updatedLikedPosts.contains(postId)) {
+                                    updatedLikedPosts.remove(postId)
+                                } else {
+                                    updatedLikedPosts.add(postId)
+                                    if (updatedDislikedPosts != null) {
+                                        updatedDislikedPosts.remove(postId)
+                                    }
+                                }
+                            }
+
+                            val updatedReactions = reactions.copy(
+                                likedPosts = updatedLikedPosts,
+                                dislikedPosts = updatedDislikedPosts
+                            )
+                            EncryptedPreferencesManager(requireContext()).saveUserReactions(
+                                updatedReactions
+                            )
+
+                            updateReactionIcons(it)
+                        }
+                    } else {
+                        Log.e(
+                            "PostFragment",
+                            "Failed to like post: ${response.errorBody()?.string()}"
+                        )
+                    }
+                }
+
+                override fun onFailure(call: Call<Post>, t: Throwable) {
+                    Log.e("PostFragment", "Error liking post: ${t.message}", t)
+                }
+            })
+    }
+
+    private fun toggleDislike(postId: String) {
+        val userId = EncryptedPreferencesManager(requireContext()).getUserData()._id
+
+        val request = UserIdRequest(userId)
+        RetrofitClient.getInstance(requireContext()).postAPI.dislikePost(postId, request)
+            .enqueue(object :
+                Callback<Post> {
+                override fun onResponse(call: Call<Post>, response: Response<Post>) {
+                    if (response.isSuccessful) {
+                        response.body()?.let {
+                            post.likes = it.likes
+                            post.dislikes = it.dislikes
+
+                            val reactions =
+                                EncryptedPreferencesManager(requireContext()).getUserReactions()
+                            val updatedLikedPosts = reactions.likedPosts?.toMutableList()
+                            val updatedDislikedPosts = reactions.dislikedPosts?.toMutableList()
+
+                            if (updatedDislikedPosts != null) {
+                                if (updatedDislikedPosts.contains(postId)) {
+                                    updatedDislikedPosts.remove(postId)
+                                } else {
+                                    updatedDislikedPosts.add(postId)
+                                    if (updatedLikedPosts != null) {
+                                        updatedLikedPosts.remove(postId)
+                                    }
+                                }
+                            }
+
+                            val updatedReactions = reactions.copy(
+                                likedPosts = updatedLikedPosts,
+                                dislikedPosts = updatedDislikedPosts
+                            )
+                            EncryptedPreferencesManager(requireContext()).saveUserReactions(
+                                updatedReactions
+                            )
+
+                            updateReactionIcons(it)
+                        }
+                    } else {
+                        Log.e(
+                            "PostFragment",
+                            "Failed to dislike post: ${response.errorBody()?.string()}"
+                        )
+                    }
+                }
+
+                override fun onFailure(call: Call<Post>, t: Throwable) {
+                    Log.e("PostFragment", "Error disliking post: ${t.message}", t)
+                }
+            })
+    }
+
     private fun openPostDetailActivity() {
         val intent = Intent(requireContext(), PostActivity::class.java)
         intent.putExtra("post", Gson().toJson(post))
-        startActivity(intent)
+        postDetailLauncher.launch(intent)
     }
 
     private fun displayPost(post: Post) {
@@ -98,8 +261,6 @@ class PostFragment : Fragment() {
             .into(avatar)
 
         username.text = post.user.username
-
-        Log.d("PostFragment", "Username: ${post.user.username}")
 
         postTitle.text = post.title
 
@@ -122,29 +283,52 @@ class PostFragment : Fragment() {
             textView.typeface = ResourcesCompat.getFont(requireContext(), R.font.inter_bold_font)
             hashtagsContainer.addView(textView)
         }
-        likeCountTextView.text = formatLikesCount(post.likes)
-        dislikeCountTextView.text = formatDislikesCount(post.dislikes)
-        commentCountTextView.text = formatCommentCount(post.comments.size)
-    }
 
-    private fun formatLikesCount(likes: Int): String {
-        return when {
-            likes >= 1000 -> String.format("%.1fK", likes / 1000.0)
-            else -> likes.toString()
+        likeCountTextView.text = formatCount(post.likes)
+        dislikeCountTextView.text = formatCount(post.dislikes)
+
+        updateReactionIcons(post)
+
+        if (post.comments.isNullOrEmpty()) {
+            commentCountTextView.text = "0"
+            commentCountTextView.visibility = View.VISIBLE
+            commentIcon.visibility = View.VISIBLE
+        } else {
+            commentCountTextView.text = formatCount(post.comments.size)
+            commentCountTextView.visibility = View.VISIBLE
+            commentIcon.visibility = View.VISIBLE
         }
-    }
 
-    private fun formatDislikesCount(dislikes: Int): String {
-        return when {
-            dislikes >= 1000 -> String.format("%.1fK", dislikes / 1000.0)
-            else -> dislikes.toString()
+
+        avatar.setOnClickListener {
+            val intent = Intent(requireContext(), UserProfileActivity::class.java)
+            Log.e("UserId", post.toString())
+            intent.putExtra("USER_ID", post.user._id)
+            startActivity(intent)
         }
+
     }
 
-    private fun formatCommentCount(comments: Int): String {
+    private fun updateReactionIcons(post: Post) {
+        val likeIcon = view?.findViewById<ImageView>(R.id.like_icon)
+        val dislikeIcon = view?.findViewById<ImageView>(R.id.dislike_icon)
+
+        val userReactions = EncryptedPreferencesManager(requireContext()).getUserReactions()
+
+        val isLiked = userReactions.likedPosts?.contains(post._id) == true
+        val isDisliked = userReactions.dislikedPosts?.contains(post._id) == true
+
+        likeIcon?.setImageResource(if (isLiked) R.drawable.ic_like_active else R.drawable.ic_like)
+        dislikeIcon?.setImageResource(if (isDisliked) R.drawable.ic_dislike_active else R.drawable.ic_dislike)
+
+        likeCountTextView.text = formatCount(post.likes)
+        dislikeCountTextView.text = formatCount(post.dislikes)
+    }
+
+    private fun formatCount(reaction: Int): String {
         return when {
-            comments >= 1000 -> String.format("%.1fK", comments / 1000.0)
-            else -> comments.toString()
+            reaction >= 1000 -> String.format("%.1fK", reaction / 1000.0)
+            else -> reaction.toString()
         }
     }
 }

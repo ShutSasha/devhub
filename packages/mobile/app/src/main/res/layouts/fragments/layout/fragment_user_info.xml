@@ -1,0 +1,134 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:context=".fragment.UserInfoFragment">
+
+    <LinearLayout
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:orientation="vertical"
+        android:background="@drawable/shape_post_background"
+        android:layout_marginTop="70dp">
+
+        <TextView
+            android:id="@+id/tvUsername"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="78dp"
+            android:fontFamily="@font/montserrat_semibold_font"
+            android:gravity="center_horizontal"
+            android:textColor="#FFFFFF"
+            android:textSize="32sp"
+            tools:text="Username" />
+
+        <TextView
+            android:id="@+id/tvName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:fontFamily="@font/montserrat_medium_font"
+            android:gravity="center_horizontal"
+            android:textColor="#FFFFFF"
+            android:textSize="20sp"
+            tools:text="Some description" />
+
+        <TextView
+            android:id="@+id/tvDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:fontFamily="@font/montserrat_medium_font"
+            android:gravity="center_horizontal"
+            android:textColor="#FFFFFF"
+            android:textSize="20sp"
+            tools:text="Some description" />
+
+        <TextView
+            android:id="@+id/tvFollowers"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:fontFamily="@font/montserrat_regular_font"
+            android:gravity="center_horizontal"
+            android:textColor="#FFFFFF"
+            android:textSize="20sp"
+            tools:text="0 followers" />
+
+        <LinearLayout
+            android:id="@+id/btnContainer"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:orientation="horizontal"
+            android:weightSum="7"
+            android:layout_marginHorizontal="19dp"
+            android:layout_marginTop="20dp">
+
+            <FrameLayout
+                android:id="@+id/btnPrimary"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="4" />
+
+            <FrameLayout
+                android:id="@+id/btnOutlined"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="3" />
+
+        </LinearLayout>
+
+        <FrameLayout
+            android:id="@+id/editBtnOutlined"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="19dp"
+            android:layout_marginTop="20dp"/>
+
+        <LinearLayout
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:orientation="horizontal"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="18dp"
+            android:gravity="center">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_birthday_cake"
+                android:layout_marginEnd="10dp"/>
+
+            <TextView
+                android:id="@+id/tvDateOfJoining"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:alpha="0.5"
+                android:fontFamily="@font/montserrat_medium_font"
+                android:textColor="@color/accent"
+                android:textSize="14sp"
+                tools:text="Joined on Sep 5, 2024" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <FrameLayout
+        android:layout_width="110dp"
+        android:layout_height="110dp"
+        android:background="@drawable/shape_avatar_container"
+        android:layout_marginTop="26dp"
+        android:layout_gravity="center_horizontal">
+
+        <ImageView
+            android:id="@+id/iv_avatar_photo"
+            android:layout_width="98dp"
+            android:layout_height="98dp"
+            android:layout_gravity="center"
+            android:background="@drawable/shape_avatar_border"
+            android:clipToOutline="true"
+            android:scaleType="centerCrop" />
+
+    </FrameLayout>
+
+</FrameLayout>

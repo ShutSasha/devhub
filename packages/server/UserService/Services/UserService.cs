@@ -1,116 +1,164 @@
-using Grpc.Core;
+using AutoMapper;
 using Microsoft.Extensions.Options;
+using MongoDB.Bson;
 using MongoDB.Driver;
+using MongoDB.Driver.Linq;
+using UserService.Abstracts;
+using UserService.Contracts.User;
+using UserService.Contracts.User;
+using UserService.Dto;
 using UserService.Models.Database;
 using UserService.Models.User;
 
 namespace UserService.Services;
 
-public class UserService : global::UserService.UserService.UserServiceBase
+public class UserService : IUserService
 {
    private readonly ILogger<UserService> _logger;
+   private readonly IStorageService _storageService;
+   private readonly IMapper _mapper;
    private readonly IMongoCollection<User> _userCollection;
+   private readonly IMongoCollection<Post> _postCollection;
+   private readonly IMongoCollection<Comment> _commentCollection;
+
 
    public UserService(IMongoDatabase mongoDatabase, IOptions<MongoDbSettings> mongoDbSettings,
-      ILogger<UserService> logger)
+      ILogger<UserService> logger, IStorageService storageService, IMapper mapper
+      )
    {
       _logger = logger;
+      _storageService = storageService;
+      _mapper = mapper;
+      _commentCollection = mongoDatabase.GetCollection<Comment>("comments");
+      _postCollection = mongoDatabase.GetCollection<Post>("posts");
       _userCollection = mongoDatabase.GetCollection<User>(mongoDbSettings.Value.CollectionName);
    }
 
-   public override async Task<AddPostResponse> AddPostToUser(AddPostRequest request, ServerCallContext context)
+   public async Task<UserDto> EditUser(string id, string name, string bio)
    {
-      var userId = request.UserId;
-
-      var filter = Builders<User>.Filter.Eq(u => u.Id, userId);
-      var update = Builders<User>.Update.Push(u => u.Posts, request.PostId);
-
-      var result = await _userCollection.UpdateOneAsync(filter, update);
-
-
-      if (result.ModifiedCount > 0)
-      {
-         return new AddPostResponse { Success = true, Message = "Post added successfully" };
-      }
-      else
-      {
-         return new AddPostResponse { Success = false, Message = "Failed to add post" };
-      }
-   }
-
-   public override async Task<DeletePostResponse> DeletePostFromUser(DeletePostRequest request,
-      ServerCallContext context)
-   {
-      var filter = Builders<User>.Filter.AnyEq(u => u.Posts, request.PostId);
+      var filter = Builders<User>.Filter.Eq(u => u.Id, id);
       var user = await _userCollection.Find(filter).FirstOrDefaultAsync();
 
       if (user == null)
       {
-         return new DeletePostResponse
-         {
-            Success = false,
-            Message = "User or post not found."
-         };
+         _logger.LogError($"User with ID {id} not found.");
+         throw new Exception($"404:User wasn't found.");
       }
 
-      var update = Builders<User>.Update.Pull(u => u.Posts, request.PostId);
-      var updateResult = await _userCollection.UpdateOneAsync(filter, update);
+      var update = Builders<User>.Update
+         .Set(u => u.Name, name)
+         .Set(u => u.Bio, bio);
 
-      if (updateResult.ModifiedCount > 0)
+      var result = await _userCollection.UpdateOneAsync(filter, update);
+
+      if (result.ModifiedCount == 0)
       {
-         return new DeletePostResponse
-         {
-            Success = true,
-            Message = "Post deleted successfully."
-         };
+         _logger.LogWarning($"No changes were made to user with ID {id}.");
+         throw new Exception($"400:No changes were made.");
       }
-
-      return new DeletePostResponse
-      {
-         Success = false,
-         Message = "Failed to delete post."
-      };
+      var updatedUser = await _userCollection.Find(filter).FirstOrDefaultAsync();
+      _logger.LogInformation($"User with ID {id} updated successfully.");
+      return _mapper.Map<User, UserDto>(updatedUser);
    }
 
-   public override async Task<RestorePostResponse> RestoreUserPost(RestorePostRequest request,
-      ServerCallContext context)
+   public async Task<string> EditUserIcon(string id, string fileName, Stream fileStream, string contentType)
    {
-      var user = await _userCollection.Find(u => u.Id == request.UserId).FirstOrDefaultAsync();
+      var candidate = await _userCollection.Find(u => u.Id == id)
+         .FirstOrDefaultAsync();
 
-      if (user == null)
+      if (candidate == null)
       {
-         return new RestorePostResponse
-         {
-            Success = false,
-            Message = "User wasn't found"
-         };
+         _logger.LogError($"404: User with this {id} not found");
+         throw new Exception($"404: User with this {id} not found");
       }
 
-      if (user.Posts.Contains(request.PostId))
+      var updatePictureResult = await _storageService.UploadFileAsync(id, fileName, fileStream, contentType);
+
+      if (candidate.Avatar.StartsWith("https://mydevhubimagebucket"))
       {
-         return new RestorePostResponse
-         {
-            Success = false,
-            Message = "Post is already restored"
-         };
+         await _storageService.DeleteFileAsync(candidate.Avatar);
       }
 
-      var update = Builders<User>.Update.Push(u => u.Posts, request.PostId);
-      var result = await _userCollection.UpdateOneAsync(u => u.Id == request.UserId, update);
+      candidate.Avatar = updatePictureResult;
+
+      var filter = Builders<User>.Filter.Eq(u => u.Id, id);
+      var update = Builders<User>.Update.Set(u => u.Avatar, candidate.Avatar);
+
+      var result = await _userCollection.UpdateOneAsync(filter, update);
 
       if (result.ModifiedCount > 0)
       {
-         return new RestorePostResponse
-         {
-            Success = true,
-            Message = "Post restored successfully"
-         };
+         _logger.LogInformation($"User {id} avatar updated successfully.");
+         return candidate.Avatar;
+      }
+      else
+      {
+         _logger.LogError($"Failed to update avatar for user {id}.");
+         throw new Exception($"500: Failed to update avatar for user {id}.");
+      }
+   }
+
+   public async Task<User> GetById(string id)
+   {
+      var candidate = await _userCollection.Find(u => u.Id == id).FirstOrDefaultAsync();
+      if (candidate != null)
+      {
+         return candidate;
       }
 
-      return new RestorePostResponse
+      throw new Exception("404: User with this id wasn't found");
+   }
+
+   public async Task<UserReactionsResponse> GetUserReaction(string userId)
+   {
+      var candidate = await GetById(userId);
+      return new UserReactionsResponse
       {
-         Success = false,
-         Message = "Failed to restore post"
+         DislikedPosts = candidate.DislikedPosts,
+         LikedPosts = candidate.LikedPosts,
+      };
+   }
+
+   public async Task<UserDetailsResponse> GetUserDetailsById(string id)
+   {
+      var user = await GetById(id);
+      
+      var posts = await _postCollection
+         .Find(p => user.Posts.Contains(p.Id))
+         .Project(p => new Post // Создаем проекцию
+         {
+            Id = p.Id,
+            Title = p.Title,
+            Content = p.Content,
+            HeaderImage = p.HeaderImage,
+            Likes = p.Likes,
+            Dislikes = p.Dislikes,
+            Tags = p.Tags,
+            CreatedAt = p.CreatedAt
+         })
+         .ToListAsync();
+
+      var comments = await _commentCollection
+         .Find(c => user.Comments.Contains(c.Id))
+         .Project(c => new Comment
+         {
+            Id = c.Id,
+            CommentText = c.CommentText,
+            CreatedAt = c.CreatedAt,
+            PostId = c.PostId,
+         })
+         .ToListAsync();
+
+      return new UserDetailsResponse
+      {
+         Id = user.Id,
+         Bio = user.Bio,
+         Avatar = user.Avatar,
+         CreatedAt = user.CreatedAt,
+         Username = user.UserName,
+         Name = user.Name,
+         Comments = comments,
+         Posts = posts
       };
    }
 }

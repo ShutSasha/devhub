@@ -3,9 +3,18 @@ syntax = "proto3";
 option csharp_namespace = "UserService";
 
 service UserService{
-  rpc AddPostToUser (AddPostRequest) returns (AddPostResponse);
-  rpc DeletePostFromUser (DeletePostRequest) returns (DeletePostResponse);
-  rpc RestoreUserPost (RestorePostRequest) returns (RestorePostResponse);
+  rpc AddPostToUser (AddPostRequest) returns (UserResponse);
+  rpc DeletePostFromUser (DeletePostRequest) returns (UserResponse);
+  rpc RestoreUserPost (RestorePostRequest) returns (UserResponse);
+  rpc AddCommentToUser (AddCommentRequest) returns (UserResponse);
+  rpc DeleteCommentFromUser (DeleteCommentRequest) returns (UserResponse);
+  rpc AddPostReactionToUser(AddReactionRequest) returns (AddReactionResponse);
+  rpc DeleteReactedPost(DeleteReactedPostRequest) returns (UserResponse);
+}
+
+message UserResponse{
+  bool success = 1;
+  string message = 2;
 }
 
 message AddPostRequest{
@@ -13,26 +22,38 @@ message AddPostRequest{
   string postId = 2;
 }
 
-message AddPostResponse{
-  bool success = 1;
-  string message = 2;
-}
-
 message DeletePostRequest{
   string postId = 1;
 }
 
-message DeletePostResponse{
-  bool success = 1;
-  string message = 2;
-}
-
 message RestorePostRequest{
-  string userId= 1;
+  string userId = 1;
   string postId = 2;
 }
 
-message RestorePostResponse{
-  bool success = 1;
-  string message = 2;
+message AddCommentRequest{
+  string id = 1;
+  string commentId = 2;
+}
+
+message DeleteCommentRequest{
+  string userId = 1;
+  string commentId = 2;
+}
+
+message AddReactionRequest{
+  string userId = 1;
+  string postId = 2;
+  string type = 3;
+}
+
+message  AddReactionResponse{
+  int32 likes = 1;
+  int32 dislikes = 2;
+  bool success = 3;
+  string message = 4;
+}
+
+message DeleteReactedPostRequest{
+  string postId = 1;
 }

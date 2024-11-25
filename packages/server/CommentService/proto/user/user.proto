@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+option go_package = "github.com/ShutSasha/devhub/packages/server/CommentService;user";
+
+service UserService{
+  rpc AddPostToUser (AddPostRequest) returns (UserResponse);
+  rpc DeletePostFromUser (DeletePostRequest) returns (UserResponse);
+  rpc RestoreUserPost (RestorePostRequest) returns (UserResponse);
+  rpc AddCommentToUser (AddCommentRequest) returns (UserResponse);
+  rpc DeleteCommentFromUser (DeleteCommentRequest) returns (UserResponse);
+}
+
+message AddPostRequest{
+  string userId = 1;
+  string postId = 2;
+}
+
+message DeletePostRequest{
+  string postId = 1;
+}
+
+message RestorePostRequest{
+  string userId = 1;
+  string postId = 2;
+}
+
+message AddCommentRequest{
+  string id = 1;
+  string commentId = 2;
+}
+
+message DeleteCommentRequest{
+  string userId = 1;
+  string commentId = 2;
+}
+
+message UserResponse{
+  bool success = 1;
+  string message = 2;
+}

@@ -272,7 +272,7 @@ const docTemplate = `{
             "patch": {
                 "description": "This endpoint allows a user to update an existing post with a new title, content, header image, and tags.",
                 "consumes": [
-                    "application/json"
+                    "multipart/form-data"
                 ],
                 "produces": [
                     "application/json"
@@ -290,18 +290,33 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "description": "Update post request body",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/update.Request"
-                        }
+                        "type": "string",
+                        "description": "Title of the post",
+                        "name": "title",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Content of the post",
+                        "name": "content",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "file",
+                        "description": "Header image for the post",
+                        "name": "headerImage",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Optional tags associated with the post (e.g., [tag1,tag2])",
+                        "name": "tags",
+                        "in": "formData"
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Success message",
+                        "description": "Model of the updated post",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -316,33 +331,128 @@ const docTemplate = `{
                     }
                 }
             }
-        }
-    },
-    "definitions": {
-        "models.Comment": {
-            "type": "object",
-            "properties": {
-                "commentText": {
-                    "type": "string"
-                },
-                "createdAt": {
-                    "type": "string"
-                },
-                "likes": {
-                    "type": "integer"
-                },
-                "user": {
-                    "type": "string"
+        },
+        "/api/posts/{id}/dislike": {
+            "post": {
+                "description": "Adds a dislike to the specified post on behalf of a user.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Reactions"
+                ],
+                "summary": "Add a dislike to a post",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Post ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Request data",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/react.ReactionRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
                 }
             }
         },
+        "/api/posts/{id}/like": {
+            "post": {
+                "description": "Adds a like to the specified post on behalf of a user.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Reactions"
+                ],
+                "summary": "Add a like to a post",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Post ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Request data",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/react.ReactionRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
         "models.Post": {
             "type": "object",
             "properties": {
                 "comments": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/models.Comment"
+                        "type": "string"
                     }
                 },
                 "content": {
@@ -374,6 +484,17 @@ const docTemplate = `{
                 }
             }
         },
+        "react.ReactionRequest": {
+            "type": "object",
+            "required": [
+                "userId"
+            ],
+            "properties": {
+                "userId": {
+                    "type": "string"
+                }
+            }
+        },
         "storage.CommentModel": {
             "type": "object",
             "properties": {
@@ -386,11 +507,11 @@ const docTemplate = `{
                 "createdAt": {
                     "type": "string"
                 },
-                "likes": {
-                    "type": "integer"
+                "post": {
+                    "type": "string"
                 },
                 "user": {
-                    "type": "string"
+                    "$ref": "#/definitions/storage.UserModel"
                 }
             }
         },
@@ -452,30 +573,6 @@ const docTemplate = `{
                 },
                 "username": {
                     "type": "string"
-                }
-            }
-        },
-        "update.Request": {
-            "type": "object",
-            "properties": {
-                "content": {
-                    "type": "string",
-                    "maxLength": 62792,
-                    "minLength": 1
-                },
-                "headerImage": {
-                    "type": "string"
-                },
-                "tags": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "title": {
-                    "type": "string",
-                    "maxLength": 128,
-                    "minLength": 1
                 }
             }
         }

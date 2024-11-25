@@ -10,74 +10,43 @@ Before running the services, ensure that you have:
 - All necessary configuration files in place for each service.
 - Installed [Task](https://github.com/go-task/task/releases) to manage the service tasks.
 
+## Steps to get autoupdate of config files
+
+1. **Navigate to scripts folder:**
+   Run this command
+
+   powershell:
+   ```ps1
+   cd  ./scripts; New-Item .env;
+   ```
+
+   cmd
+   ```cmd
+   cd scripts && type NUL > .env
+   ```
+
+   In .env file paste the content that can be obtained from back-end developers.
+
+2. **Ensure that you have installed Python on your PC**
+   In terminal run the following command:
+
+   ```
+   python --version
+   ```
+
+   run
+   ```py
+   pip install requests python-dotenv
+   ```
+
+   run
+   ```
+   npm install
+   ```
+   
 ## Steps to Run All Services
 
-1. **Paste configuration files into services**
-
-   For AuthService paste this appsettings.Development.json file into **root** directory of a service **(Ask Developer for Application key)**
-   
-```json
-{  
-   "Logging": {  
-      "LogLevel": {  
-         "Default": "Information",  
-         "Microsoft.AspNetCore": "Warning"  
-      }  
-   },  
-   "MongoDbSettings":{  
-      "ConnectionUri":"mongodb+srv://root:<db_password>@devhubdb.jsttz.mongodb.net/?retryWrites=true&w=majority&appName=DevHubDB",  
-      "DatabaseName": "DevHubDB",  
-      "CollectionName": "users"  
-   },  
-   "SenderData": {
-	  "SenderPassword": "<app_password>", 
-      "SenderEmail" : "devhubmailsystem@gmail.com"  
-   },   
-   "JwtOptions": {  
-      "AccessSecretKey": "MyExtraMegaSuperKeyThatYouCanUnderstand",  
-      "RefreshSecretKey": "MyExtraMegaSuperRefreshKeyThatYouCanUnderstand"  
-   }
-}
-```
-
-   For UserService paste this appsettings.Development.json file into **root** directory of a service
-   
-```json
-{
-  "Logging": {
-    "LogLevel": {
-      "Default": "Information",
-      "Microsoft.AspNetCore": "Warning"
-    }
-  },
-  "MongoDbSettings":{
-    "ConnectionUri":"mongodb+srv://root:<db_password>@devhubdb.jsttz.mongodb.net/?retryWrites=true&w=majority&appName=DevHubDB",
-    "DatabaseName": "DevHubDB",
-    "CollectionName": "users"
-  }
-}
-
-```
-   
-   For PostService add a **config** folder into **root** directory of a service and paste this config.yaml file into this config folder.
-   
-```yaml
-env: "local"
-storage_path: "mongodb+srv://root:<db_password>@devhubdb.jsttz.mongodb.net/?retryWrites=true&w=majority&appName=DevHubDB"
-http:
-  port: 8080
-  timeout: 10s
-grpc:
-  user_service_port: 5228
-aws:
-  region: "eu-west-3"
-  access_key: ""
-  secret_key: ""
-  bucket: ""
-```
-
-
-2. **Navigate to the project folder:**
+1. **Navigate to the project folder:**
 
    Open a terminal or command prompt, and change the directory to the folder where the services are stored. For example:
 
@@ -85,7 +54,7 @@ aws:
    cd C:/Users/SomeFolder/devhub/packages/server
    ```
 
-3. **Run all services using Task:**
+2. **Run all services using Task:**
 
    To start all services simultaneously, use the following command:
 

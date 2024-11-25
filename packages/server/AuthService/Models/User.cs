@@ -29,6 +29,9 @@ public class User
    [BsonElement("email")] 
    public string Email { get; set; }
    
+   [BsonElement("bio")]
+   public string Bio { get; set; }
+   
    [BsonElement("createdAt")] 
    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
    

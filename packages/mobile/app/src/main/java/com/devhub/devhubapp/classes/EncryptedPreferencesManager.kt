@@ -1,19 +1,12 @@
 package com.devhub.devhubapp.classes
 
 import android.content.Context
-import android.content.Intent
 import android.content.SharedPreferences
-import android.util.Log
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
-import com.devhub.devhubapp.activity.WelcomeActivity
 import com.devhub.devhubapp.api.AuthAPI
-import com.devhub.devhubapp.dataClasses.LoginResponse
-import com.devhub.devhubapp.dataClasses.TokenResponse
 import com.devhub.devhubapp.dataClasses.User
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import com.devhub.devhubapp.dataClasses.UserReactions
 import java.util.Date
 
 class EncryptedPreferencesManager(context: Context) {
@@ -40,7 +33,7 @@ class EncryptedPreferencesManager(context: Context) {
         saveData("username", userData.username ?: "")
         saveData("email", userData.email ?: "")
         saveData("avatar", userData.avatar ?: "")
-        saveData("createdAt", userData.createdAt?.toString() ?: "")
+        saveData("createdAt", userData.createdAt.time)
         saveData("devPoints", userData.devPoints.toString())
         saveData("activationCode", userData.activationCode ?: "")
         saveData("isActivated", userData.isActivated.toString())
@@ -49,7 +42,7 @@ class EncryptedPreferencesManager(context: Context) {
 
     fun getUserData(): User {
 
-        val createdAtLong = sharedPreferences.getLong("createdAt", 0)
+        val createdAtLong = sharedPreferences.getLong("createdAt", 0L)
         val createdAt = Date(createdAtLong)
 
         return User(
@@ -62,16 +55,17 @@ class EncryptedPreferencesManager(context: Context) {
             devPoints = sharedPreferences.getString("devPoints", "0")?.toIntOrNull() ?: 0,
             activationCode = sharedPreferences.getString("activationCode", "") ?: "",
             isActivated = sharedPreferences.getString("isActivated", "false")?.toBoolean() ?: false,
-            roles = sharedPreferences.getString("roles", "")?.split(",")?.toTypedArray() ?: emptyArray()
+            roles = sharedPreferences.getString("roles", "")?.split(",")?.toTypedArray()
+                ?: emptyArray()
         )
     }
 
-    fun saveTokens(access_token: String?, refresh_token: String?){
+    fun saveTokens(access_token: String?, refresh_token: String?) {
         saveData("access_token", access_token ?: "")
         saveData("refresh_token", refresh_token ?: "")
     }
 
-    fun getAccessToken(): String?{
+    fun getAccessToken(): String? {
         return sharedPreferences.getString("access_token", null)
     }
 
@@ -79,8 +73,38 @@ class EncryptedPreferencesManager(context: Context) {
         return sharedPreferences.getString("refresh_token", null)
     }
 
-    fun saveData(key: String, value: String) {
-        sharedPreferences.edit().putString(key, value).apply()
+    fun saveUserReactions(reactions: UserReactions) {
+        saveData("likedPosts", reactions.likedPosts?.joinToString(",") ?: "")
+        saveData("dislikedPosts", reactions.dislikedPosts?.joinToString(",") ?: "")
+    }
+
+    fun getUserReactions(): UserReactions {
+        val likedPosts =
+            sharedPreferences.getString("likedPosts", "")?.split(",")?.filter { it.isNotBlank() }
+                ?: emptyList()
+        val dislikedPosts =
+            sharedPreferences.getString("dislikedPosts", "")?.split(",")?.filter { it.isNotBlank() }
+                ?: emptyList()
+
+        return UserReactions(
+            likedPosts = likedPosts,
+            dislikedPosts = dislikedPosts
+        )
+    }
+
+
+    fun saveData(key: String, value: Any) {
+        val editor = sharedPreferences.edit()
+
+        when (value) {
+            is String -> editor.putString(key, value)
+            is Long -> editor.putLong(key, value)
+            is Int -> editor.putInt(key, value)
+            is Boolean -> editor.putBoolean(key, value)
+            else -> throw IllegalArgumentException("Unsupported data type")
+        }
+
+        editor.apply()
     }
 
     fun getData(key: String): String? {
