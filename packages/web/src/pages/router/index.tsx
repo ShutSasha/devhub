@@ -9,6 +9,9 @@ import { ForgotPasswordVerifyCode } from '@pages/auth/forgot-password/forgot-pas
 import { EnterNewPassword } from '@pages/auth/forgot-password/enter-new-password.page'
 import { CreatePost } from '@pages/posts/create-post/create-post.page'
 import { PostView } from '@pages/posts/post-view/post-view.page'
+import { UserProfile } from '@pages/user/profile/profile.page'
+import { UserEditProfile } from '@pages/user/edit-profile/edit-profile.page'
+import { EditPost } from '@pages/posts/edit-post/edit-post.page'
 
 import { ROUTES } from './routes.enum'
 
@@ -50,8 +53,20 @@ const router = createBrowserRouter([
     element: <CreatePost />,
   },
   {
+    path: `${ROUTES.EDIT_POST}`,
+    element: <EditPost />,
+  },
+  {
     path: `${ROUTES.POST_VIEW}`,
     element: <PostView />,
+  },
+  {
+    path: `${ROUTES.USER_PROFILE}`,
+    element: <UserProfile />,
+  },
+  {
+    path: `${ROUTES.USER_EDIT_PROFILE}`,
+    element: <UserEditProfile />,
   },
 ])
 

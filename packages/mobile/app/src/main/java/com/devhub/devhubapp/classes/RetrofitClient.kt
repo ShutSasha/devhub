@@ -18,7 +18,7 @@ class RetrofitClient private constructor(context: Context) {
 
     private var retrofit: Retrofit
     private val encryptedPreferencesManager = EncryptedPreferencesManager(context)
-    private val authAPI: AuthAPI
+    val authAPI: AuthAPI
     val postAPI: PostAPI
     val commentAPI: CommentAPI
     val userAPI: UserAPI

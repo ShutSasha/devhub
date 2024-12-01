@@ -15,8 +15,7 @@
         android:background="@drawable/shape_oval"
         android:clipToOutline="true"
         android:scaleType="centerCrop"
-        android:layout_marginVertical="5dp"
-        android:src="@drawable/ic_pfp" />
+        android:layout_marginVertical="5dp" />
 
     <EditText
         android:id="@+id/comment_input"

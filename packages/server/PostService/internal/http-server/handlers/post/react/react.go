@@ -39,9 +39,11 @@ type ReactionRequest struct {
 func NewLike(
 	log *slog.Logger,
 	postReactor interfaces.PostReactor,
+	postProvider interfaces.PostProvider,
+	fileProvider interfaces.FileProvider,
 	grpcClient pb.UserServiceClient,
 ) http.HandlerFunc {
-	return handleReaction(log, postReactor, grpcClient, "like")
+	return handleReaction(log, postReactor, postProvider, fileProvider, grpcClient, "like")
 }
 
 // NewDislike adds a dislike to a post.
@@ -59,14 +61,18 @@ func NewLike(
 func NewDislike(
 	log *slog.Logger,
 	postReactor interfaces.PostReactor,
+	postProvider interfaces.PostProvider,
+	fileProvider interfaces.FileProvider,
 	grpcClient pb.UserServiceClient,
 ) http.HandlerFunc {
-	return handleReaction(log, postReactor, grpcClient, "dislike")
+	return handleReaction(log, postReactor, postProvider, fileProvider, grpcClient, "dislike")
 }
 
 func handleReaction(
 	log *slog.Logger,
 	postReactor interfaces.PostReactor,
+	postProvider interfaces.PostProvider,
+	fileProvider interfaces.FileProvider,
 	grpcClient pb.UserServiceClient,
 	reactionType string,
 ) http.HandlerFunc {
@@ -91,6 +97,12 @@ func handleReaction(
 			utils.HandleError(log, w, r, "failed to decode from request", err, http.StatusBadRequest, "postId", "failed to decode from request")
 			return
 		}
+
+		if request.UserId == "" {
+			utils.HandleError(log, w, r, "wrong user id", fmt.Errorf("wrong user id"), http.StatusUnauthorized, "user", "user unauthorized")
+			return
+		}
+
 		if err := validator.New().Struct(request); err != nil {
 			validateErr := err.(validator.ValidationErrors)
 			utils.HandleValidatorError(log, w, r, "invalid request", err, validateErr, http.StatusBadRequest)
@@ -123,7 +135,13 @@ func handleReaction(
 			return
 		}
 
+		post, err := postProvider.GetById(context.TODO(), postObjectId, fileProvider)
+		if err != nil {
+			utils.HandleError(log, w, r, "failed to get post with provided post id", err, http.StatusBadRequest, "postId", "Error providing post")
+			return
+		}
+
 		log.Info(fmt.Sprintf("%s reaction added successfully", reactionType))
-		render.JSON(w, r, map[string]string{"status": "success"})
+		render.JSON(w, r, post)
 	}
 }

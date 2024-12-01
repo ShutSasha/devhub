@@ -28,7 +28,43 @@ export const api = createApi({
         body,
       }),
     }),
+    dislike: builder.mutation<IPost, { postId: string; userId: string | undefined }>({
+      query: ({ postId, userId }) => ({
+        url: `posts/${postId}/dislike`,
+        method: 'POST',
+        body: { userId },
+      }),
+    }),
+    like: builder.mutation<IPost, { postId: string; userId: string | undefined }>({
+      query: ({ postId, userId }) => ({
+        url: `posts/${postId}/like`,
+        method: 'POST',
+        body: { userId },
+      }),
+    }),
+    editPost: builder.mutation<IPost, { postId: string | undefined; body: FormData }>({
+      query: ({ postId, body }) => ({
+        url: `posts/${postId}`,
+        method: 'PATCH',
+        body,
+      }),
+    }),
+    deletePost: builder.mutation<void, { id: string | undefined }>({
+      query: ({ id }) => ({
+        url: `posts/${id}`,
+        method: 'DELETE',
+      }),
+    }),
   }),
 })
 
-export const { useGetPostsQuery, useLazyGetPostsQuery, useCreatePostMutation, useGetPostByIdQuery } = api
+export const {
+  useGetPostsQuery,
+  useLazyGetPostsQuery,
+  useCreatePostMutation,
+  useGetPostByIdQuery,
+  useDislikeMutation,
+  useLikeMutation,
+  useEditPostMutation,
+  useDeletePostMutation,
+} = api

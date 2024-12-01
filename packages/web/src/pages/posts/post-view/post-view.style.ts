@@ -24,7 +24,7 @@ export const PostImage = styled.img`
   width: 100%;
 
   object-fit: cover;
-  object-position: 50% 0%;
+  object-position: 50% 50%;
   box-sizing: border-box;
   border-radius: 8px;
   margin-bottom: 18px;
@@ -96,34 +96,34 @@ export const ReactionImage = styled.div`
 `
 
 interface StyledLikeProps {
-  isLiked?: boolean
+  $isLiked?: boolean
 }
 
 export const Like = styled(ReactionImage)<StyledLikeProps>`
-  background-image: ${({ isLiked }) => (isLiked ? `url(${likePressed})` : `url(${like})`)};
-  transition: all 0.25s ease-in;
+  background-image: ${({ $isLiked }) => ($isLiked ? `url(${likePressed})` : `url(${like})`)};
+  transition: all 0.1s ease-in;
 
   &:hover {
-    background-image: ${({ isLiked }) => (isLiked ? `url(${likePressed})` : `url(${likeHover})`)};
+    background-image: ${({ $isLiked }) => ($isLiked ? `url(${likePressed})` : `url(${likeHover})`)};
   }
 `
 
 interface StyledDislikeProps {
-  isDisliked?: boolean
+  $isDisliked?: boolean
 }
 
 export const Dislike = styled(ReactionImage)<StyledDislikeProps>`
-  background-image: ${({ isDisliked }) => (isDisliked ? `url(${dislikePressed})` : `url(${dislike})`)};
-  transition: all 0.25s ease-in;
+  background-image: ${({ $isDisliked }) => ($isDisliked ? `url(${dislikePressed})` : `url(${dislike})`)};
+  transition: all 0.1s ease-in;
 
   &:hover {
-    background-image: ${({ isDisliked }) => (isDisliked ? `url(${dislikePressed})` : `url(${dislikeHover})`)};
+    background-image: ${({ $isDisliked }) => ($isDisliked ? `url(${dislikePressed})` : `url(${dislikeHover})`)};
   }
 `
 
 export const Comment = styled(ReactionImage)`
   background-image: url(${comment});
-  transition: all 0.25s ease-in;
+  transition: all 0.1s ease-in;
 
   &:hover {
     background-image: url(${commentHover});

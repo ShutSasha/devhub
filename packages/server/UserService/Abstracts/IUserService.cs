@@ -1,4 +1,4 @@
-using UserService.Contracts.Posts;
+using UserService.Contracts.User;
 using UserService.Contracts.User;
 using UserService.Dto;
 using UserService.Models.User;

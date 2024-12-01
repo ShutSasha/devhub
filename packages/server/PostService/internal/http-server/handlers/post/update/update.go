@@ -26,8 +26,8 @@ import (
 // - HeaderImage: Optional image URL to update the post header.
 // - Tags: Optional list of tags associated with the post.
 type Request struct {
-	Title       string   `json:"title,omitempty" validate:"omitempty,max=128,min=1"`
-	Content     string   `json:"content,omitempty" validate:"omitempty,min=1,max=62792"`
+	Title       string   `json:"title" validate:"required,max=128,min=1"`
+	Content     string   `json:"content" validate:"required,max=62792"`
 	HeaderImage string   `json:"headerImage,omitempty"`
 	Tags        []string `json:"tags,omitempty"`
 }
@@ -37,10 +37,13 @@ type Request struct {
 // @Summary Update an existing post
 // @Description This endpoint allows a user to update an existing post with a new title, content, header image, and tags.
 // @Tags posts
-// @Accept json
+// @Accept multipart/form-data
 // @Produce json
 // @Param id path string true "Post ID"
-// @Param request body Request true "Update post request body"
+// @Param title formData string false "Title of the post"
+// @Param content formData string false "Content of the post"
+// @Param headerImage formData file false "Header image for the post"
+// @Param tags formData string false "Optional tags associated with the post (e.g., [tag1,tag2])"
 // @Success 200 {object} map[string]interface{} "Model of the updated post"
 // @Failure 400 {object} map[string]interface{} "Validation errors or request decoding failures"
 // @Router /api/posts/{id} [patch]
@@ -53,6 +56,20 @@ func New(log *slog.Logger, postUpdater interfaces.PostUpdater, postProvider inte
 			slog.String("op", op),
 			slog.String("request_id", middleware.GetReqID(r.Context())),
 		)
+
+		utils.LogRequestBody(r, log)
+
+		if r.FormValue("title") == "" && r.FormValue("content") == "" && (r.FormValue("tags") == "" || r.FormValue("tags") == "[]") {
+			if _, _, err := r.FormFile("headerImage"); err == http.ErrMissingFile {
+				utils.HandleError(log, w, r, "no fields provided for update", nil, http.StatusBadRequest, "body", "At least one field must be provided")
+				return
+			}
+		}
+
+		if r.Header.Get("Content-Type") == "" || !strings.HasPrefix(r.Header.Get("Content-Type"), "multipart/form-data") {
+			utils.HandleError(log, w, r, "Content-Type must be multipart/form-data", fmt.Errorf("invalid content type"), http.StatusBadRequest, "body", "no fields provided")
+			return
+		}
 
 		if err := r.ParseMultipartForm(10 << 20); err != nil {
 			utils.HandleError(log, w, r, "failed to parse multipart form", err, http.StatusInternalServerError, "headerImage", "Failed to parse multipart form")
@@ -113,45 +130,36 @@ func New(log *slog.Logger, postUpdater interfaces.PostUpdater, postProvider inte
 		}
 
 		if _, _, err := r.FormFile("headerImage"); err == nil {
+			log.Info("removing image")
 			fileRemoveErr := fileRemover.Remove(context.TODO(), post.HeaderImage)
 			if fileRemoveErr != nil {
 				log.Error("failed to delete post image from aws", sl.Err(fileRemoveErr))
 			} else {
 				log.Info("header image successfuly deleted from aws")
 			}
-		} else if err != http.ErrMissingFile {
-			utils.HandleError(log, w, r, "error retrieving file", err, http.StatusBadRequest, "headerImage", "Failed to retrieve file")
-			return
-		}
 
-		_, _, err = r.FormFile("headerImage")
-		if err != nil {
-			if err != http.ErrMissingFile {
-				utils.HandleError(log, w, r, "failed to retrieve file", err, http.StatusBadRequest, "headerImage", "Failed to retrieve file")
-				return
-			}
-		} else {
+			log.Info("uploading image")
 			newImageKey, err := utils.HandleFileUpload(log, r, post.User.Id, fileSaver)
 			if err != nil {
 				utils.HandleError(log, w, r, "file upload error", err, http.StatusBadRequest, "headerImage", "Failed to retrieve or save file")
 				return
 			}
-			log.Info("new post image successfuly saved to aws")
-
-			err = fileRemover.Remove(context.TODO(), post.HeaderImage)
-			if err != nil {
-				log.Error("failed to delete previous post image from aws", sl.Err(err))
-			} else {
-				log.Info("previous post image successfuly deleted from aws")
-			}
+			log.Info("new post image successfully saved to AWS")
 
 			req.HeaderImage = newImageKey
+		} else if err != http.ErrMissingFile {
+			utils.HandleError(log, w, r, "failed to retrieve file", err, http.StatusBadRequest, "headerImage", "Failed to retrieve file")
+			return
+		} else {
+			log.Info(http.ErrMissingFile.Error())
 		}
 
 		if req.Title == "" && req.Content == "" && len(req.Tags) == 0 && req.HeaderImage == "" {
 			utils.HandleError(log, w, r, "no fields provided for update", nil, http.StatusBadRequest, "body", "At least one field must be provided")
 			return
 		}
+
+		log.Info("headerImage: " + req.HeaderImage)
 
 		err = postUpdater.Update(
 			context.TODO(),

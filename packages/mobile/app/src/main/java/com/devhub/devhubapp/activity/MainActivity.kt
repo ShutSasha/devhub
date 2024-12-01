@@ -14,6 +14,7 @@ import com.devhub.devhubapp.R
 import com.devhub.devhubapp.classes.EncryptedPreferencesManager
 import com.devhub.devhubapp.classes.RetrofitClient
 import com.devhub.devhubapp.dataClasses.Post
+import com.devhub.devhubapp.dataClasses.UserReactions
 import com.devhub.devhubapp.fragment.FooterFragment
 import com.devhub.devhubapp.fragment.HeaderFragment
 import com.devhub.devhubapp.fragment.PostFragment
@@ -27,6 +28,9 @@ class MainActivity : AppCompatActivity() {
     private var currentPage = 1
     private var isLoading = false
     private lateinit var encryptedPreferencesManager: EncryptedPreferencesManager
+    private lateinit var userReactions: UserReactions
+    private val existingPostsIds = mutableSetOf<String>()
+    private val REQUEST_CODE_CREATE_POST = 101
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,13 +54,12 @@ class MainActivity : AppCompatActivity() {
 
         val fragmentManager = supportFragmentManager
         if (savedInstanceState == null) {
+            fetchUserReactions()
             fragmentManager.beginTransaction()
                 .replace(R.id.header_container, HeaderFragment())
                 .replace(R.id.footer_container, FooterFragment())
                 .commit()
         }
-
-        fetchPostsAndDisplay(currentPage)
 
         val scrollView = findViewById<ScrollView>(R.id.scrollView)
         scrollView.viewTreeObserver.addOnScrollChangedListener {
@@ -71,13 +74,41 @@ class MainActivity : AppCompatActivity() {
 
         if (intent.getBooleanExtra("UPDATE_POSTS", false)) {
             refreshPosts()
+            intent.removeExtra("UPDATE_POSTS")
         }
+    }
+
+    private fun fetchUserReactions() {
+        GlobalScope.launch(Dispatchers.Main) {
+            userReactions = fetchUserReactionsInternal() ?: UserReactions(emptyList(), emptyList())
+        }
+    }
+
+    private suspend fun fetchUserReactionsInternal(): UserReactions? {
+
+        return try {
+            withContext(Dispatchers.IO) {
+                val userId = encryptedPreferencesManager.getUserData()._id
+                val response =
+                    RetrofitClient.getInstance(applicationContext).userAPI.getUserReactions(userId)
+                        .execute()
+                if (response.isSuccessful) response.body() else null
+            }
+        } catch (e: Exception) {
+            Log.e("MainActivity", "Error fetching user reactions: ${e.message}", e)
+            null
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        currentPage = 1
+        fetchPostsAndDisplay(currentPage)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-
-        if (resultCode == RESULT_OK) {
+        if (requestCode == REQUEST_CODE_CREATE_POST && resultCode == RESULT_OK) {
             val updatePosts = data?.getBooleanExtra("UPDATE_POSTS", false) ?: false
             if (updatePosts) {
                 refreshPosts()
@@ -87,22 +118,43 @@ class MainActivity : AppCompatActivity() {
 
     fun refreshPosts() {
         currentPage = 1
+        isLoading = false
+        val fragmentManager = supportFragmentManager
+        val fragments = fragmentManager.fragments
+        for (fragment in fragments) {
+            if (fragment is PostFragment) {
+                fragmentManager.beginTransaction().remove(fragment).commit()
+            }
+        }
+        existingPostsIds.clear()
+
         findViewById<LinearLayout>(R.id.posts_container).removeAllViews()
+
         fetchPostsAndDisplay(currentPage)
     }
 
     private fun fetchPostsAndDisplay(page: Int) {
+        if (page == 1) {
+            findViewById<LinearLayout>(R.id.posts_container).removeAllViews()
+        }
         isLoading = true
         GlobalScope.launch(Dispatchers.Main) {
             try {
-                val posts = withContext(Dispatchers.IO) {
+                if (!this@MainActivity::userReactions.isInitialized) {
+                    userReactions =
+                        fetchUserReactionsInternal() ?: UserReactions(emptyList(), emptyList())
+                }
+
+                val postResponse = withContext(Dispatchers.IO) {
                     RetrofitClient.getInstance(applicationContext).postAPI.getPosts(
                         limit = 10,
                         page = page
                     )
                 }
+                val posts = postResponse
+
                 if (posts.isNotEmpty()) {
-                    displayPosts(posts)
+                    displayPosts(posts, userReactions)
                 }
                 isLoading = false
             } catch (e: Exception) {
@@ -112,15 +164,17 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun displayPosts(posts: List<Post>) {
+    private fun displayPosts(posts: List<Post>, reactions: UserReactions?) {
         val fragmentManager = supportFragmentManager
         val container = findViewById<LinearLayout>(R.id.posts_container)
 
         for (post in posts) {
-            val postFragment = PostFragment.newInstance(post)
+            if (existingPostsIds.contains(post._id)) continue
+            val postFragment = PostFragment.newInstance(post, reactions)
             fragmentManager.beginTransaction()
                 .add(container.id, postFragment)
                 .commit()
+            existingPostsIds.add(post._id)
         }
     }
 }

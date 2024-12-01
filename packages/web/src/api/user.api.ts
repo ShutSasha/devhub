@@ -1,17 +1,41 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
+import { createApi } from '@reduxjs/toolkit/query/react'
 
-import { IUser } from '~types/user/user.type'
+import baseQueryWithReauth from './baseQueryWithReauth'
+
+import { IUser, ReqEditUserData, UserDetailsResponse } from '~types/user/user.type'
 
 export const api = createApi({
   reducerPath: 'userApi',
-  baseQuery: fetchBaseQuery({
-    baseUrl: 'https://jsonplaceholder.typicode.com',
-  }),
+  baseQuery: baseQueryWithReauth,
   endpoints: builder => ({
-    getUsers: builder.query<IUser[], void>({
-      query: () => 'users',
+    getUserDetails: builder.query<UserDetailsResponse, { userId: string | undefined }>({
+      query: ({ userId }) => ({
+        url: `users/user-details/${userId}`,
+        method: 'GET',
+      }),
+    }),
+    getUserReactions: builder.query<{ likedPosts: string[]; dislikedPosts: string[] }, { userId: string | undefined }>({
+      query: ({ userId }) => ({
+        url: `users/user-reactions/${userId}`,
+        method: 'GET',
+      }),
+    }),
+    editUserData: builder.mutation<{ user: IUser }, ReqEditUserData>({
+      query: body => ({
+        url: `users`,
+        method: 'PATCH',
+        body: body,
+      }),
+    }),
+    editUserPhoto: builder.mutation<{ avatar: string }, { id: string | undefined; body: FormData }>({
+      query: ({ id, body }) => ({
+        url: `users/update-photo/${id}`,
+        method: 'POST',
+        body,
+      }),
     }),
   }),
 })
 
-export const { useGetUsersQuery } = api
+export const { useGetUserDetailsQuery, useGetUserReactionsQuery, useEditUserDataMutation, useEditUserPhotoMutation } =
+  api

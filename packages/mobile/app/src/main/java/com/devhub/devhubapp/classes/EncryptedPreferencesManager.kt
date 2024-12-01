@@ -1,22 +1,13 @@
 package com.devhub.devhubapp.classes
 
 import android.content.Context
-import android.content.Intent
 import android.content.SharedPreferences
-import android.util.Log
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
-import com.devhub.devhubapp.activity.WelcomeActivity
 import com.devhub.devhubapp.api.AuthAPI
-import com.devhub.devhubapp.dataClasses.LoginResponse
-import com.devhub.devhubapp.dataClasses.TokenResponse
 import com.devhub.devhubapp.dataClasses.User
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import java.text.SimpleDateFormat
+import com.devhub.devhubapp.dataClasses.UserReactions
 import java.util.Date
-import java.util.Locale
 
 class EncryptedPreferencesManager(context: Context) {
     private val sharedPreferences: SharedPreferences
@@ -70,18 +61,38 @@ class EncryptedPreferencesManager(context: Context) {
         )
     }
 
-    fun saveTokens(access_token: String?, refresh_token: String?){
+    fun saveTokens(access_token: String?, refresh_token: String?) {
         saveData("access_token", access_token ?: "")
         saveData("refresh_token", refresh_token ?: "")
     }
 
-    fun getAccessToken(): String?{
+    fun getAccessToken(): String? {
         return sharedPreferences.getString("access_token", null)
     }
 
     fun getRefreshToken(): String? {
         return sharedPreferences.getString("refresh_token", null)
     }
+
+    fun saveUserReactions(reactions: UserReactions) {
+        saveData("likedPosts", reactions.likedPosts?.joinToString(",") ?: "")
+        saveData("dislikedPosts", reactions.dislikedPosts?.joinToString(",") ?: "")
+    }
+
+    fun getUserReactions(): UserReactions {
+        val likedPosts =
+            sharedPreferences.getString("likedPosts", "")?.split(",")?.filter { it.isNotBlank() }
+                ?: emptyList()
+        val dislikedPosts =
+            sharedPreferences.getString("dislikedPosts", "")?.split(",")?.filter { it.isNotBlank() }
+                ?: emptyList()
+
+        return UserReactions(
+            likedPosts = likedPosts,
+            dislikedPosts = dislikedPosts
+        )
+    }
+
 
     fun saveData(key: String, value: Any) {
         val editor = sharedPreferences.edit()

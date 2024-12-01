@@ -4,7 +4,7 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
 using UserService.Abstracts;
-using UserService.Contracts.Posts;
+using UserService.Contracts.User;
 using UserService.Contracts.User;
 using UserService.Dto;
 using UserService.Models.Database;
@@ -42,7 +42,7 @@ public class UserService : IUserService
       if (user == null)
       {
          _logger.LogError($"User with ID {id} not found.");
-         throw new Exception($"404:User with ID {id} not found.");
+         throw new Exception($"404:User wasn't found.");
       }
 
       var update = Builders<User>.Update
@@ -54,7 +54,7 @@ public class UserService : IUserService
       if (result.ModifiedCount == 0)
       {
          _logger.LogWarning($"No changes were made to user with ID {id}.");
-         throw new Exception($"400:No changes were made to user with ID {id}.");
+         throw new Exception($"400:No changes were made.");
       }
       var updatedUser = await _userCollection.Find(filter).FirstOrDefaultAsync();
       _logger.LogInformation($"User with ID {id} updated successfully.");

@@ -25,4 +25,6 @@ interface UserAPI {
         @Body file: String
     ): Call<ResponseBody>
 
+//    @GET("users/user-reactions/{userId}")
+//    fun getUserReactions(@Path("userId") userId: String): Call<UserReactions>
 }

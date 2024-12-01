@@ -23,11 +23,12 @@ public class AuthService
    private readonly JwtProvider _jwtProvider;
    private readonly TokenService _tokenService;
    private readonly IMapper _mapper;
+   private readonly ILogger<AuthService> _logger;
    private readonly GoogleAuthOptions _googleAuthOptions;
 
    public AuthService(IMongoDatabase mongoDatabase, IOptions<MongoDbSettings> mongoDbSettings,
       PasswordHasher passwordHasher, MailService mailService, JwtProvider jwtProvider,
-      TokenService tokenService, IMapper mapper, IOptions<GoogleAuthOptions> googleAuthOptions)
+      TokenService tokenService, IMapper mapper, IOptions<GoogleAuthOptions> googleAuthOptions,ILogger<AuthService> logger)
    {
       _userCollection = mongoDatabase.GetCollection<User>(mongoDbSettings.Value.CollectionName);
       _passwordHasher = passwordHasher;
@@ -35,6 +36,7 @@ public class AuthService
       _jwtProvider = jwtProvider;
       _tokenService = tokenService;
       _mapper = mapper;
+      _logger = logger;
       _googleAuthOptions = googleAuthOptions.Value;
    }
 
@@ -115,6 +117,7 @@ public class AuthService
       }
 
       var (accessToken, refreshToken) = await _tokenService.GenerateTokens(candidate);
+      _logger.LogInformation("Tokens successfully generated");
 
       loginResponse.AccessToken = accessToken;
       loginResponse.RefreshToken = refreshToken;
@@ -149,10 +152,12 @@ public class AuthService
 
       if (user == null)
       {
+         _logger.LogError($"User with id {userId} wasn't found");
          throw new Exception("Unauthorized user");
       }
 
       var (newAccessToken, newRefreshToken) = await _tokenService.GenerateTokens(user);
+      
 
       loginResponse.AccessToken = newAccessToken;
       loginResponse.RefreshToken = newRefreshToken;
@@ -166,6 +171,7 @@ public class AuthService
 
       if (user == null || user.ActivationCode != activationCode)
       {
+         _logger.LogError($"Activation code {activationCode} doesn't match {user?.ActivationCode}");
          throw new Exception("Invalid email or password");
       }
 
@@ -193,6 +199,7 @@ public class AuthService
          update
       );
 
+      _logger.LogInformation($"Preparing to send email verification to {user.Email}");
       await _mailService.SendVerificationCode(user.Email, verificationCode);
    }
 
@@ -202,6 +209,7 @@ public class AuthService
 
       if (user == null)
       {
+         _logger.LogError($"User with email {user?.Email} wasn't found");
          throw new Exception("User wasn't found");
       }
 
