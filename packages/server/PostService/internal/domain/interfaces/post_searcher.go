@@ -9,9 +9,11 @@ import (
 type PostSearcher interface {
 	Search(
 		ctx context.Context,
-		sortBy string,
+		sortBy int,
 		query string,
 		tags []string,
 		fileProvider FileProvider,
-	) ([]storage.PostModel, error)
+		page int,
+		limit int,
+	) ([]storage.PostModel, int, error)
 }
