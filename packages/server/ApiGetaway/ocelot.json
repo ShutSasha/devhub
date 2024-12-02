@@ -242,6 +242,30 @@
          "UpstreamPathTemplate": "/api/users/user-followings",
          "UpstreamHttpMethod": ["DELETE"]
       },
+      {
+         "DownstreamPathTemplate": "/api/users/user-followings/{userId}",
+         "DownstreamScheme": "http",
+         "DownstreamHostAndPorts": [
+            {
+               "Host": "localhost",
+               "Port": 5229
+            }
+         ],
+         "UpstreamPathTemplate": "/api/users/user-followings/{userId}",
+         "UpstreamHttpMethod": ["GET"]
+      },
+      {
+         "DownstreamPathTemplate": "/api/users/user-followers/{userId}",
+         "DownstreamScheme": "http",
+         "DownstreamHostAndPorts": [
+            {
+               "Host": "localhost",
+               "Port": 5229
+            }
+         ],
+         "UpstreamPathTemplate": "/api/users/user-followers/{userId}",
+         "UpstreamHttpMethod": ["GET"]
+      },
       
       
       {
