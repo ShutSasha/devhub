@@ -214,6 +214,14 @@ public class UserService : IUserService
 
    }
 
+   public async Task<bool> CheckUserFollowing(string userId, string targetUserId)
+   {
+      var (user, targetUser) = await GetUsersForFollowingAction(userId, targetUserId);
+
+      return user.Followings.Contains(targetUserId);
+   }
+
+
    public async Task<UserDetailsResponse> GetUserDetailsById(string id)
    {
       var user = await GetById(id);

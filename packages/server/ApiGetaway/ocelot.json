@@ -169,7 +169,6 @@
          "UpstreamPathTemplate": "/api/posts",
          "UpstreamHttpMethod": ["GET"]
       },
-
       {
          "DownstreamPathTemplate": "/api/users",
          "DownstreamScheme": "http",
@@ -264,6 +263,18 @@
             }
          ],
          "UpstreamPathTemplate": "/api/users/user-followers/{userId}",
+         "UpstreamHttpMethod": ["GET"]
+      },
+      {
+         "DownstreamPathTemplate": "/api/users/is-following",
+         "DownstreamScheme": "http",
+         "DownstreamHostAndPorts": [
+            {
+               "Host": "localhost",
+               "Port": 5229
+            }
+         ],
+         "UpstreamPathTemplate": "/api/users/is-following",
          "UpstreamHttpMethod": ["GET"]
       },
       
