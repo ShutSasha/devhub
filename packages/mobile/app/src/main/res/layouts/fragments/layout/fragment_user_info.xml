@@ -68,13 +68,15 @@
                 android:id="@+id/btnPrimary"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="4" />
+                android:layout_weight="4"
+                android:layout_marginHorizontal="10dp"/>
 
             <FrameLayout
                 android:id="@+id/btnOutlined"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="3" />
+                android:layout_weight="3"
+                android:layout_marginHorizontal="10dp"/>
 
         </LinearLayout>
 

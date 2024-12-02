@@ -2,7 +2,6 @@
     android:id="@+id/outlinedbtn"
     android:layout_width="match_parent"
     android:layout_height="41dp"
-    android:layout_marginHorizontal="10dp"
     android:background="@drawable/shape_input_background"
     android:fontFamily="@font/montserrat_semibold_font"
     android:textAllCaps="false"
