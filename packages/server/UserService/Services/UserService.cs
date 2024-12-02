@@ -121,20 +121,16 @@ public class UserService : IUserService
 
    public async Task<UserDto> AddUserFollowing(string userId, string followingId)
    {
-      var users = await _userCollection.Find(u => u.Id == userId || u.Id == followingId).ToListAsync();
-
-      var user = users.FirstOrDefault(u => u.Id == userId);
-      var targetUser = users.FirstOrDefault(u => u.Id == followingId);
-
-      if (user == null || targetUser == null)
-         throw new Exception($"404: User or target wasn't found");
-
+      var (user, targetUser) = await GetUsersForFollowingAction(userId, followingId);
+      
       if (user.Followings.Contains(followingId))
          throw new Exception($"400: You've already subscribed to this user");
 
       var userUpdate = Builders<User>.Update.AddToSet(u => u.Followings, followingId);
       var targetUserUpdate = Builders<User>.Update.AddToSet(u => u.Followers, userId);
 
+      _logger.LogInformation($"Preparing to update users with id {userId}, {followingId}");
+      
       var userUpdateTask = _userCollection.UpdateOneAsync(
          Builders<User>.Filter.Eq(u => u.Id, userId),
          userUpdate);
@@ -161,7 +157,8 @@ public class UserService : IUserService
 
       if (user == null || targetUser == null)
          throw new Exception("404: User or target user wasn't found");
-
+      
+      _logger.LogInformation($"users with id {userId}, {followingId} were found");
       return (user, targetUser);
    }
 
@@ -175,6 +172,7 @@ public class UserService : IUserService
       var userUpdate = Builders<User>.Update.Pull(u => u.Followings, followingId);
       var targetUserUpdate = Builders<User>.Update.Pull(u => u.Followers, userId);
 
+      _logger.LogInformation($"Preparing to update users with id {userId}, {followingId}");
       var userUpdateTask = _userCollection.UpdateOneAsync(
          Builders<User>.Filter.Eq(u => u.Id, userId),
          userUpdate);
@@ -190,7 +188,8 @@ public class UserService : IUserService
       
       user.Followings.Remove(followingId);
       targetUser.Followers.Remove(userId);
-
+      
+      _logger.LogInformation($"users with id {userId}, {followingId} updated successfully");
       return _mapper.Map<User, UserDto>(user);
    }
 
