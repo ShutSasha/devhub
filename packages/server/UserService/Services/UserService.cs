@@ -152,9 +152,46 @@ public class UserService : IUserService
       return _mapper.Map<User, UserDto>(user);
    }
 
+   private async Task<(User User, User TargetUser)> GetUsersForFollowingAction(string userId, string followingId)
+   {
+      var users = await _userCollection.Find(u => u.Id == userId || u.Id == followingId).ToListAsync();
+
+      var user = users.FirstOrDefault(u => u.Id == userId);
+      var targetUser = users.FirstOrDefault(u => u.Id == followingId);
+
+      if (user == null || targetUser == null)
+         throw new Exception("404: User or target user wasn't found");
+
+      return (user, targetUser);
+   }
+
    public async Task<UserDto> RemoveUserFollowing(string userId, string followingId)
    {
-      throw new NotImplementedException();
+      var (user, targetUser) = await GetUsersForFollowingAction(userId, followingId);
+      
+      if (!user.Followings.Contains(followingId))
+         throw new Exception("400: You're not subscribed to this user");
+      
+      var userUpdate = Builders<User>.Update.Pull(u => u.Followings, followingId);
+      var targetUserUpdate = Builders<User>.Update.Pull(u => u.Followers, userId);
+
+      var userUpdateTask = _userCollection.UpdateOneAsync(
+         Builders<User>.Filter.Eq(u => u.Id, userId),
+         userUpdate);
+
+      var targetUserUpdateTask = _userCollection.UpdateOneAsync(
+         Builders<User>.Filter.Eq(u => u.Id, followingId),
+         targetUserUpdate);
+
+      await Task.WhenAll(userUpdateTask, targetUserUpdateTask);
+      
+      if (userUpdateTask.Result.ModifiedCount == 0 || targetUserUpdateTask.Result.ModifiedCount == 0)
+         throw new Exception("500: Failed to update user or target user data");
+      
+      user.Followings.Remove(followingId);
+      targetUser.Followers.Remove(userId);
+
+      return _mapper.Map<User, UserDto>(user);
    }
 
    public async Task<UserDetailsResponse> GetUserDetailsById(string id)

@@ -122,4 +122,22 @@ public class UserController : ControllerBase
             e.Message);
       }
    }
+   
+   [HttpDelete("user-followings")]
+   [ProducesResponseType(200, Type = typeof(UserDto))]
+   public async Task<IActionResult> RemoveUserFollowing([FromBody] UserFollowingsRequest request)
+   {
+      try
+      {
+         var userUpdateResult = await _userService.RemoveUserFollowing(request.userId, request.followingUserId);
+         return Ok(userUpdateResult);
+      }
+      catch (Exception e)
+      {
+         return ErrorResponseHelper.CreateErrorResponse(
+            Convert.ToInt32(e.Message.Split(":")[0]),
+            nameof(AddUserFollowing),
+            e.Message);
+      }
+   }
 }
