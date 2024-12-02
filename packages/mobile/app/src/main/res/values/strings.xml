@@ -22,4 +22,5 @@
     <string name="lorem">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis a tortor at augue aliquam efficitur. Mauris ante arcu, faucibus nec augue quis, vestibulum eleifend urna. Quisque euismod placerat sodales. Proin eros nisl, tincidunt eu purus sit amet, fermentum tempus arcu. Praesent et est sed enim porttitor cursus a id mauris. Nam enim erat, lacinia non ex eu, malesuada bibendum neque. Maecenas tincidunt purus orci, non mattis nibh tristique a. Praesent quis sodales magna. </string>
     <string name="name">Name</string>
     <string name="description">Description</string>
+    <string name="your_followers_followed_list_is_empty">Your Followers/Followed list is empty</string>
 </resources>
