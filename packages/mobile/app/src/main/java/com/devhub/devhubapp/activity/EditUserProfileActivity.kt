@@ -4,10 +4,11 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.provider.OpenableColumns
 import android.text.InputType
 import android.util.Log
 import android.view.View
-import android.widget.ImageView
+import android.webkit.MimeTypeMap
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -23,9 +24,7 @@ import com.devhub.devhubapp.classes.ErrorHandler
 import com.devhub.devhubapp.classes.RetrofitClient
 import com.devhub.devhubapp.dataClasses.EditProfileRequest
 import com.devhub.devhubapp.dataClasses.EditProfileResponse
-import com.devhub.devhubapp.dataClasses.LoginRequest
-import com.devhub.devhubapp.dataClasses.LoginResponse
-import com.devhub.devhubapp.dataClasses.User
+import com.devhub.devhubapp.dataClasses.UpdatePhotoResponse
 import com.devhub.devhubapp.databinding.ActivityEditUserProfileBinding
 import com.devhub.devhubapp.fragment.ErrorFragment
 import com.devhub.devhubapp.fragment.FooterFragment
@@ -34,14 +33,15 @@ import com.devhub.devhubapp.fragment.InputFragment
 import com.devhub.devhubapp.fragment.InputTextListener
 import com.devhub.devhubapp.fragment.OutlinedButtonFragment
 import com.devhub.devhubapp.fragment.PrimaryButtonFragment
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
-import java.util.TimeZone
+import java.io.File
 
 class EditUserProfileActivity : AppCompatActivity() {
     private lateinit var encryptedPreferencesManager: EncryptedPreferencesManager
@@ -232,34 +232,63 @@ class EditUserProfileActivity : AppCompatActivity() {
     }
 
     private fun updatePhoto(userId: String?) {
-        Log.i("UpdatePhoto", "$userId $selectedImageUri")
         if (userId.isNullOrEmpty() || selectedImageUri == null) {
             Log.e("UpdatePhoto", "User ID or selected image is missing")
             return
+        } else {
+            Log.i("UpdatePhoto", "${selectedImageUri}")
         }
 
-        val inputStream = contentResolver.openInputStream(selectedImageUri!!)
-        val photoBytes = inputStream?.readBytes()
-        val base64Photo = android.util.Base64.encodeToString(photoBytes, android.util.Base64.DEFAULT)
+        val imageFile = getFileFromUri(selectedImageUri!!)
+        if (imageFile == null || !imageFile.exists()) {
+            Log.e("UpdatePhoto", "File creation failed")
+            return
+        }
 
-        userAPI.updatePhoto(userId, base64Photo).enqueue(object : Callback<ResponseBody> {
-            override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+        val mimeType = getMimeType(imageFile) ?: "application/octet-stream"
+        val requestFile = imageFile.asRequestBody(mimeType.toMediaType())
+        val imagePart = MultipartBody.Builder().setType(MultipartBody.FORM).addFormDataPart(
+            "file", imageFile.name, requestFile
+        ).build()
+        Log.d("UpdatePhoto", "Uploading file with MIME type: $mimeType")
+
+        userAPI.updatePhoto(userId, imagePart).enqueue(object : Callback<UpdatePhotoResponse> {
+            override fun onResponse(call: Call<UpdatePhotoResponse>, response: Response<UpdatePhotoResponse>) {
                 if (response.isSuccessful) {
                     Log.i("UpdatePhoto", "Photo updated successfully")
-                    val intent = Intent(this@EditUserProfileActivity, UserProfileActivity::class.java)
-                    intent.putExtra("USER_ID", userId)
-                    startActivity(intent)
-                    finish()
+                    val photoUri = response.body()
+                    if (photoUri != null && !photoUri.avatar.isNullOrEmpty()) {
+                        encryptedPreferencesManager.saveData("avatar", photoUri.avatar)
+                    } else {
+                        Log.e("UpdatePhoto", "No data to save")
+                    }
                 } else {
-                    handleErrors(response.errorBody())
-                    Log.e("UpdatePhoto", "Failed to update photo: ${response.message()}")
+                    Log.e("UpdatePhoto", "Failed to update photo: ${response.code()} ${response.message()}")
                 }
             }
 
-            override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
-                Log.e("UpdatePhoto", "Error: ${t.message}")
+            override fun onFailure(call: Call<UpdatePhotoResponse>, t: Throwable) {
+                Log.e("UpdatePhoto", "Request failed: ${t.message}")
             }
         })
+    }
+
+    private fun getFileFromUri(uri: Uri): File? {
+        val filePath: String? = null
+        val cursor = contentResolver.query(uri, null, null, null, null)
+        cursor?.use {
+            val nameIndex = it.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+            if (nameIndex != -1 && it.moveToFirst()) {
+                val displayName = it.getString(nameIndex)
+                val inputStream = contentResolver.openInputStream(uri)
+                val file = File(cacheDir, displayName)
+                file.outputStream().use { output ->
+                    inputStream?.copyTo(output)
+                }
+                return file
+            }
+        }
+        return null
     }
 
     private fun handleErrors(errorBody: ResponseBody?) {
@@ -276,6 +305,9 @@ class EditUserProfileActivity : AppCompatActivity() {
         ErrorHandler.handleErrors(errorBody, errorFragments, errorViews)
     }
 
-
+    private fun getMimeType(file: File): String? {
+        val extension = file.extension.lowercase() // Получаем расширение файла
+        return MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension)
+    }
 
 }

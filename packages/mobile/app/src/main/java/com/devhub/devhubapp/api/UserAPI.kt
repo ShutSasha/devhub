@@ -2,8 +2,10 @@ package com.devhub.devhubapp.api
 
 import com.devhub.devhubapp.dataClasses.EditProfileRequest
 import com.devhub.devhubapp.dataClasses.EditProfileResponse
+import com.devhub.devhubapp.dataClasses.UpdatePhotoResponse
 import com.devhub.devhubapp.dataClasses.UserDetail
-import okhttp3.ResponseBody
+import com.devhub.devhubapp.dataClasses.UserReactions
+import okhttp3.MultipartBody
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -22,9 +24,9 @@ interface UserAPI {
     @POST("users/update-photo/{userId}")
     fun updatePhoto(
         @Path("userId") id: String,
-        @Body file: String
-    ): Call<ResponseBody>
+        @Body file: MultipartBody
+    ): Call<UpdatePhotoResponse>
 
-//    @GET("users/user-reactions/{userId}")
-//    fun getUserReactions(@Path("userId") userId: String): Call<UserReactions>
+    @GET("users/user-reactions/{userId}")
+    fun getUserReactions(@Path("userId") userId: String): Call<UserReactions>
 }

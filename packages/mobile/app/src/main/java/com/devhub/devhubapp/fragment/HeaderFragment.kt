@@ -40,7 +40,7 @@ class HeaderFragment : Fragment() {
 
         createPostButton.setOnClickListener {
             val intent = Intent(activity, CreatePostActivity::class.java)
-            createPostLauncher.launch(intent)  // Исправлено
+            createPostLauncher.launch(intent)
         }
 
         avatar.setOnClickListener {
