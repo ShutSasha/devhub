@@ -65,9 +65,13 @@ public class User
    [BsonRepresentation(BsonType.ObjectId)]
    public List<string> Comments { get; set; } = new List<string>();
    
-   [BsonElement("friends")]
+   [BsonElement("followers")]
    [BsonRepresentation(BsonType.ObjectId)]
-   public List<string> Friends { get; set; } = new List<string>();
+   public List<string> Followers { get; set; } = new List<string>();
+
+   [BsonElement("followings")]
+   [BsonRepresentation(BsonType.ObjectId)]
+   public List<string> Followings { get; set; } = new List<string>();
    
    [BsonElement("chats")]
    [BsonRepresentation(BsonType.ObjectId)]

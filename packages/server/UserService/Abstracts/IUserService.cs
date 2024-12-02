@@ -13,4 +13,7 @@ public interface IUserService
    Task<UserDetailsResponse> GetUserDetailsById(string id);
    Task<User> GetById(string id);
    Task<UserReactionsResponse> GetUserReaction(string userId);
+   Task<UserDto> AddUserFollowing(string userId, string followingId);
+   Task<UserDto> RemoveUserFollowing(string userId, string followingId);
+   Task<List<UserConnectionsDto>> GetUserConnections(string userId,string connectionType);
 }
