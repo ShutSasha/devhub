@@ -53,9 +53,9 @@ public class User
    [BsonRepresentation(BsonType.ObjectId)]
    public List<string> Posts { get; set; } = new List<string>();
    
-   // [BsonElement("marks")]
-   // [BsonRepresentation(BsonType.ObjectId)]
-   // public List<string> Reports { get; set; } = new List<string>();
+   [BsonElement("savedPosts")]
+   [BsonRepresentation(BsonType.ObjectId)]
+   public List<string> SavedPosts { get; set; } = new List<string>();
 
    [BsonElement("tags")]
    [BsonRepresentation(BsonType.String)]

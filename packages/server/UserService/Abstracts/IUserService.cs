@@ -17,4 +17,6 @@ public interface IUserService
    Task<UserDto> RemoveUserFollowing(string userId, string followingId);
    Task<List<UserConnectionsDto>> GetUserConnections(string userId,string connectionType);
    Task<bool> CheckUserFollowing(string userId, string targetUserId);
+   Task UpdateSavedPost(string userId,string savedPostId, bool isAdding);
+   Task<List<string>> GetSavedPosts(string userId);
 }

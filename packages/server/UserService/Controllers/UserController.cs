@@ -23,7 +23,7 @@ public class UserController : ControllerBase
    }
 
    [HttpPatch]
-   [ProducesResponseType(200,Type = typeof(UserDto))]
+   [ProducesResponseType(200, Type = typeof(UserDto))]
    public async Task<IActionResult> EditUser([FromBody] EditUserRequest request)
    {
       try
@@ -60,7 +60,7 @@ public class UserController : ControllerBase
          var contentType = file.ContentType;
          var updateUserIconResult = await _userService.EditUserIcon(userId, fileName, fileStream, contentType);
 
-         return Ok(new{ Avatar = updateUserIconResult});
+         return Ok(new { Avatar = updateUserIconResult });
       }
       catch (Exception ex)
       {
@@ -72,7 +72,7 @@ public class UserController : ControllerBase
    }
 
    [HttpGet("user-details/{userId}")]
-   [ProducesResponseType(200,Type =typeof(UserDetailsResponse))]
+   [ProducesResponseType(200, Type = typeof(UserDetailsResponse))]
    public async Task<IActionResult> GetUserDetails([ObjectIdValidation] string userId)
    {
       try
@@ -87,13 +87,13 @@ public class UserController : ControllerBase
    }
 
    [HttpGet("user-reactions/{userId}")]
-   [ProducesResponseType(200,Type =typeof(UserReactionsResponse))]
+   [ProducesResponseType(200, Type = typeof(UserReactionsResponse))]
    public async Task<IActionResult> GetUserReactions([ObjectIdValidation] string userId)
    {
       try
       {
          var userReactions = await _userService.GetUserReaction(userId);
-         
+
          return Ok(userReactions);
       }
       catch (Exception e)
@@ -111,7 +111,7 @@ public class UserController : ControllerBase
    {
       try
       {
-         var userUpdateResult = await _userService.AddUserFollowing(request.userId, request.followingUserId);
+         var userUpdateResult = await _userService.AddUserFollowing(request.UserId, request.FollowingUserId);
          return Ok(userUpdateResult);
       }
       catch (Exception e)
@@ -122,14 +122,14 @@ public class UserController : ControllerBase
             e.Message);
       }
    }
-   
+
    [HttpDelete("user-followings")]
    [ProducesResponseType(200, Type = typeof(UserDto))]
    public async Task<IActionResult> RemoveUserFollowing([FromBody] UserFollowingsRequest request)
    {
       try
       {
-         var userUpdateResult = await _userService.RemoveUserFollowing(request.userId, request.followingUserId);
+         var userUpdateResult = await _userService.RemoveUserFollowing(request.UserId, request.FollowingUserId);
          return Ok(userUpdateResult);
       }
       catch (Exception e)
@@ -142,7 +142,7 @@ public class UserController : ControllerBase
    }
 
    [HttpGet("user-followings/{userId}")]
-   [ProducesResponseType(200,Type =typeof(List<UserConnectionsDto>))]
+   [ProducesResponseType(200, Type = typeof(List<UserConnectionsDto>))]
    public async Task<IActionResult> GetUserFollowings([FromRoute] [ObjectIdValidation] string userId)
    {
       try
@@ -158,9 +158,9 @@ public class UserController : ControllerBase
             e.Message);
       }
    }
-   
+
    [HttpGet("user-followers/{userId}")]
-   [ProducesResponseType(200,Type =typeof(List<UserConnectionsDto>))]
+   [ProducesResponseType(200, Type = typeof(List<UserConnectionsDto>))]
    public async Task<IActionResult> GetUserFollowers([FromRoute] string userId)
    {
       try
@@ -194,6 +194,57 @@ public class UserController : ControllerBase
             nameof(AddUserFollowing),
             e.Message);
       }
-   } 
+   }
+
+   [HttpPost("saved-posts")]
+   public async Task<IActionResult> AddSavedPost([FromBody] UserSavedPostRequest request)
+   {
+      try
+      {
+         await _userService.UpdateSavedPost(request.UserId, request.SavedPostId, true);
+         return Ok();
+      }
+      catch (Exception e)
+      {
+         return ErrorResponseHelper.CreateErrorResponse(
+            Convert.ToInt32(e.Message.Split(":")[0]),
+            nameof(AddUserFollowing),
+            e.Message);
+      }
+   }
+
+   [HttpDelete("saved-posts")]
+   public async Task<IActionResult> DeleteSavedPost([FromBody] UserSavedPostRequest request)
+   {
+      try
+      {
+         await _userService.UpdateSavedPost(request.UserId, request.SavedPostId, false);
+         return Ok();
+      }
+      catch (Exception e)
+      {
+         return ErrorResponseHelper.CreateErrorResponse(
+            Convert.ToInt32(e.Message.Split(":")[0]),
+            nameof(AddUserFollowing),
+            e.Message);
+      }
+   }
+
+   [HttpGet("saved-posts/{userId}")]
+   public async Task<IActionResult> GetUserSavedPosts([FromRoute] string userId)
+   {
+      try
+      {
+         var savedPosts = await _userService.GetSavedPosts(userId);
+         return Ok(new { SavedPosts = savedPosts });
+      }
+      catch (Exception e)
+      {
+         return ErrorResponseHelper.CreateErrorResponse(
+            Convert.ToInt32(e.Message.Split(":")[0]),
+            nameof(AddUserFollowing),
+            e.Message);
+      }
+   }
    
 }

@@ -213,7 +213,7 @@ public class UserService : IUserService
       return connections;
 
    }
-
+   
    public async Task<bool> CheckUserFollowing(string userId, string targetUserId)
    {
       var (user, targetUser) = await GetUsersForFollowingAction(userId, targetUserId);
@@ -221,6 +221,38 @@ public class UserService : IUserService
       return user.Followings.Contains(targetUserId);
    }
 
+   public async Task UpdateSavedPost(string userId, string savedPostId, bool isAdding)
+   {
+      var user = await GetById(userId);
+      if (user == null)
+         throw new Exception("404: User not found");
+
+      if (user.SavedPosts.Contains(savedPostId) == isAdding)
+      {
+         var action = isAdding ? "saved" : "deleted";
+         throw new Exception($"400: You've already {action} this post");
+      }
+      
+      var userUpdate = isAdding
+         ? Builders<User>.Update.AddToSet(u => u.SavedPosts, savedPostId)
+         : Builders<User>.Update.Pull(u => u.SavedPosts, savedPostId);
+
+      var userUpdateResult = await _userCollection.UpdateOneAsync(
+         Builders<User>.Filter.Eq(u => u.Id, userId),
+         userUpdate);
+
+      if (userUpdateResult.ModifiedCount <= 0)
+      {
+         throw new Exception("500: Can't update user");
+      }
+   }
+
+   public async Task<List<string>> GetSavedPosts(string userId)
+   {
+      var user = await GetById(userId);
+
+      return user.SavedPosts;
+   }
 
    public async Task<UserDetailsResponse> GetUserDetailsById(string id)
    {
