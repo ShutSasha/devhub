@@ -30,6 +30,7 @@ class EncryptedPreferencesManager(context: Context) {
     fun saveUserData(userData: User) {
         saveData("user_id", userData._id)
         saveData("name", userData.name ?: "")
+        saveData("bio", userData.bio ?: "")
         saveData("username", userData.username ?: "")
         saveData("email", userData.email ?: "")
         saveData("avatar", userData.avatar ?: "")
@@ -37,7 +38,7 @@ class EncryptedPreferencesManager(context: Context) {
         saveData("devPoints", userData.devPoints.toString())
         saveData("activationCode", userData.activationCode ?: "")
         saveData("isActivated", userData.isActivated.toString())
-        saveData("roles", userData.roles?.joinToString(",") ?: "")
+        saveData("roles", userData.userRole?.joinToString(",") ?: "")
     }
 
     fun getUserData(): User {
@@ -48,6 +49,7 @@ class EncryptedPreferencesManager(context: Context) {
         return User(
             _id = sharedPreferences.getString("user_id", "") ?: "",
             name = sharedPreferences.getString("name", "") ?: "",
+            bio = sharedPreferences.getString("bio", "") ?: "",
             username = sharedPreferences.getString("username", "") ?: "",
             email = sharedPreferences.getString("email", "") ?: "",
             avatar = sharedPreferences.getString("avatar", "") ?: "",
@@ -55,8 +57,7 @@ class EncryptedPreferencesManager(context: Context) {
             devPoints = sharedPreferences.getString("devPoints", "0")?.toIntOrNull() ?: 0,
             activationCode = sharedPreferences.getString("activationCode", "") ?: "",
             isActivated = sharedPreferences.getString("isActivated", "false")?.toBoolean() ?: false,
-            roles = sharedPreferences.getString("roles", "")?.split(",")?.toTypedArray()
-                ?: emptyArray()
+            userRole = sharedPreferences.getString("roles", "")?.split(",")?.toTypedArray() ?: emptyArray()
         )
     }
 

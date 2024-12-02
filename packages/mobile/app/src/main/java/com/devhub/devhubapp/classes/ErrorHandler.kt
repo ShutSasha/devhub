@@ -61,6 +61,14 @@ object ErrorHandler {
                         errorFragments["activationCode"]?.setErrorText(activationCodeErrors.joinToString("\n"))
                         errorViews["activationCode"]?.visibility = View.VISIBLE
                     }
+                    errors.EditUserError?.let { editUserErrors ->
+                        errorFragments["editUser"]?.setErrorText(editUserErrors.joinToString("\n"))
+                        errorViews["editUser"]?.visibility = View.VISIBLE
+                    }
+                    errors.UpdateUserError?.let { updateUserErrors ->
+                        errorFragments["updateUser"]?.setErrorText(updateUserErrors.joinToString("\n"))
+                        errorViews["updateUser"]?.visibility = View.VISIBLE
+                    }
                 }
             } catch (e: Exception) {
                 Log.e("Error Parsing", "Error parsing error response: ${e.message}")

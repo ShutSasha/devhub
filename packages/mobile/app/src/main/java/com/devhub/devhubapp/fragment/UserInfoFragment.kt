@@ -1,6 +1,7 @@
 package com.devhub.devhubapp.fragment
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -12,6 +13,8 @@ import androidx.fragment.app.FragmentTransaction
 import androidx.transition.Visibility
 import com.bumptech.glide.Glide
 import com.devhub.devhubapp.R
+import com.devhub.devhubapp.activity.EditUserProfileActivity
+import com.devhub.devhubapp.activity.UserProfileActivity
 import com.devhub.devhubapp.classes.EncryptedPreferencesManager
 import com.devhub.devhubapp.databinding.FragmentUserInfoBinding
 import java.text.SimpleDateFormat
@@ -106,7 +109,9 @@ class UserInfoFragment : Fragment() {
             val editOutlinedButtonFragment = OutlinedButtonFragment()
             editOutlinedButtonFragment.setButtonText("Edit profile")
             editOutlinedButtonFragment.setButtonAction {
-                // Button action
+                val intent = Intent(requireContext(), EditUserProfileActivity::class.java)
+                intent.putExtra("DESCRIPTION", description)
+                startActivity(intent)
             }
             fragmentTransaction.add(R.id.editBtnOutlined, editOutlinedButtonFragment)
         }

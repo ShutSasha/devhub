@@ -161,6 +161,7 @@ class LogInActivity : AppCompatActivity() {
                         val user = User(
                             _id = userResponse._id,
                             name = userResponse.name ?: "",
+                            bio = userResponse.bio ?: "",
                             username = userResponse.username,
                             avatar = userResponse.avatar,
                             email = userResponse.email,
@@ -168,7 +169,7 @@ class LogInActivity : AppCompatActivity() {
                             devPoints = userResponse.devPoints,
                             activationCode = userResponse.activationCode?: "",
                             isActivated = userResponse.isActivated,
-                            roles = userResponse.userRole.map { it.toString() }.toTypedArray()
+                            userRole = userResponse.userRole.map { it.toString() }.toTypedArray()
                         )
 
                         encryptedPreferencesManager.saveUserData(user)

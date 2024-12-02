@@ -158,10 +158,12 @@ class CreatePostActivity : AppCompatActivity() {
         call.enqueue(object : Callback<Post> {
             override fun onResponse(call: Call<Post>, response: Response<Post>) {
                 if (response.isSuccessful) {
-                    val intent = Intent()
+                    val intent = Intent(this@CreatePostActivity, MainActivity::class.java)
                     intent.putExtra("UPDATE_POSTS", true)
                     setResult(RESULT_OK, intent)
+                    startActivity(intent)
                     finish()
+
                 } else {
                     Log.e(
                         "CreatePostActivity",

@@ -5,6 +5,7 @@ import java.util.Date
 data class User(
     val _id: String,
     val name: String?,
+    val bio: String?,
     val username: String,
     val avatar: String,
     val email: String,
@@ -12,6 +13,6 @@ data class User(
     val devPoints: Int,
     val activationCode: String,
     val isActivated: Boolean,
-    val roles: Array<String>
+    val userRole: Array<String>
 ) {
 }
