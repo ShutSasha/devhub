@@ -218,6 +218,30 @@
          "UpstreamPathTemplate": "/api/users/user-reactions/{userId}",
          "UpstreamHttpMethod": ["GET"]
       },
+      {
+         "DownstreamPathTemplate": "/api/users/user-followings",
+         "DownstreamScheme": "http",
+         "DownstreamHostAndPorts": [
+            {
+               "Host": "localhost",
+               "Port": 5229
+            }
+         ],
+         "UpstreamPathTemplate": "/api/users/user-followings",
+         "UpstreamHttpMethod": ["POST"]
+      },
+      {
+         "DownstreamPathTemplate": "/api/users/user-followings",
+         "DownstreamScheme": "http",
+         "DownstreamHostAndPorts": [
+            {
+               "Host": "localhost",
+               "Port": 5229
+            }
+         ],
+         "UpstreamPathTemplate": "/api/users/user-followings",
+         "UpstreamHttpMethod": ["DELETE"]
+      },
       
       
       {
