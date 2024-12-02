@@ -316,6 +316,18 @@
          ],
          "UpstreamPathTemplate": "/api/posts/{id}/dislike",
          "UpstreamHttpMethod": ["POST"]
+      },
+      {
+         "DownstreamPathTemplate": "/api/posts/get-popular-tags",
+         "DownstreamScheme": "http",
+         "DownstreamHostAndPorts": [
+            {
+               "Host": "localhost",
+               "Port": 8080
+            }
+         ],
+         "UpstreamPathTemplate": "/api/posts/get-popular-tags",
+         "UpstreamHttpMethod": ["GET"]
       }
    ],
    "GlobalConfiguration": {
