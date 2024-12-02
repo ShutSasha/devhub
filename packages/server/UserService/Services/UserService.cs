@@ -193,6 +193,27 @@ public class UserService : IUserService
       return _mapper.Map<User, UserDto>(user);
    }
 
+   public async Task<List<UserConnectionsDto>> GetUserConnections(string userId,string connectionType)
+   {
+      var user = await GetById(userId);
+
+      var ids = connectionType.ToLower() switch
+      {
+         "followings" => user.Followings,
+         "followers" => user.Followers,
+         _ => throw new Exception("400: Invalid connection type")
+      };
+      
+      var users = await _userCollection
+         .Find(u => ids.Contains(u.Id))
+         .ToListAsync();
+
+      var connections = _mapper.Map<List<UserConnectionsDto>>(users);
+
+      return connections;
+
+   }
+
    public async Task<UserDetailsResponse> GetUserDetailsById(string id)
    {
       var user = await GetById(id);

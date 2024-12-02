@@ -140,4 +140,41 @@ public class UserController : ControllerBase
             e.Message);
       }
    }
+
+   [HttpGet("user-followings/{userId}")]
+   [ProducesResponseType(200,Type =typeof(List<UserConnectionsDto>))]
+   public async Task<IActionResult> GetUserFollowings([FromRoute] [ObjectIdValidation] string userId)
+   {
+      try
+      {
+         var userFollowings = await _userService.GetUserConnections(userId, "followings");
+         return Ok(userFollowings);
+      }
+      catch (Exception e)
+      {
+         return ErrorResponseHelper.CreateErrorResponse(
+            Convert.ToInt32(e.Message.Split(":")[0]),
+            nameof(AddUserFollowing),
+            e.Message);
+      }
+   }
+   
+   [HttpGet("user-followers/{userId}")]
+   [ProducesResponseType(200,Type =typeof(List<UserConnectionsDto>))]
+   public async Task<IActionResult> GetUserFollowers([FromRoute] string userId)
+   {
+      try
+      {
+         var userFollowers = await _userService.GetUserConnections(userId, "followers");
+         return Ok(userFollowers);
+      }
+      catch (Exception e)
+      {
+         return ErrorResponseHelper.CreateErrorResponse(
+            Convert.ToInt32(e.Message.Split(":")[0]),
+            nameof(AddUserFollowing),
+            e.Message);
+      }
+   }
+   
 }
