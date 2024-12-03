@@ -176,5 +176,24 @@ public class UserController : ControllerBase
             e.Message);
       }
    }
+
+   [HttpGet("is-following")]
+   [ProducesResponseType(200, Type = typeof(bool))]
+   public async Task<IActionResult> IsFollowing([FromQuery] [ObjectIdValidation] string userId,
+      [FromQuery] [ObjectIdValidation] string targetUserId)
+   {
+      try
+      {
+         var isUserFollowed = await _userService.CheckUserFollowing(userId, targetUserId);
+         return Ok(isUserFollowed);
+      }
+      catch (Exception e)
+      {
+         return ErrorResponseHelper.CreateErrorResponse(
+            Convert.ToInt32(e.Message.Split(":")[0]),
+            nameof(AddUserFollowing),
+            e.Message);
+      }
+   } 
    
 }

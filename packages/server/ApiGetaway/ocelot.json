@@ -169,7 +169,6 @@
          "UpstreamPathTemplate": "/api/posts",
          "UpstreamHttpMethod": ["GET"]
       },
-
       {
          "DownstreamPathTemplate": "/api/users",
          "DownstreamScheme": "http",
@@ -266,6 +265,18 @@
          "UpstreamPathTemplate": "/api/users/user-followers/{userId}",
          "UpstreamHttpMethod": ["GET"]
       },
+      {
+         "DownstreamPathTemplate": "/api/users/is-following",
+         "DownstreamScheme": "http",
+         "DownstreamHostAndPorts": [
+            {
+               "Host": "localhost",
+               "Port": 5229
+            }
+         ],
+         "UpstreamPathTemplate": "/api/users/is-following",
+         "UpstreamHttpMethod": ["GET"]
+      },
       
       
       {
@@ -316,6 +327,18 @@
          ],
          "UpstreamPathTemplate": "/api/posts/{id}/dislike",
          "UpstreamHttpMethod": ["POST"]
+      },
+      {
+         "DownstreamPathTemplate": "/api/posts/get-popular-tags",
+         "DownstreamScheme": "http",
+         "DownstreamHostAndPorts": [
+            {
+               "Host": "localhost",
+               "Port": 8080
+            }
+         ],
+         "UpstreamPathTemplate": "/api/posts/get-popular-tags",
+         "UpstreamHttpMethod": ["GET"]
       }
    ],
    "GlobalConfiguration": {
