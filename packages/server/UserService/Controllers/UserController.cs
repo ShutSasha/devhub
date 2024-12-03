@@ -125,7 +125,7 @@ public class UserController : ControllerBase
    
    [HttpDelete("user-followings")]
    [ProducesResponseType(200, Type = typeof(UserDto))]
-   public async Task<IActionResult> RemoveUserFollowing([FromBody] UserFollowingsRequest request)
+   public async Task<IActionResult> RemoveUserFollowing([FromQuery] UserFollowingsRequest request)
    {
       try
       {
