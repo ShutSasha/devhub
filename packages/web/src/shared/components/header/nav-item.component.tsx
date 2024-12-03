@@ -33,11 +33,12 @@ const LinkContainer = styled(Link)`
 interface NavItemProps {
   icon: string
   navTitle: string
+  path: string
 }
 
-export const NavItem: FC<NavItemProps> = ({ icon, navTitle }) => {
+export const NavItem: FC<NavItemProps> = ({ icon, navTitle, path }) => {
   return (
-    <LinkContainer style={{ display: 'flex', alignItems: 'center', gap: '10px' }} to={'/'}>
+    <LinkContainer style={{ display: 'flex', alignItems: 'center', gap: '10px' }} to={path}>
       <NavIcon src={icon} />
       <Text
         fontFamily={FONTS.MONTSERRAT}
