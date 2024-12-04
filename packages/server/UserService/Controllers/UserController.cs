@@ -1,13 +1,10 @@
-using Amazon.Util.Internal;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 using UserService.Abstracts;
-using UserService.Contracts.User;
 using UserService.Contracts.User;
 using UserService.Dto;
 using UserService.Helpers.Errors;
 using UserService.Helpers.Response;
-using ZstdSharp.Unsafe;
-using Type = Google.Protobuf.WellKnownTypes.Type;
 
 namespace UserService.Controllers;
 
@@ -21,8 +18,9 @@ public class UserController : ControllerBase
    {
       _userService = userService;
    }
-
+   
    [HttpPatch]
+   [SwaggerOperation("Edit user model")]
    [ProducesResponseType(200,Type = typeof(UserDto))]
    public async Task<IActionResult> EditUser([FromBody] EditUserRequest request)
    {
@@ -43,6 +41,7 @@ public class UserController : ControllerBase
    }
 
    [HttpPost("update-photo/{userId}")]
+   [SwaggerOperation("Update user avatar")]
    public async Task<IActionResult> UpdateUserPhoto(IFormFile file, [FromRoute] [ObjectIdValidation] string userId)
    {
       if (file == null || file.Length == 0)
@@ -72,6 +71,7 @@ public class UserController : ControllerBase
    }
 
    [HttpGet("user-details/{userId}")]
+   [SwaggerOperation("Get user data")]
    [ProducesResponseType(200,Type =typeof(UserDetailsResponse))]
    public async Task<IActionResult> GetUserDetails([ObjectIdValidation] string userId)
    {
@@ -87,6 +87,7 @@ public class UserController : ControllerBase
    }
 
    [HttpGet("user-reactions/{userId}")]
+   [SwaggerOperation("Get user liked and disliked posts")]
    [ProducesResponseType(200,Type =typeof(UserReactionsResponse))]
    public async Task<IActionResult> GetUserReactions([ObjectIdValidation] string userId)
    {
@@ -106,6 +107,7 @@ public class UserController : ControllerBase
    }
 
    [HttpPost("user-followings")]
+   [SwaggerOperation("Add user following")]
    [ProducesResponseType(200, Type = typeof(UserDto))]
    public async Task<IActionResult> AddUserFollowing([FromBody] UserFollowingsRequest request)
    {
@@ -124,6 +126,7 @@ public class UserController : ControllerBase
    }
    
    [HttpDelete("user-followings")]
+   [SwaggerOperation("Delete user following")]
    [ProducesResponseType(200, Type = typeof(UserDto))]
    public async Task<IActionResult> RemoveUserFollowing([FromQuery] UserFollowingsRequest request)
    {
@@ -142,6 +145,7 @@ public class UserController : ControllerBase
    }
 
    [HttpGet("user-followings/{userId}")]
+   [SwaggerOperation("Get list of user followings")]
    [ProducesResponseType(200,Type =typeof(List<UserConnectionsDto>))]
    public async Task<IActionResult> GetUserFollowings([FromRoute] [ObjectIdValidation] string userId)
    {
@@ -160,6 +164,7 @@ public class UserController : ControllerBase
    }
    
    [HttpGet("user-followers/{userId}")]
+   [SwaggerOperation("Get list of user followers")]
    [ProducesResponseType(200,Type =typeof(List<UserConnectionsDto>))]
    public async Task<IActionResult> GetUserFollowers([FromRoute] string userId)
    {
@@ -178,6 +183,7 @@ public class UserController : ControllerBase
    }
 
    [HttpGet("is-following")]
+   [SwaggerOperation("Check whether the user is following")]
    [ProducesResponseType(200, Type = typeof(bool))]
    public async Task<IActionResult> IsFollowing([FromQuery] [ObjectIdValidation] string userId,
       [FromQuery] [ObjectIdValidation] string targetUserId)
