@@ -20,6 +20,8 @@ export interface UserDetailsResponse {
   avatar: string
   name: string | null
   username: string
+  followers: string[]
+  followings: string[]
   createdAt: string
   posts: Omit<IPost, 'comments'>[]
   comments: {

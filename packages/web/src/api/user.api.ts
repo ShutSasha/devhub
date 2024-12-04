@@ -38,6 +38,16 @@ export const api = createApi({
         method: 'GET',
       }),
     }),
+    addFollowingUserFollowing: builder.mutation<
+      any,
+      { userId: string | undefined; followingUserId: string | undefined }
+    >({
+      query: body => ({
+        url: `users/user-followings`,
+        method: 'POST',
+        body: body,
+      }),
+    }),
     deleteUserFollowing: builder.mutation<any, { userId: string | undefined; followingUserId: string | undefined }>({
       query: ({ userId, followingUserId }) => ({
         url: `users/user-followings?userId=${userId}&followingUserId=${followingUserId}`,
@@ -69,4 +79,5 @@ export const {
   useGetUserFollowersQuery,
   useGetUserFollowingsQuery,
   useDeleteUserFollowingMutation,
+  useAddFollowingUserFollowingMutation,
 } = api
