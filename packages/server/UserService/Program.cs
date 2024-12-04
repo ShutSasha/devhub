@@ -1,6 +1,4 @@
-using System.Net;
 using Amazon.S3;
-using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using UserService.Abstracts;
@@ -27,7 +25,11 @@ builder.Services.AddCors(options =>
 
 services.AddControllers();
 services.AddEndpointsApiExplorer();
-services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+   options.EnableAnnotations();
+});
+
 services.Configure<MongoDbSettings>(configuration.GetSection("MongoDbSettings"));
 services.AddSingleton<IMongoClient>(sp =>
 {
