@@ -228,7 +228,7 @@ public class UserService : IUserService
       
       var posts = await _postCollection
          .Find(p => user.Posts.Contains(p.Id))
-         .Project(p => new Post // Создаем проекцию
+         .Project(p => new Post
          {
             Id = p.Id,
             Title = p.Title,
@@ -260,6 +260,8 @@ public class UserService : IUserService
          CreatedAt = user.CreatedAt,
          Username = user.UserName,
          Name = user.Name,
+         Followers = user.Followers,
+         Followings = user.Followings,
          Comments = comments,
          Posts = posts
       };
