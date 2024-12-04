@@ -9,6 +9,7 @@ using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using MongoDB.Bson.IO;
 using Newtonsoft.Json;
+using Swashbuckle.AspNetCore.Annotations;
 using JsonConvert = Newtonsoft.Json.JsonConvert;
 
 namespace AuthService.Controllers;
@@ -29,6 +30,7 @@ public class AuthController : ControllerBase
    }
 
    [HttpPost("register")]
+   [SwaggerOperation("Register user")]
    public async Task<IActionResult> Register([FromBody] RegistrationUserRequest request)
    {
       try
@@ -48,6 +50,7 @@ public class AuthController : ControllerBase
    }
 
    [HttpPost("login")]
+   [SwaggerOperation("Authorize user")]
    public async Task<IActionResult> Login([FromBody] LoginUserRequest request)
    {
       try
@@ -58,7 +61,7 @@ public class AuthController : ControllerBase
             HttpOnly = true,
             //TODO: Сделать проверку на environment mode 
             // Secure = true,
-            SameSite = SameSiteMode.Strict,
+            SameSite = SameSiteMode.None,
             Expires = DateTime.Now.AddSeconds(30)
          });
          return Ok(new { AccessToken = loginResult.AccessToken, RefreshToken = loginResult.RefreshToken, User = loginResult.UserData });
@@ -70,6 +73,7 @@ public class AuthController : ControllerBase
    }
 
    [HttpPost("verify-email")]
+   [SwaggerOperation("Verify user email address")]
    public async Task<IActionResult> VerifyEmail([FromBody] VerifyEmailRequest request)
    {
       try
@@ -84,6 +88,7 @@ public class AuthController : ControllerBase
    }
 
    [HttpPost("refresh")]
+   [SwaggerOperation("Refresh user access and refresh tokens")]
    public async Task<IActionResult> Refresh()
    {
       try
@@ -101,7 +106,7 @@ public class AuthController : ControllerBase
          {
             HttpOnly = true,
             // Secure = true,
-            SameSite = SameSiteMode.Strict,
+            SameSite = SameSiteMode.None,
             Expires = DateTime.UtcNow.AddDays(30)
          });
 
@@ -114,6 +119,7 @@ public class AuthController : ControllerBase
    }
 
    [HttpPatch("password-verification-code")]
+   [SwaggerOperation("Send verification code for password recovering")]
    public async Task<IActionResult> SendVerificationCode([FromBody] SendVerificationCodeRequest request)
    {
       try
@@ -128,6 +134,7 @@ public class AuthController : ControllerBase
    }
 
    [HttpPatch("change-password")]
+   [SwaggerOperation("Update user password")]
    public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
    {
       try
@@ -142,6 +149,7 @@ public class AuthController : ControllerBase
    }
 
    [HttpPost("logout")]
+   [SwaggerOperation("Unauthorize user")]
    public async Task<IActionResult> Logout()
    {
       try
@@ -157,6 +165,7 @@ public class AuthController : ControllerBase
 
    [Authorize]
    [HttpGet("testinfo")]
+   [SwaggerIgnore]
    public async Task<IActionResult> GetInformation([FromServices] IHttpClientFactory httpClientFactory)
    {
       var httpClient = httpClientFactory.CreateClient();
@@ -172,6 +181,7 @@ public class AuthController : ControllerBase
    }
    
    [HttpGet("google-login")]
+   [SwaggerIgnore]
    public async Task<IActionResult> GoogleLogin()
    {
       try
@@ -193,6 +203,7 @@ public class AuthController : ControllerBase
    
 
    [HttpGet("signin-google")]
+   [SwaggerIgnore]
    public async Task<IActionResult> GoogleCallback()
    {
       var authenticateResult = await HttpContext.AuthenticateAsync("google");
@@ -225,6 +236,7 @@ public class AuthController : ControllerBase
    }
    
    [HttpGet("github-login")]
+   [SwaggerIgnore]
    public async Task<IActionResult> GitHubLogin()
    {
       try
@@ -242,6 +254,7 @@ public class AuthController : ControllerBase
    }
    
    [HttpGet("signin-github")]
+   [SwaggerIgnore]
    public async Task<IActionResult> GitHubCallback()
    {
       var authenticateResult = await HttpContext.AuthenticateAsync("github");
