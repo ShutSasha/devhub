@@ -1,4 +1,3 @@
-import { useEffect } from 'react'
 import { SearchInput } from '@shared/components/search-input/search-input.component'
 import { MainLayout } from '@shared/layouts/main.layout'
 import { ROUTES } from '@pages/router/routes.enum'
@@ -15,12 +14,6 @@ export const Followers = () => {
   const navigate = useNavigate()
   const user = useAppSelector(state => state.userSlice.user)
   const currentUrl = window.location.href
-
-  useEffect(() => {
-    if (!user) {
-      navigate(ROUTES.HOME)
-    }
-  }, [user, navigate])
 
   const handleRedirectToUserProfile = (id: string) => {
     navigate(ROUTES.USER_PROFILE.replace(':id', id))

@@ -41,3 +41,5 @@ export interface UserFollowersResponse {
   username: string
   avatar: string
 }
+
+export type UserFollowingsResponse = UserFollowersResponse[]

@@ -25,6 +25,7 @@ export const UserAvatat = styled.img`
   height: 110px;
   border-radius: 50%;
   border: 5px solid ${colors.bgPage};
+  object-fit: cover;
 `
 
 export const Username = styled.p`
@@ -44,6 +45,14 @@ export const Name = styled.p`
 `
 
 export const UserDescription = styled.p`
+  font-family: ${FONTS.MONTSERRAT};
+  font-size: 20px;
+  font-weight: 400;
+  color: #fff;
+  margin-bottom: 10px;
+`
+
+export const UserFollowersText = styled.p`
   font-family: ${FONTS.MONTSERRAT};
   font-size: 20px;
   font-weight: 400;
@@ -115,6 +124,7 @@ export const PostUserAvatar = styled.img`
   width: 48px;
   height: 48px;
   border-radius: 50%;
+  object-fit: cover;
 `
 
 export const PostUsername = styled.p`

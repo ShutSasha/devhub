@@ -2,7 +2,13 @@ import { createApi } from '@reduxjs/toolkit/query/react'
 
 import baseQueryWithReauth from './baseQueryWithReauth'
 
-import { IUser, ReqEditUserData, UserDetailsResponse, UserFollowersResponse } from '~types/user/user.type'
+import {
+  IUser,
+  ReqEditUserData,
+  UserDetailsResponse,
+  UserFollowersResponse,
+  UserFollowingsResponse,
+} from '~types/user/user.type'
 
 export const api = createApi({
   reducerPath: 'userApi',
@@ -24,6 +30,18 @@ export const api = createApi({
       query: ({ userId }) => ({
         url: `users/user-followers/${userId}`,
         method: 'GET',
+      }),
+    }),
+    getUserFollowings: builder.query<UserFollowingsResponse, { userId: string | undefined }>({
+      query: ({ userId }) => ({
+        url: `users/user-followings/${userId}`,
+        method: 'GET',
+      }),
+    }),
+    deleteUserFollowing: builder.mutation<any, { userId: string | undefined; followingUserId: string | undefined }>({
+      query: ({ userId, followingUserId }) => ({
+        url: `users/user-followings?userId=${userId}&followingUserId=${followingUserId}`,
+        method: 'DELETE',
       }),
     }),
     editUserData: builder.mutation<{ user: IUser }, ReqEditUserData>({
@@ -49,4 +67,6 @@ export const {
   useEditUserDataMutation,
   useEditUserPhotoMutation,
   useGetUserFollowersQuery,
+  useGetUserFollowingsQuery,
+  useDeleteUserFollowingMutation,
 } = api

@@ -32,6 +32,10 @@ export const UserListItem = styled.div`
   padding: 16px;
   border-top: 1px solid #2a2a2d;
   border-bottom: 1px solid #2a2a2d;
+
+  &: last-child {
+    border-bottom: none;
+  }
 `
 
 export const UserListItemDataContainer = styled.div`
@@ -60,4 +64,24 @@ export const OpenChatIcon = styled.img`
   width: 24px;
   height: 24px;
   cursor: pointer;
+`
+
+export const UnFollowButton = styled.button`
+  background-color: transparent;
+  border: ${colors.textPrimary} 1px solid;
+  cursor: pointer;
+  font-family: ${FONTS.MONTSERRAT};
+  font-weight: 500;
+  line-height: 20px;
+  font-size: 16px;
+  color: ${colors.textPrimary};
+  transition: color 0.3s;
+  border-radius: 5px;
+  padding: 4px 10px;
+
+  &:hover {
+    color: #000;
+    background-color: ${colors.primaryOrange};
+    border: 1px solid transparent;
+  }
 `
