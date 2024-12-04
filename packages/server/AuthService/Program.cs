@@ -38,7 +38,10 @@ services.AddAuthorization();
 
 services.AddControllers();
 services.AddEndpointsApiExplorer();
-services.AddSwaggerGen();
+services.AddSwaggerGen(options =>
+{
+    options.EnableAnnotations();
+});
 services.AddHttpClient();
 
 services.Configure<MongoDbSettings>(configuration.GetSection("MongoDbSettings"));
