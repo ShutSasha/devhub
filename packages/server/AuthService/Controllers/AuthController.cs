@@ -61,7 +61,7 @@ public class AuthController : ControllerBase
             HttpOnly = true,
             //TODO: Сделать проверку на environment mode 
             // Secure = true,
-            SameSite = SameSiteMode.None,
+            SameSite = SameSiteMode.Lax,
             Expires = DateTime.Now.AddSeconds(30)
          });
          return Ok(new { AccessToken = loginResult.AccessToken, RefreshToken = loginResult.RefreshToken, User = loginResult.UserData });
@@ -106,7 +106,7 @@ public class AuthController : ControllerBase
          {
             HttpOnly = true,
             // Secure = true,
-            SameSite = SameSiteMode.None,
+            SameSite = SameSiteMode.Lax,
             Expires = DateTime.UtcNow.AddDays(30)
          });
 
