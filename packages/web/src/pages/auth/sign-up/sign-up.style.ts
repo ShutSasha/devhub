@@ -49,7 +49,7 @@ export const AuthIcon = styled.button<{ $image: string }>`
   width: 36px;
   cursor: pointer;
 
-  background: ${({ $image }) => `url(${$image})`};
+  background: ${({ $image }) => `url(${$image}) `};
   background-size: cover;
   border: none;
 `
