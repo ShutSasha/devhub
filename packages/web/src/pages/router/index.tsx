@@ -75,7 +75,7 @@ const router = createBrowserRouter([
     element: <Followers />,
   },
   {
-    path: `${ROUTES.USER_FRIENDS_FOLLOWERS_LIST}`,
+    path: `${ROUTES.USER_FRIENDS_FOLLOWED_LIST}`,
     element: <FollowedList />,
   },
 ])

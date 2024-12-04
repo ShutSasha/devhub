@@ -13,5 +13,5 @@ export enum ROUTES {
   USER_PROFILE = '/user-profile/:id',
   USER_EDIT_PROFILE = '/user-edit-profile/:id',
   USER_FRIENDS_FOLLOWERS = '/user-friends-followers/:id',
-  USER_FRIENDS_FOLLOWERS_LIST = '/user-friends-followers-list/:id',
+  USER_FRIENDS_FOLLOWED_LIST = '/user-friends-followers-list/:id',
 }

@@ -67,6 +67,7 @@ const AuthDisplay = () => {
 }
 
 export const Header = () => {
+  const user = useAppSelector(state => state.userSlice.user)
   const loadingFromState = useAppSelector(state => state.userSlice.loading)
 
   const navigate = useNavigate()
@@ -90,7 +91,7 @@ export const Header = () => {
         <Logo src={logo} onClick={handleLogoClick} />
         <NavList>
           {navElements.map(el => (
-            <NavItem key={el.title} icon={el.icon} navTitle={el.title} path={el.path} />
+            <NavItem key={el.title} icon={el.icon} navTitle={el.title} path={el.path} user={user} />
           ))}
         </NavList>
         <AuthContainer>{isLoading ? <div>Loading...</div> : <AuthDisplay />}</AuthContainer>
