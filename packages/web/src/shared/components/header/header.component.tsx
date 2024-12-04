@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { FC } from 'react'
 import { useNavigate } from 'react-router-dom'
 import logo from '@assets/images/logo.svg'
 import { ROUTES } from '@pages/router/routes.enum'
@@ -21,6 +21,8 @@ import {
 } from './header.style'
 import { NavItem } from './nav-item.component'
 import { navElements } from './consts/header-elements.const'
+
+import { IUser } from '~types/user/user.type'
 
 const AuthDisplay = () => {
   const navigate = useNavigate()
@@ -66,20 +68,12 @@ const AuthDisplay = () => {
   )
 }
 
-export const Header = () => {
-  const user = useAppSelector(state => state.userSlice.user)
-  const loadingFromState = useAppSelector(state => state.userSlice.loading)
+interface HeaderProps {
+  user: IUser | null
+}
 
+export const Header: FC<HeaderProps> = ({ user }) => {
   const navigate = useNavigate()
-  const [isLoading, setIsLoading] = useState(true)
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(loadingFromState)
-    }, 300)
-
-    return () => clearTimeout(timer)
-  }, [loadingFromState])
 
   const handleLogoClick = () => {
     navigate(ROUTES.HOME)
@@ -94,7 +88,9 @@ export const Header = () => {
             <NavItem key={el.title} icon={el.icon} navTitle={el.title} path={el.path} user={user} />
           ))}
         </NavList>
-        <AuthContainer>{isLoading ? <div>Loading...</div> : <AuthDisplay />}</AuthContainer>
+        <AuthContainer>
+          <AuthDisplay />
+        </AuthContainer>
       </Container>
     </Wrapper>
   )
