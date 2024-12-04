@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "license": "UNLICENSED",
   "dependencies": {
     "@reduxjs/toolkit": "^2.2.7",
     "@testing-library/jest-dom": "^5.14.1",

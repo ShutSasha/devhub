@@ -2,7 +2,7 @@ import { createApi } from '@reduxjs/toolkit/query/react'
 
 import baseQueryWithReauth from './baseQueryWithReauth'
 
-import { IUser, ReqEditUserData, UserDetailsResponse } from '~types/user/user.type'
+import { IUser, ReqEditUserData, UserDetailsResponse, UserFollowersResponse } from '~types/user/user.type'
 
 export const api = createApi({
   reducerPath: 'userApi',
@@ -17,6 +17,12 @@ export const api = createApi({
     getUserReactions: builder.query<{ likedPosts: string[]; dislikedPosts: string[] }, { userId: string | undefined }>({
       query: ({ userId }) => ({
         url: `users/user-reactions/${userId}`,
+        method: 'GET',
+      }),
+    }),
+    getUserFollowers: builder.query<UserFollowersResponse[], { userId: string | undefined }>({
+      query: ({ userId }) => ({
+        url: `users/user-followers/${userId}`,
         method: 'GET',
       }),
     }),
@@ -37,5 +43,10 @@ export const api = createApi({
   }),
 })
 
-export const { useGetUserDetailsQuery, useGetUserReactionsQuery, useEditUserDataMutation, useEditUserPhotoMutation } =
-  api
+export const {
+  useGetUserDetailsQuery,
+  useGetUserReactionsQuery,
+  useEditUserDataMutation,
+  useEditUserPhotoMutation,
+  useGetUserFollowersQuery,
+} = api

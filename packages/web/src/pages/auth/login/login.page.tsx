@@ -27,7 +27,6 @@ export const Login = () => {
   const [login, { error: loginError }] = useLoginMutation()
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
-  console.log(googleImage)
 
   const [username, setUsername] = useState<string>('')
   const [password, setPassword] = useState<string>('')

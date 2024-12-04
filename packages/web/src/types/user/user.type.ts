@@ -35,3 +35,9 @@ export interface ReqEditUserData {
   name: string
   bio: string
 }
+
+export interface UserFollowersResponse {
+  _id: string
+  username: string
+  avatar: string
+}
