@@ -52,12 +52,11 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
-        val fragmentManager = supportFragmentManager
         if (savedInstanceState == null) {
-            fetchUserReactions()
-            fragmentManager.beginTransaction()
+            val footerFragment = FooterFragment.newInstance("home")
+            supportFragmentManager.beginTransaction()
                 .replace(R.id.header_container, HeaderFragment())
-                .replace(R.id.footer_container, FooterFragment())
+                .replace(R.id.footer_container, footerFragment)
                 .commit()
         }
 
