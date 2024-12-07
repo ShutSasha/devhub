@@ -24,10 +24,10 @@ builder.Configuration.SetBasePath(builder.Environment.ContentRootPath)
    .AddJsonFile("ocelot.json", optional: false, reloadOnChange: true)
    .AddEnvironmentVariables();
 
-services.AddCustomAuthentication(configuration);
+//services.AddCustomAuthentication(configuration);
 services.AddOcelot(builder.Configuration);
-services.AddAuthorization();
-services.AddEndpointsApiExplorer();
+//services.AddAuthorization();
+//services.AddEndpointsApiExplorer();
 services.AddSwaggerGen(c =>
 {
    c.SwaggerDoc("v1", new OpenApiInfo { Title = "API Gateway", Version = "v1" });
@@ -51,7 +51,7 @@ if (app.Environment.IsDevelopment())
       c.RoutePrefix = "";
    });
 }
-app.UseAuthentication();
-app.UseAuthorization();
+//app.UseAuthentication();
+//app.UseAuthorization();
 await app.UseOcelot();
 app.Run();
