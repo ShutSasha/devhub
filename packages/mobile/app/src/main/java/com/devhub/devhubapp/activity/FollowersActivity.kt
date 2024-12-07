@@ -37,8 +37,10 @@ class FollowersActivity : AppCompatActivity(), OnFollowStateChangedListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_followers)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.followersContainer)) { v, insets ->
+        binding = ActivityFollowersBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
@@ -52,9 +54,7 @@ class FollowersActivity : AppCompatActivity(), OnFollowStateChangedListener {
                 .commit()
         }
 
-        binding = ActivityFollowersBinding.inflate(layoutInflater)
         encryptedPreferencesManager = EncryptedPreferencesManager(this)
-        setContentView(binding.root)
 
         userId = intent.getStringExtra("USER_ID") ?: ""
         username = intent.getStringExtra("USERNAME") ?: ""
@@ -62,7 +62,7 @@ class FollowersActivity : AppCompatActivity(), OnFollowStateChangedListener {
         setUpFragments()
     }
 
-    private fun setUpFragments(){
+    private fun setUpFragments() {
         binding.noFollowingsContainer.visibility = View.GONE
         binding.noFollowersContainer.visibility = View.GONE
 
@@ -70,7 +70,8 @@ class FollowersActivity : AppCompatActivity(), OnFollowStateChangedListener {
         val fragmentTransaction: FragmentTransaction = fragmentManager.beginTransaction()
 
         val userName = encryptedPreferencesManager.getData("username")
-        val targetUsername = if (username.isNotEmpty() && username != userName) username else userName
+        val targetUsername =
+            if (username.isNotEmpty() && username != userName) username else userName
         binding.tvUsername.text = "@${targetUsername}"
 
         val followersFragment = UnderlinedTextFragment()
@@ -85,7 +86,7 @@ class FollowersActivity : AppCompatActivity(), OnFollowStateChangedListener {
                 binding.followers.visibility = View.VISIBLE
                 binding.followings.visibility = View.GONE
                 binding.noFollowingsContainer.visibility = View.GONE
-                if(followers.isEmpty()){
+                if (followers.isEmpty()) {
                     binding.noFollowersContainer.visibility = View.VISIBLE
                 } else {
                     binding.noFollowersContainer.visibility = View.GONE
@@ -103,7 +104,7 @@ class FollowersActivity : AppCompatActivity(), OnFollowStateChangedListener {
                 binding.followers.visibility = View.GONE
                 binding.followings.visibility = View.VISIBLE
                 binding.noFollowersContainer.visibility = View.GONE
-                if(followings.isEmpty()){
+                if (followings.isEmpty()) {
                     binding.noFollowingsContainer.visibility = View.VISIBLE
                 } else {
                     binding.noFollowingsContainer.visibility = View.GONE
@@ -112,7 +113,7 @@ class FollowersActivity : AppCompatActivity(), OnFollowStateChangedListener {
         }
         fragmentTransaction.add(R.id.tvFollowed, followedFragment)
 
-        if(followersFragment.isUnderlined){
+        if (followersFragment.isUnderlined) {
             binding.followers.visibility = View.VISIBLE
             binding.followings.visibility = View.GONE
         } else {
@@ -129,7 +130,10 @@ class FollowersActivity : AppCompatActivity(), OnFollowStateChangedListener {
 
         RetrofitClient.getInstance(applicationContext).userAPI.getFollowings(targetId)
             .enqueue(object : Callback<List<Follower>> {
-                override fun onResponse(call: Call<List<Follower>>, response: Response<List<Follower>>) {
+                override fun onResponse(
+                    call: Call<List<Follower>>,
+                    response: Response<List<Follower>>
+                ) {
                     if (response.isSuccessful) {
                         val data = response.body()
                         if (data != null) {
@@ -140,7 +144,10 @@ class FollowersActivity : AppCompatActivity(), OnFollowStateChangedListener {
                             Log.e("GetFollowings", "Response body is null")
                         }
                     } else {
-                        Log.e("GetFollowings", "Failed with error: ${response.errorBody()?.string()}")
+                        Log.e(
+                            "GetFollowings",
+                            "Failed with error: ${response.errorBody()?.string()}"
+                        )
                     }
                 }
 
@@ -156,7 +163,10 @@ class FollowersActivity : AppCompatActivity(), OnFollowStateChangedListener {
 
         RetrofitClient.getInstance(applicationContext).userAPI.getFollowers(targetId)
             .enqueue(object : Callback<List<Follower>> {
-                override fun onResponse(call: Call<List<Follower>>, response: Response<List<Follower>>) {
+                override fun onResponse(
+                    call: Call<List<Follower>>,
+                    response: Response<List<Follower>>
+                ) {
                     if (response.isSuccessful) {
                         val data = response.body()
                         if (data != null) {
@@ -167,7 +177,10 @@ class FollowersActivity : AppCompatActivity(), OnFollowStateChangedListener {
                             Log.e("GetFollowers", "Response body is null")
                         }
                     } else {
-                        Log.e("GetFollowers", "Failed with error: ${response.errorBody()?.string()}")
+                        Log.e(
+                            "GetFollowers",
+                            "Failed with error: ${response.errorBody()?.string()}"
+                        )
                     }
                 }
 
@@ -188,7 +201,9 @@ class FollowersActivity : AppCompatActivity(), OnFollowStateChangedListener {
             val fragment = FollowerFragment.newInstance(
                 username = follower.username,
                 avatarUrl = follower.avatar,
-                userId = if (userId.isNotEmpty() && userId != encryptedPreferencesManager.getData("user_id")) userId else encryptedPreferencesManager.getData("user_id"),
+                userId = if (userId.isNotEmpty() && userId != encryptedPreferencesManager.getData("user_id")) userId else encryptedPreferencesManager.getData(
+                    "user_id"
+                ),
                 targetUserId = follower._id
             )
             isFollowing(userId, follower._id) { isFollowing ->
@@ -211,7 +226,9 @@ class FollowersActivity : AppCompatActivity(), OnFollowStateChangedListener {
             val fragment = FollowerFragment.newInstance(
                 username = follower.username,
                 avatarUrl = follower.avatar,
-                userId = if (userId.isNotEmpty() && userId != encryptedPreferencesManager.getData("user_id")) userId else encryptedPreferencesManager.getData("user_id"),
+                userId = if (userId.isNotEmpty() && userId != encryptedPreferencesManager.getData("user_id")) userId else encryptedPreferencesManager.getData(
+                    "user_id"
+                ),
                 targetUserId = follower._id
             )
 
@@ -234,7 +251,10 @@ class FollowersActivity : AppCompatActivity(), OnFollowStateChangedListener {
                         val isFollowingResponse = response.body()
                         if (isFollowingResponse != null) {
                             callback(isFollowingResponse)
-                            Log.i("IsFollowing", "IsFollowing successfully retrieved: $isFollowingResponse")
+                            Log.i(
+                                "IsFollowing",
+                                "IsFollowing successfully retrieved: $isFollowingResponse"
+                            )
                         } else {
                             Log.e("IsFollowing", "Response body is null")
                         }

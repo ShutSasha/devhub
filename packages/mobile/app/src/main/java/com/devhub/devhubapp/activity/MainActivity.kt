@@ -84,7 +84,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private suspend fun fetchUserReactionsInternal(): UserReactions? {
-
         return try {
             withContext(Dispatchers.IO) {
                 val userId = encryptedPreferencesManager.getUserData()._id
@@ -103,6 +102,7 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
         currentPage = 1
         fetchPostsAndDisplay(currentPage)
+        refreshPosts()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
