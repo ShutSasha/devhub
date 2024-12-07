@@ -23,4 +23,6 @@
     <string name="name">Name</string>
     <string name="description">Description</string>
     <string name="your_followers_followed_list_is_empty">Your Followers/Followed list is empty</string>
+    <string name="your_followers_list_is_empty">Your Followers list is empty</string>
+    <string name="your_followed_list_is_empty">Your Followed list is empty</string>
 </resources>
