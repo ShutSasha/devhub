@@ -22,10 +22,7 @@ import com.devhub.devhubapp.fragment.UserInfoFragment
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.text.SimpleDateFormat
 import java.util.Date
-import java.util.Locale
-import java.util.TimeZone
 
 class UserProfileActivity : AppCompatActivity() {
     private lateinit var user: UserDetail
@@ -44,6 +41,7 @@ class UserProfileActivity : AppCompatActivity() {
             name = "",
             username = "",
             avatar = "",
+            followers = emptyArray(),
             createdAt = Date(),
             bio = "",
             posts = emptyList(),
@@ -112,6 +110,7 @@ class UserProfileActivity : AppCompatActivity() {
             id = user._id,
             username = user.username,
             avatarUrl = user.avatar,
+            followers = user.followers,
             createdAt = user.createdAt,
             description = user.bio ?: "",
             name = user.name ?: ""
@@ -170,7 +169,7 @@ class UserProfileActivity : AppCompatActivity() {
                         if (data != null) {
                             user = data
                             Log.i("UserDetail", "UserDetail successfully retrieved")
-                            Log.e("UserDetail", user.posts.toString())
+                            Log.e("UserDetail", data.toString())
 
                             fetchUserReactions(id)
                         } else {
