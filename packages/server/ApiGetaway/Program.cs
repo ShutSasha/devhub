@@ -35,7 +35,7 @@ services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
-app.UseMiddleware<ExceptionMiddleware>();
+//app.UseMiddleware<ExceptionMiddleware>();
 app.UseCors("AllowMultipleOrigins");
 
 if (app.Environment.IsDevelopment())
