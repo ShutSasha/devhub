@@ -1,18 +1,54 @@
+import { toast } from 'react-toastify'
 import { useNavigate, useParams } from 'react-router-dom'
 import { UserProfileLayout } from '@shared/layouts/user/user-profile.layout'
-import { useGetUserDetailsQuery } from '@api/user.api'
+import {
+  useAddFollowingUserFollowingMutation,
+  useDeleteUserFollowingMutation,
+  useGetUserDetailsQuery,
+} from '@api/user.api'
 import postCreatedSVG from '@assets/images/user/post-created-icon.svg'
 import commentWrittenSVG from '@assets/images/user/comment-written-icon.svg'
 import { ROUTES } from '@pages/router/routes.enum'
 import { useAppSelector } from '@app/store/store'
+import { handleServerException } from '@utils/handleServerException.util'
 
 import * as _ from './profile.style'
+
+import { ErrorException } from '~types/error/error.type'
 
 export const UserProfile = () => {
   const { id } = useParams()
   const navigate = useNavigate()
   const user = useAppSelector(state => state.userSlice.user)
-  const { data: userDetails, isLoading } = useGetUserDetailsQuery({ userId: id }, { refetchOnMountOrArgChange: true })
+  const {
+    data: userDetails,
+    isLoading,
+    refetch,
+  } = useGetUserDetailsQuery({ userId: id }, { refetchOnMountOrArgChange: true })
+  const [followByUser] = useAddFollowingUserFollowingMutation()
+  const [unfollowByUser] = useDeleteUserFollowingMutation()
+
+  const handleFollow = async () => {
+    try {
+      await followByUser({ userId: user?._id, followingUserId: userDetails?._id }).unwrap()
+
+      refetch()
+    } catch (e) {
+      console.error(e)
+      toast.error(handleServerException(e as ErrorException)?.join(', '))
+    }
+  }
+
+  const handleUnfollow = async () => {
+    try {
+      await unfollowByUser({ userId: user?._id, followingUserId: userDetails?._id }).unwrap()
+
+      refetch()
+    } catch (e) {
+      console.error(e)
+      toast.error(handleServerException(e as ErrorException)?.join(', '))
+    }
+  }
 
   if (!id) {
     return (
@@ -45,6 +81,21 @@ export const UserProfile = () => {
         <_.Username>{userDetails.username}</_.Username>
         {userDetails.name && <_.Name>{userDetails.name}</_.Name>}
         {userDetails.bio && <_.UserDescription>{userDetails.bio}</_.UserDescription>}
+        {
+          <_.UserFollowersText>
+            {userDetails?.followers ? userDetails.followers.length : 0} followers
+          </_.UserFollowersText>
+        }
+        {userDetails._id !== user?._id && (
+          <_.InterectWithUserContainer>
+            {user && userDetails?.followers?.includes(user?._id) ? (
+              <_.UnfollowBtn onClick={handleUnfollow}>Unfollow</_.UnfollowBtn>
+            ) : (
+              <_.FollowBtn onClick={handleFollow}>Follow</_.FollowBtn>
+            )}
+            <_.SendMessageBtn>Send message</_.SendMessageBtn>
+          </_.InterectWithUserContainer>
+        )}
         {user?._id === userDetails._id && (
           <_.EditProfileBtn onClick={() => navigate(`${ROUTES.USER_EDIT_PROFILE.replace(':id', userDetails._id)}`)}>
             Edit profile

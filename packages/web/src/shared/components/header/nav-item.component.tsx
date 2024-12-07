@@ -1,16 +1,19 @@
 import { FC } from 'react'
-import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
 import { FONTS } from '@shared/consts/fonts.enum'
+import { toast } from 'react-toastify'
 
 import { Text } from '../text/text.component'
+
+import { IUser } from '~types/user/user.type'
 
 const NavIcon = styled.img`
   width: 20px;
   height: 20px;
 `
 
-const LinkContainer = styled(Link)`
+const LinkContainer = styled.div`
   text-decoration: none;
   outline: none;
   position: relative;
@@ -33,11 +36,30 @@ const LinkContainer = styled(Link)`
 interface NavItemProps {
   icon: string
   navTitle: string
+  path: string
+  user: IUser | null
 }
 
-export const NavItem: FC<NavItemProps> = ({ icon, navTitle }) => {
+export const NavItem: FC<NavItemProps> = ({ icon, navTitle, path, user }) => {
+  const navigate = useNavigate()
+
+  const handleClick = () => {
+    if (path.includes(':id')) {
+      if (user) {
+        navigate(path.replace(':id', user._id))
+      } else {
+        toast.error('User is not authenticated', { autoClose: 1500 })
+      }
+    } else {
+      navigate(path)
+    }
+  }
+
   return (
-    <LinkContainer style={{ display: 'flex', alignItems: 'center', gap: '10px' }} to={'/'}>
+    <LinkContainer
+      style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}
+      onClick={handleClick}
+    >
       <NavIcon src={icon} />
       <Text
         fontFamily={FONTS.MONTSERRAT}

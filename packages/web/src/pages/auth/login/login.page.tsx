@@ -6,8 +6,8 @@ import { AuthLayout } from '@shared/layouts/auth/auth.layout'
 import { ChangeEvent, useState } from 'react'
 import { AuthBtn } from '@shared/components/auth/btn/btn.component'
 import { EmphasizeLine } from '@shared/components/auth/emphasize-line/emphasize-line.component'
-import googleImage from '@assets/images/auth/devicon_google.svg'
-import githubImage from '@assets/images/auth/mdi_github.svg'
+import googleImage from '@assets/images/auth/devicon_google.svg?url'
+import githubImage from '@assets/images/auth/mdi_github.svg?url'
 import { Text } from '@shared/components/text/text.component'
 import { FONTS } from '@shared/consts/fonts.enum'
 import { AuthIcon, ImgContainer } from '@pages/auth/sign-up/sign-up.style'
@@ -53,7 +53,7 @@ export const Login = () => {
 
   const handleGoogleAuth = () => {
     try {
-      const redirectUrl = `${process.env.REACT_APP_GOOGLE_AUTH_API}`
+      const redirectUrl = `${import.meta.env.VITE_GOOGLE_AUTH_API}`
 
       window.location.href = redirectUrl
     } catch (e) {
@@ -63,7 +63,7 @@ export const Login = () => {
 
   const handleGithubAuth = async () => {
     try {
-      const redirectUrl = `${process.env.REACT_APP_GITHUB_AUTH_API}`
+      const redirectUrl = `${import.meta.env.VITE_GITHUB_AUTH_API}`
 
       window.location.href = redirectUrl
     } catch (e) {
@@ -101,8 +101,9 @@ export const Login = () => {
         style={{ marginBottom: '16px' }}
       />
       <ImgContainer>
-        <AuthIcon $image={googleImage} onClick={handleGoogleAuth} />
+        <AuthIcon $image={`${googleImage}`} onClick={handleGoogleAuth} />
         <AuthIcon $image={githubImage} onClick={handleGithubAuth} />
+        {/* <img src={googleImage} alt="" /> */}
       </ImgContainer>
     </AuthLayout>
   )
