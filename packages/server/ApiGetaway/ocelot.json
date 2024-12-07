@@ -179,6 +179,9 @@
             }
          ],
          "UpstreamPathTemplate": "/api/users",
+         "AuthenticationOptions": {
+            "AuthenticationProviderKey": "Bearer"
+         },
          "UpstreamHttpMethod": ["PATCH"]
       },
       {

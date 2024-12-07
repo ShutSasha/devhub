@@ -1,0 +1,14 @@
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning",
+      "Ocelot": "Error"
+    }
+  },
+   "JwtOptions": {
+      "AccessSecretKey": "jwt_access_secrets",
+      "RefreshSecretKey": "jwt_refresh_secrets",
+      "ExpiresDuration": "1"
+   }
+}
