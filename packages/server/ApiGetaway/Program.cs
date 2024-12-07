@@ -1,14 +1,10 @@
-using ApiGetaway.Helpers;
-using ApiGetaway.Helpers.Response;
 using Microsoft.OpenApi.Models;
 using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
-var services = builder.Services;
-var configuration = builder.Configuration;
 
-services.AddCors(options =>
+builder.Services.AddCors(options =>
 {
    options.AddPolicy("AllowMultipleOrigins", policy =>
    {
@@ -24,18 +20,16 @@ builder.Configuration.SetBasePath(builder.Environment.ContentRootPath)
    .AddJsonFile("ocelot.json", optional: false, reloadOnChange: true)
    .AddEnvironmentVariables();
 
-//services.AddCustomAuthentication(configuration);
-services.AddOcelot(builder.Configuration);
-//services.AddAuthorization();
-//services.AddEndpointsApiExplorer();
-services.AddSwaggerGen(c =>
+builder.Services.AddOcelot(builder.Configuration);
+
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(c =>
 {
    c.SwaggerDoc("v1", new OpenApiInfo { Title = "API Gateway", Version = "v1" });
 });
 
 var app = builder.Build();
 
-//app.UseMiddleware<ExceptionMiddleware>();
 app.UseCors("AllowMultipleOrigins");
 
 if (app.Environment.IsDevelopment())
@@ -51,7 +45,6 @@ if (app.Environment.IsDevelopment())
       c.RoutePrefix = "";
    });
 }
-//app.UseAuthentication();
-//app.UseAuthorization();
+
 await app.UseOcelot();
 app.Run();
