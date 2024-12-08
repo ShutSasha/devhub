@@ -277,6 +277,43 @@
          "UpstreamPathTemplate": "/api/users/is-following",
          "UpstreamHttpMethod": ["GET"]
       },
+      {
+         "DownstreamPathTemplate": "/api/users/saved-posts",
+         "DownstreamScheme": "http",
+         "DownstreamHostAndPorts": [
+            {
+               "Host": "localhost",
+               "Port": 5229
+            }
+         ],
+         "UpstreamPathTemplate": "/api/users/saved-posts",
+         "UpstreamHttpMethod": ["POST","DELETE"]
+      },
+      {
+         "DownstreamPathTemplate": "/api/users/saved-posts/{userId}",
+         "DownstreamScheme": "http",
+         "DownstreamHostAndPorts": [
+            {
+               "Host": "localhost",
+               "Port": 5229
+            }
+         ],
+         "UpstreamPathTemplate": "/api/users/saved-posts/{userId}",
+         "UpstreamHttpMethod": ["GET"]
+      },
+      {
+         "DownstreamPathTemplate": "/api/users/saved-posts-details/{userId}",
+         "DownstreamScheme": "http",
+         "DownstreamHostAndPorts": [
+            {
+               "Host": "localhost",
+               "Port": 5229
+            }
+         ],
+         "UpstreamPathTemplate": "/api/users/saved-posts-details/{userId}",
+         "UpstreamHttpMethod": ["GET"]
+      },
+      
       
       
       {
