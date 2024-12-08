@@ -1,3 +1,4 @@
+using Amazon.Runtime.Internal.Util;
 using AutoMapper;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson;
@@ -24,7 +25,7 @@ public class UserService : IUserService
 
    public UserService(IMongoDatabase mongoDatabase, IOptions<MongoDbSettings> mongoDbSettings,
       ILogger<UserService> logger, IStorageService storageService, IMapper mapper
-      )
+   )
    {
       _logger = logger;
       _storageService = storageService;
@@ -56,6 +57,7 @@ public class UserService : IUserService
          _logger.LogWarning($"No changes were made to user with ID {id}.");
          throw new Exception($"400:No changes were made.");
       }
+
       var updatedUser = await _userCollection.Find(filter).FirstOrDefaultAsync();
       _logger.LogInformation($"User with ID {id} updated successfully.");
       return _mapper.Map<User, UserDto>(updatedUser);
@@ -122,7 +124,7 @@ public class UserService : IUserService
    public async Task<UserDto> AddUserFollowing(string userId, string followingId)
    {
       var (user, targetUser) = await GetUsersForFollowingAction(userId, followingId);
-      
+
       if (user.Followings.Contains(followingId))
          throw new Exception($"400: You've already subscribed to this user");
 
@@ -130,7 +132,7 @@ public class UserService : IUserService
       var targetUserUpdate = Builders<User>.Update.AddToSet(u => u.Followers, userId);
 
       _logger.LogInformation($"Preparing to update users with id {userId}, {followingId}");
-      
+
       var userUpdateTask = _userCollection.UpdateOneAsync(
          Builders<User>.Filter.Eq(u => u.Id, userId),
          userUpdate);
@@ -157,7 +159,7 @@ public class UserService : IUserService
 
       if (user == null || targetUser == null)
          throw new Exception("404: User or target user wasn't found");
-      
+
       _logger.LogInformation($"users with id {userId}, {followingId} were found");
       return (user, targetUser);
    }
@@ -165,10 +167,10 @@ public class UserService : IUserService
    public async Task<UserDto> RemoveUserFollowing(string userId, string followingId)
    {
       var (user, targetUser) = await GetUsersForFollowingAction(userId, followingId);
-      
+
       if (!user.Followings.Contains(followingId))
          throw new Exception("400: You're not subscribed to this user");
-      
+
       var userUpdate = Builders<User>.Update.Pull(u => u.Followings, followingId);
       var targetUserUpdate = Builders<User>.Update.Pull(u => u.Followers, userId);
 
@@ -182,18 +184,18 @@ public class UserService : IUserService
          targetUserUpdate);
 
       await Task.WhenAll(userUpdateTask, targetUserUpdateTask);
-      
+
       if (userUpdateTask.Result.ModifiedCount == 0 || targetUserUpdateTask.Result.ModifiedCount == 0)
          throw new Exception("500: Failed to update user or target user data");
-      
+
       user.Followings.Remove(followingId);
       targetUser.Followers.Remove(userId);
-      
+
       _logger.LogInformation($"users with id {userId}, {followingId} updated successfully");
       return _mapper.Map<User, UserDto>(user);
    }
 
-   public async Task<List<UserConnectionsDto>> GetUserConnections(string userId,string connectionType)
+   public async Task<List<UserConnectionsDto>> GetUserConnections(string userId, string connectionType)
    {
       var user = await GetById(userId);
 
@@ -203,7 +205,7 @@ public class UserService : IUserService
          "followers" => user.Followers,
          _ => throw new Exception("400: Invalid connection type")
       };
-      
+
       var users = await _userCollection
          .Find(u => ids.Contains(u.Id))
          .ToListAsync();
@@ -211,9 +213,8 @@ public class UserService : IUserService
       var connections = _mapper.Map<List<UserConnectionsDto>>(users);
 
       return connections;
-
    }
-   
+
    public async Task<bool> CheckUserFollowing(string userId, string targetUserId)
    {
       var (user, targetUser) = await GetUsersForFollowingAction(userId, targetUserId);
@@ -232,7 +233,7 @@ public class UserService : IUserService
          var action = isAdding ? "saved" : "deleted";
          throw new Exception($"400: You've already {action} this post");
       }
-      
+
       var userUpdate = isAdding
          ? Builders<User>.Update.AddToSet(u => u.SavedPosts, savedPostId)
          : Builders<User>.Update.Pull(u => u.SavedPosts, savedPostId);
@@ -254,13 +255,68 @@ public class UserService : IUserService
       return user.SavedPosts;
    }
 
+   public async Task<List<PostDto>> GetDetailedSavedPosts(string userId)
+   {
+      var user = await GetById(userId);
+      
+      var savedPostIds = user.SavedPosts;
+      if (!savedPostIds.Any())
+      {
+         return new List<PostDto>();
+      }
+      
+      var postsWithAuthors = await _postCollection
+         .Find(p => savedPostIds.Contains(p.Id))
+         .ToListAsync();
+
+      var result = new List<PostDto>();
+
+      foreach (var post in postsWithAuthors)
+      {
+         var author = await _userCollection
+            .Find(u => u.Id == post.UserId.ToString())
+            .Project(u => new SavedPostUserDto
+            {
+               Id = u.Id,
+               Name = u.Name,
+               Username = u.UserName,
+               Avatar = u.Avatar,
+               DevPoints = u.DevPoints
+            })
+            .FirstOrDefaultAsync();
+
+         if (author == null)
+         {
+            throw new Exception($"500: Author not found for post {post.Id}");
+         }
+
+         var detailedPost = new PostDto
+         {
+            Id = post.Id,
+            User = author,
+            Title = post.Title,
+            Content = post.Content,
+            CreatedAt = post.CreatedAt,
+            Likes = post.Likes,
+            Dislikes = post.Dislikes,
+            HeaderImage = post.HeaderImage,
+            Comments = post.Comments,
+            Tags = post.Tags
+         };
+
+         result.Add(detailedPost);
+      }
+
+      return result;
+   }
+
    public async Task<UserDetailsResponse> GetUserDetailsById(string id)
    {
       var user = await GetById(id);
-      
+
       var posts = await _postCollection
          .Find(p => user.Posts.Contains(p.Id))
-         .Project(p => new Post // Создаем проекцию
+         .Project(p => new Post
          {
             Id = p.Id,
             Title = p.Title,

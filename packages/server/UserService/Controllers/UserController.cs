@@ -1,34 +1,23 @@
-using Amazon.Util.Internal;
 using Microsoft.AspNetCore.Mvc;
 using UserService.Abstracts;
-using UserService.Contracts.User;
 using UserService.Contracts.User;
 using UserService.Dto;
 using UserService.Helpers.Errors;
 using UserService.Helpers.Response;
-using ZstdSharp.Unsafe;
-using Type = Google.Protobuf.WellKnownTypes.Type;
 
 namespace UserService.Controllers;
 
 [ApiController]
 [Route("api/users")]
-public class UserController : ControllerBase
+public class UserController(IUserService userService) : ControllerBase
 {
-   private readonly IUserService _userService;
-
-   public UserController(IUserService userService)
-   {
-      _userService = userService;
-   }
-
    [HttpPatch]
    [ProducesResponseType(200, Type = typeof(UserDto))]
    public async Task<IActionResult> EditUser([FromBody] EditUserRequest request)
    {
       try
       {
-         var userInformation = await _userService.EditUser(request.Id, request.Name, request.Bio);
+         var userInformation = await userService.EditUser(request.Id, request.Name, request.Bio);
          return Ok(new { User = userInformation });
       }
       catch (Exception e)
@@ -45,7 +34,7 @@ public class UserController : ControllerBase
    [HttpPost("update-photo/{userId}")]
    public async Task<IActionResult> UpdateUserPhoto(IFormFile file, [FromRoute] [ObjectIdValidation] string userId)
    {
-      if (file == null || file.Length == 0)
+      if (file.Length == 0)
       {
          return ErrorResponseHelper.CreateErrorResponse(
             400,
@@ -58,7 +47,7 @@ public class UserController : ControllerBase
          await using var fileStream = file.OpenReadStream();
          var fileName = file.FileName;
          var contentType = file.ContentType;
-         var updateUserIconResult = await _userService.EditUserIcon(userId, fileName, fileStream, contentType);
+         var updateUserIconResult = await userService.EditUserIcon(userId, fileName, fileStream, contentType);
 
          return Ok(new { Avatar = updateUserIconResult });
       }
@@ -77,7 +66,7 @@ public class UserController : ControllerBase
    {
       try
       {
-         var userDetails = await _userService.GetUserDetailsById(userId);
+         var userDetails = await userService.GetUserDetailsById(userId);
          return Ok(userDetails);
       }
       catch (Exception e)
@@ -92,7 +81,7 @@ public class UserController : ControllerBase
    {
       try
       {
-         var userReactions = await _userService.GetUserReaction(userId);
+         var userReactions = await userService.GetUserReaction(userId);
 
          return Ok(userReactions);
       }
@@ -111,7 +100,7 @@ public class UserController : ControllerBase
    {
       try
       {
-         var userUpdateResult = await _userService.AddUserFollowing(request.UserId, request.FollowingUserId);
+         var userUpdateResult = await userService.AddUserFollowing(request.UserId, request.FollowingUserId);
          return Ok(userUpdateResult);
       }
       catch (Exception e)
@@ -129,7 +118,7 @@ public class UserController : ControllerBase
    {
       try
       {
-         var userUpdateResult = await _userService.RemoveUserFollowing(request.UserId, request.FollowingUserId);
+         var userUpdateResult = await userService.RemoveUserFollowing(request.UserId, request.FollowingUserId);
          return Ok(userUpdateResult);
       }
       catch (Exception e)
@@ -147,7 +136,7 @@ public class UserController : ControllerBase
    {
       try
       {
-         var userFollowings = await _userService.GetUserConnections(userId, "followings");
+         var userFollowings = await userService.GetUserConnections(userId, "followings");
          return Ok(userFollowings);
       }
       catch (Exception e)
@@ -165,7 +154,7 @@ public class UserController : ControllerBase
    {
       try
       {
-         var userFollowers = await _userService.GetUserConnections(userId, "followers");
+         var userFollowers = await userService.GetUserConnections(userId, "followers");
          return Ok(userFollowers);
       }
       catch (Exception e)
@@ -184,7 +173,7 @@ public class UserController : ControllerBase
    {
       try
       {
-         var isUserFollowed = await _userService.CheckUserFollowing(userId, targetUserId);
+         var isUserFollowed = await userService.CheckUserFollowing(userId, targetUserId);
          return Ok(isUserFollowed);
       }
       catch (Exception e)
@@ -201,7 +190,7 @@ public class UserController : ControllerBase
    {
       try
       {
-         await _userService.UpdateSavedPost(request.UserId, request.SavedPostId, true);
+         await userService.UpdateSavedPost(request.UserId, request.SavedPostId, true);
          return Ok();
       }
       catch (Exception e)
@@ -218,7 +207,7 @@ public class UserController : ControllerBase
    {
       try
       {
-         await _userService.UpdateSavedPost(request.UserId, request.SavedPostId, false);
+         await userService.UpdateSavedPost(request.UserId, request.SavedPostId, false);
          return Ok();
       }
       catch (Exception e)
@@ -235,7 +224,7 @@ public class UserController : ControllerBase
    {
       try
       {
-         var savedPosts = await _userService.GetSavedPosts(userId);
+         var savedPosts = await userService.GetSavedPosts(userId);
          return Ok(new { SavedPosts = savedPosts });
       }
       catch (Exception e)
@@ -246,5 +235,21 @@ public class UserController : ControllerBase
             e.Message);
       }
    }
-   
+
+   [HttpGet("user-posts-details/{userId}")]
+   public async Task<IActionResult> GetUserSavedPostsDetails([FromRoute] string userId)
+   {
+      try
+      {
+         var detailedSavedPosts = await userService.GetDetailedSavedPosts(userId);
+         return Ok(detailedSavedPosts);
+      }
+      catch (Exception e)
+      {
+         return ErrorResponseHelper.CreateErrorResponse(
+            Convert.ToInt32(e.Message.Split(":")[0]),
+            nameof(AddUserFollowing),
+            e.Message);
+      }      
+   }
 }
