@@ -11,6 +11,7 @@ import (
 type PostService interface {
 	AddCommentToPost(ctx context.Context, commentId string, postId string) error
 	RemoveCommentFromPost(ctx context.Context, postId string, commentId string) error
+	UpdateSavedPost(ctx context.Context, postId string, value int) error
 }
 
 type postAPI struct {
@@ -54,6 +55,23 @@ func (p *postAPI) RemoveCommentFromPost(ctx context.Context, in *postv1.RemoveCo
 	}
 
 	return &postv1.RemoveCommentResponse{
+		Success: true,
+		Message: "",
+	}, nil
+}
+
+func (p *postAPI) UpdateSavedPost(ctx context.Context, in *postv1.UpdateSavedPostRequest) (*postv1.UserResponse, error) {
+	const op = "grpc.post.UpdateSavedPost"
+
+	err := p.postService.UpdateSavedPost(context.TODO(), in.PostId, int(in.Value))
+	if err != nil {
+		return &postv1.UserResponse{
+			Success: false,
+			Message: err.Error(),
+		}, fmt.Errorf("%s: %w", op, err)
+	}
+
+	return &postv1.UserResponse{
 		Success: true,
 		Message: "",
 	}, nil
