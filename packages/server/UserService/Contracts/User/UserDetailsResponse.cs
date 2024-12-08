@@ -12,6 +12,6 @@ public class UserDetailsResponse
    public string Name { get; set; }
    public string Username { get; set; }
    public DateTime CreatedAt { get; set; }
-   public List<Post> Posts { get; set; }
+   public List<Models.User.Post> Posts { get; set; }
    public List<Comment> Comments { get; set; }
 }

@@ -1,11 +1,8 @@
-using Amazon.Runtime.Internal.Util;
 using AutoMapper;
 using Microsoft.Extensions.Options;
-using MongoDB.Bson;
 using MongoDB.Driver;
-using MongoDB.Driver.Linq;
+using Post;
 using UserService.Abstracts;
-using UserService.Contracts.User;
 using UserService.Contracts.User;
 using UserService.Dto;
 using UserService.Models.Database;
@@ -18,20 +15,22 @@ public class UserService : IUserService
    private readonly ILogger<UserService> _logger;
    private readonly IStorageService _storageService;
    private readonly IMapper _mapper;
+   private readonly PostService.PostServiceClient _postServiceClient;
    private readonly IMongoCollection<User> _userCollection;
-   private readonly IMongoCollection<Post> _postCollection;
+   private readonly IMongoCollection<Models.User.Post> _postCollection;
    private readonly IMongoCollection<Comment> _commentCollection;
 
 
    public UserService(IMongoDatabase mongoDatabase, IOptions<MongoDbSettings> mongoDbSettings,
-      ILogger<UserService> logger, IStorageService storageService, IMapper mapper
-   )
+      ILogger<UserService> logger, IStorageService storageService, IMapper mapper,
+      PostService.PostServiceClient postServiceClient)
    {
       _logger = logger;
       _storageService = storageService;
       _mapper = mapper;
+      _postServiceClient = postServiceClient;
       _commentCollection = mongoDatabase.GetCollection<Comment>("comments");
-      _postCollection = mongoDatabase.GetCollection<Post>("posts");
+      _postCollection = mongoDatabase.GetCollection<Models.User.Post>("posts");
       _userCollection = mongoDatabase.GetCollection<User>(mongoDbSettings.Value.CollectionName);
    }
 
@@ -123,7 +122,7 @@ public class UserService : IUserService
 
    public async Task<UserDto> AddUserFollowing(string userId, string followingId)
    {
-      var (user, targetUser) = await GetUsersForFollowingAction(userId, followingId);
+      var (user, _) = await GetUsersForFollowingAction(userId, followingId);
 
       if (user.Followings.Contains(followingId))
          throw new Exception($"400: You've already subscribed to this user");
@@ -234,13 +233,37 @@ public class UserService : IUserService
          throw new Exception($"400: You've already {action} this post");
       }
 
-      var userUpdate = isAdding
-         ? Builders<User>.Update.AddToSet(u => u.SavedPosts, savedPostId)
-         : Builders<User>.Update.Pull(u => u.SavedPosts, savedPostId);
+      UpdateDefinition<User>? updateDefinition = null;
+
+      Post.UserResponse? repsonse = null;
+      switch (isAdding)
+      {
+         case true:
+            updateDefinition = Builders<User>.Update.AddToSet(u => u.SavedPosts, savedPostId);
+            repsonse = _postServiceClient.UpdateSavedPost(new Post.UpdateSavedPostRequest
+            {
+               PostId = savedPostId,
+               Value = 1,
+            });
+            break;
+         case false:
+            updateDefinition = Builders<User>.Update.Pull(u => u.SavedPosts, savedPostId);
+            repsonse = _postServiceClient.UpdateSavedPost(new Post.UpdateSavedPostRequest
+            {
+               PostId = savedPostId,
+               Value = -1,
+            });
+            break;
+      }
+
+      if (!repsonse.Success)
+      {
+         throw new Exception($"500: {repsonse.Message}");
+      }
 
       var userUpdateResult = await _userCollection.UpdateOneAsync(
          Builders<User>.Filter.Eq(u => u.Id, userId),
-         userUpdate);
+         updateDefinition);
 
       if (userUpdateResult.ModifiedCount <= 0)
       {
@@ -258,13 +281,13 @@ public class UserService : IUserService
    public async Task<List<PostDto>> GetDetailedSavedPosts(string userId)
    {
       var user = await GetById(userId);
-      
+
       var savedPostIds = user.SavedPosts;
       if (!savedPostIds.Any())
       {
          return new List<PostDto>();
       }
-      
+
       var postsWithAuthors = await _postCollection
          .Find(p => savedPostIds.Contains(p.Id))
          .ToListAsync();
@@ -316,7 +339,7 @@ public class UserService : IUserService
 
       var posts = await _postCollection
          .Find(p => user.Posts.Contains(p.Id))
-         .Project(p => new Post
+         .Project(p => new Models.User.Post
          {
             Id = p.Id,
             Title = p.Title,

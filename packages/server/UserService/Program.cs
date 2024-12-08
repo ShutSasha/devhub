@@ -3,6 +3,7 @@ using Amazon.S3;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
+using Post;
 using UserService.Abstracts;
 using UserService.Helpers.Config;
 using UserService.Models.Database;
@@ -23,6 +24,11 @@ builder.Services.AddCors(options =>
          .AllowAnyMethod()
          .AllowAnyHeader();
    });
+});
+
+services.AddGrpcClient<PostService.PostServiceClient>(option =>
+{
+   option.Address = new Uri("http://localhost:5226");
 });
 
 services.AddControllers();
