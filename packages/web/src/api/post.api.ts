@@ -16,7 +16,7 @@ export const api = createApi({
       }),
     }),
     getPosts: builder.query<IPost[], { page: number; limit: number; q?: string; tags?: string[]; sort?: string }>({
-      query: ({ page, limit, q, tags, sort = 'desc' }) => {
+      query: ({ page, limit, q, tags, sort }) => {
         const queryString = qs.stringify({ page, limit, q, tags, sort }, { arrayFormat: 'brackets' })
 
         return {
@@ -24,6 +24,12 @@ export const api = createApi({
           method: 'GET',
         }
       },
+    }),
+    getPopularTags: builder.query<string[], void>({
+      query: () => ({
+        url: `posts/get-popular-tags?limit=5`,
+        method: 'GET',
+      }),
     }),
     createPost: builder.mutation<IPost, FormData>({
       query: body => ({
@@ -71,4 +77,5 @@ export const {
   useLikeMutation,
   useEditPostMutation,
   useDeletePostMutation,
+  useGetPopularTagsQuery,
 } = api

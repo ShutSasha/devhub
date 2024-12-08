@@ -1,3 +1,4 @@
+import { FONTS } from '@shared/consts/fonts.enum'
 import styled from 'styled-components'
 
 export const PostsContainer = styled.div`
@@ -15,14 +16,19 @@ export const DropdownButton = styled.button`
   background-color: #333;
   color: #ffa500;
   border: none;
-  padding: 8px 12px;
+  padding: 8px 20px;
+  font-size: 16px;
+  border: 1px solid #ff9200;
+  fon-weight: 500;
+  font-family: ${FONTS.MONTSERRAT};
   cursor: pointer;
-  border-radius: 4px;
+  border-radius: 10px;
 `
 
 export const DropdownContent = styled.div<{ $isOpen: boolean }>`
   display: ${(props: { $isOpen: boolean }) => (props.$isOpen ? 'block' : 'none')};
   position: absolute;
+  top: 50px;
   background-color: #222;
   color: white;
   min-width: 200px;
