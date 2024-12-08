@@ -17,4 +17,5 @@ public class UserDto
    public bool IsActivated { get; set; }
    public List<string> UserRole { get; set; }
    public List<string> Followings { get; set; }
+   public List<string> Followers { get; set; }
 }
