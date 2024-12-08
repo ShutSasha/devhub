@@ -8,7 +8,7 @@ import { RefreshResponse } from '~types/auth/refresh-response.type'
 // create a new mutex
 const mutex = new Mutex()
 
-const baseUrl = `${process.env.REACT_APP_API_URL}`
+const baseUrl = `${import.meta.env.VITE_API_URL}`
 
 const baseQuery = fetchBaseQuery({
   baseUrl,

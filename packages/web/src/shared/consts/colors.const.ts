@@ -9,4 +9,5 @@ export const colors = Object.freeze({
   black300: '#B3B3B3',
   black600: '#666666',
   white300: '#B3B3B3',
+  primaryOrange: '#F7981D',
 })

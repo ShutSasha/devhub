@@ -12,6 +12,8 @@ import { PostView } from '@pages/posts/post-view/post-view.page'
 import { UserProfile } from '@pages/user/profile/profile.page'
 import { UserEditProfile } from '@pages/user/edit-profile/edit-profile.page'
 import { EditPost } from '@pages/posts/edit-post/edit-post.page'
+import { Followers } from '@pages/friends/followers/followers.page'
+import { FollowedList } from '@pages/friends/followed-list/followed-list.page'
 
 import { ROUTES } from './routes.enum'
 
@@ -67,6 +69,14 @@ const router = createBrowserRouter([
   {
     path: `${ROUTES.USER_EDIT_PROFILE}`,
     element: <UserEditProfile />,
+  },
+  {
+    path: `${ROUTES.USER_FRIENDS_FOLLOWERS}`,
+    element: <Followers />,
+  },
+  {
+    path: `${ROUTES.USER_FRIENDS_FOLLOWED_LIST}`,
+    element: <FollowedList />,
   },
 ])
 

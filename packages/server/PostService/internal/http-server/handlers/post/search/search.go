@@ -2,12 +2,11 @@ package search
 
 import (
 	"context"
-	"errors"
 	"log/slog"
 	"net/http"
+	"strconv"
 
 	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/domain/interfaces"
-	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/storage"
 
 	resp "github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/lib/api/response"
 	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/lib/logger/sl"
@@ -15,17 +14,23 @@ import (
 	"github.com/go-chi/render"
 )
 
-// New is a handler function that processes the HTTP request to retrieve posts by query.
-// It extracts the query, tags and sort method from the URL, validates it, and calls the PostSearcher to get the post.
-// @Summary Get posts by query
-// @Description This endpoint retrieves posts by query.
-// @Tags posts
-// @Accept json
-// @Produce json
-// @Success 200 {object} []models.Post "The requested posts"
-// @Failure 404 {object} map[string]interface{} "Posts not found"
-// @Failure 500 {object} map[string]interface{} "Internal server error"
-// @Router /api/posts/search [get]
+// New handles the search for posts with optional query parameters like sorting, pagination, and tags.
+//
+// @Summary      Search for posts
+// @Description  Searches posts based on query string, tags, and sorting order.
+// @Tags         posts
+// @Accept       json
+// @Produce      json
+// @Param        q       query   string  false  "Search query for post title or content" example("Golang")
+// @Param        tags[]   query   []string false  "Tags to filter posts" collectionFormat(multi) example("dev","tech")
+// @Param        sort    query   string  false  "Sort order for posts by date" Enums(asc, desc) default(desc)
+// @Param        page    query   int     false  "Page number for pagination" default(1)
+// @Param        limit   query   int     false  "Number of posts per page" default(10)
+// @Success      200     {array} storage.PostModel "List of posts"
+// @Failure      400     {object} map[string][]string "Invalid pagination or query parameters"
+// @Failure      404     {object} map[string]interface{} "No posts found"
+// @Failure      500     {object} map[string][]string "Internal server error"
+// @Router       /api/posts/search [get]
 func New(log *slog.Logger, postSearcher interfaces.PostSearcher, fileProvider interfaces.FileProvider) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		const op = "handlers.post.search.New"
@@ -39,21 +44,42 @@ func New(log *slog.Logger, postSearcher interfaces.PostSearcher, fileProvider in
 		query := r.URL.Query().Get("q")
 		tags := r.URL.Query()["tags[]"]
 
-		posts, err := postSearcher.Search(
+		pageStr := r.URL.Query().Get("page")
+		limitStr := r.URL.Query().Get("limit")
+
+		page := 1
+		limit := 10
+		var err error
+
+		if pageStr != "" {
+			page, err = strconv.Atoi(pageStr)
+			if err != nil || page < 1 {
+				render.JSON(w, r, resp.Error(map[string][]string{
+					"pagination": {"Invalid page number"},
+				}, http.StatusBadRequest))
+				return
+			}
+		}
+
+		if limitStr != "" {
+			limit, err = strconv.Atoi(limitStr)
+			if err != nil || limit < 1 {
+				render.JSON(w, r, resp.Error(map[string][]string{
+					"pagination": {"Invalid limit number"},
+				}, http.StatusBadRequest))
+				return
+			}
+		}
+		sortOrder := parseSortParam(sortBy)
+		posts, _, err := postSearcher.Search(
 			context.TODO(),
-			sortBy,
+			sortOrder,
 			query,
 			tags,
 			fileProvider,
+			page,
+			limit,
 		)
-		if errors.Is(err, storage.ErrPostsNotFound) {
-			log.Error(storage.ErrPostsNotFound.Error())
-
-			render.JSON(w, r, resp.Error(map[string][]string{
-				"posts": {storage.ErrPostsNotFound.Error()},
-			}, http.StatusNotFound))
-			return
-		}
 		if err != nil {
 			log.Error("can not get posts", sl.Err(err))
 
@@ -62,9 +88,23 @@ func New(log *slog.Logger, postSearcher interfaces.PostSearcher, fileProvider in
 			}, http.StatusInternalServerError))
 			return
 		}
+		if posts == nil {
+			w.WriteHeader(http.StatusNotFound)
+
+			render.JSON(w, r, map[string]interface{}{})
+			return
+		}
 
 		log.Info("posts successfully found")
 
 		render.JSON(w, r, posts)
 	}
+}
+
+func parseSortParam(sort string) int {
+	if sort == "asc" {
+		return 1
+	}
+
+	return -1
 }

@@ -1,5 +1,6 @@
-import { FC, ReactNode } from 'react'
 import styled from 'styled-components'
+import { FC, ReactNode } from 'react'
+import { useAppSelector } from '@app/store/store'
 import { Header } from '@shared/components/header/header.component'
 import { Footer } from '@shared/components/footer/footer.component'
 import { colors } from '@shared/consts/colors.const'
@@ -22,9 +23,11 @@ const Container = styled.div`
 `
 
 export const CreatePostLayout: FC<CreatePosttProps> = ({ children }) => {
+  const user = useAppSelector(state => state.userSlice.user)
+
   return (
     <Wrapper>
-      <Header />
+      <Header user={user} />
       <Container>{children}</Container>
       <Footer />
     </Wrapper>

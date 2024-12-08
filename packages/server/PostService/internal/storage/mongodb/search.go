@@ -11,8 +11,15 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func (s *Storage) Search(ctx context.Context, sortBy string, query string,
-	tags []string, fileProvider interfaces.FileProvider) ([]storage.PostModel, error) {
+func (s *Storage) Search(
+	ctx context.Context,
+	sortBy int,
+	query string,
+	tags []string,
+	fileProvider interfaces.FileProvider,
+	page int,
+	limit int,
+) ([]storage.PostModel, int, error) {
 	const op = "storage.mongodb.Search"
 
 	collection := s.db.Database("DevHubDB").Collection("posts")
@@ -48,8 +55,6 @@ func (s *Storage) Search(ctx context.Context, sortBy string, query string,
 	if len(searchFilter) > 0 {
 		pipeline = append(pipeline, bson.D{{Key: "$match", Value: searchFilter}})
 	}
-
-	// agregate user
 
 	pipeline = append(pipeline, bson.D{
 		{Key: "$lookup", Value: bson.D{
@@ -110,31 +115,37 @@ func (s *Storage) Search(ctx context.Context, sortBy string, query string,
 			}},
 		})
 
-	var sortField string
-	switch sortBy {
-	case "date":
-		sortField = "created_at"
-	case "likes":
-		sortField = "likes"
-	default:
-		sortField = "likes"
-	}
+	sortField := "created_at"
 
-	pipeline = append(pipeline, bson.D{{Key: "$sort", Value: bson.D{{Key: sortField, Value: -1}}}})
+	pipeline = append(pipeline, bson.D{{Key: "$sort", Value: bson.D{{Key: sortField, Value: sortBy}}}})
+
+	pipeline = append(pipeline,
+		bson.D{
+			{Key: "$skip", Value: int64((page - 1) * limit)},
+		},
+		bson.D{
+			{Key: "$limit", Value: int64(limit)},
+		},
+	)
 
 	cursor, err := collection.Aggregate(ctx, pipeline)
 	if err != nil {
 		if errors.Is(err, mongo.ErrNilCursor) {
-			return nil, storage.ErrPostsNotFound
+			return nil, 0, storage.ErrPostsNotFound
 		}
-		return nil, fmt.Errorf("%s: could not execute search query: %w", op, err)
+		return nil, 0, fmt.Errorf("%s: could not execute search query: %w", op, err)
 	}
 	defer cursor.Close(ctx)
 
 	var posts []storage.PostModel
 	if err := cursor.All(ctx, &posts); err != nil {
-		return nil, fmt.Errorf("%s: could not decode results: %w", op, err)
+		return nil, 0, fmt.Errorf("%s: could not decode results: %w", op, err)
 	}
 
-	return posts, nil
+	totalCount, err := collection.CountDocuments(ctx, searchFilter)
+	if err != nil {
+		return nil, 0, fmt.Errorf("%s: could not count documents: %w", op, err)
+	}
+
+	return posts, int(totalCount), nil
 }

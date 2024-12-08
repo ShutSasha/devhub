@@ -19,6 +19,7 @@ import (
 	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/http-server/handlers/post/save"
 	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/http-server/handlers/post/search"
 	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/http-server/handlers/post/update"
+	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/http-server/handlers/tags"
 	mwLogger "github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/http-server/middleware/logger"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -39,6 +40,7 @@ type PostStorage interface {
 	interfaces.PostUpdater
 	interfaces.PostSearcher
 	interfaces.PostReactor
+	interfaces.TagsProvider
 }
 
 type FileStorage interface {
@@ -86,6 +88,8 @@ func New(
 		r.Post("/{id}/dislike", react.NewDislike(log, postStorage, postStorage, fileStorage, grpcUserClient))
 
 		r.Get("/search", search.New(log, postStorage, fileStorage))
+
+		r.Get("/get-popular-tags", tags.GetPopularTags(log, postStorage))
 	})
 
 	httpServer := &http.Server{

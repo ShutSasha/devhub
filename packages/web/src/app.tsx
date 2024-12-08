@@ -9,7 +9,7 @@ import 'react-toastify/dist/ReactToastify.css'
 
 import { RefreshResponse } from '~types/auth/refresh-response.type'
 
-const baseUrl = `${process.env.REACT_APP_API_URL}`
+const baseUrl = `${import.meta.env.VITE_API_URL}`
 
 export const App = () => {
   const user = useAppSelector(state => state.userSlice.user)

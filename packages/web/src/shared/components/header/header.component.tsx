@@ -1,10 +1,6 @@
-import { useEffect, useState } from 'react'
+import { FC } from 'react'
 import { useNavigate } from 'react-router-dom'
 import logo from '@assets/images/logo.svg'
-import home from '@assets/images/header/home.svg'
-import friends from '@assets/images/header/friends.svg'
-import star from '@assets/images/header/star.svg'
-import chats from '@assets/images/header/chats.svg'
 import { ROUTES } from '@pages/router/routes.enum'
 import { useAppDispatch, useAppSelector } from '@app/store/store'
 import { useLogoutMutation } from '@api/auth.api'
@@ -24,15 +20,9 @@ import {
   Wrapper,
 } from './header.style'
 import { NavItem } from './nav-item.component'
+import { navElements } from './consts/header-elements.const'
 
-type NavItem = { title: string; icon: string }
-
-const navElements: NavItem[] = [
-  { title: 'Home', icon: home },
-  { title: 'Friends', icon: friends },
-  { title: 'Starred', icon: star },
-  { title: 'Chats', icon: chats },
-]
+import { IUser } from '~types/user/user.type'
 
 const AuthDisplay = () => {
   const navigate = useNavigate()
@@ -78,19 +68,12 @@ const AuthDisplay = () => {
   )
 }
 
-export const Header = () => {
-  const loadingFromState = useAppSelector(state => state.userSlice.loading)
+interface HeaderProps {
+  user: IUser | null
+}
 
+export const Header: FC<HeaderProps> = ({ user }) => {
   const navigate = useNavigate()
-  const [isLoading, setIsLoading] = useState(true)
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(loadingFromState)
-    }, 300)
-
-    return () => clearTimeout(timer)
-  }, [loadingFromState])
 
   const handleLogoClick = () => {
     navigate(ROUTES.HOME)
@@ -102,10 +85,12 @@ export const Header = () => {
         <Logo src={logo} onClick={handleLogoClick} />
         <NavList>
           {navElements.map(el => (
-            <NavItem key={el.title} icon={el.icon} navTitle={el.title} />
+            <NavItem key={el.title} icon={el.icon} navTitle={el.title} path={el.path} user={user} />
           ))}
         </NavList>
-        <AuthContainer>{isLoading ? <div>Loading...</div> : <AuthDisplay />}</AuthContainer>
+        <AuthContainer>
+          <AuthDisplay />
+        </AuthContainer>
       </Container>
     </Wrapper>
   )

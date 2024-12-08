@@ -371,6 +371,8 @@ public class UserService : IUserService
          CreatedAt = user.CreatedAt,
          Username = user.UserName,
          Name = user.Name,
+         Followers = user.Followers,
+         Followings = user.Followings,
          Comments = comments,
          Posts = posts
       };
