@@ -5,6 +5,7 @@ using UserService.Contracts.User;
 using UserService.Dto;
 using UserService.Helpers.Errors;
 using UserService.Helpers.Response;
+using Type = Google.Protobuf.WellKnownTypes.Type;
 
 namespace UserService.Controllers;
 
@@ -204,6 +205,7 @@ public class UserController : ControllerBase
    }
 
    [HttpPost("saved-posts")]
+   [SwaggerOperation("Add saved post")]
    public async Task<IActionResult> AddSavedPost([FromBody] UserSavedPostRequest request)
    {
       try
@@ -221,6 +223,7 @@ public class UserController : ControllerBase
    }
 
    [HttpDelete("saved-posts")]
+   [SwaggerOperation("Delete saved post")]
    public async Task<IActionResult> DeleteSavedPost([FromBody] UserSavedPostRequest request)
    {
       try
@@ -238,6 +241,8 @@ public class UserController : ControllerBase
    }
 
    [HttpGet("saved-posts/{userId}")]
+   [SwaggerOperation("Get saved list of saved posts id")]
+   [ProducesResponseType(200,Type = typeof(List<string>))]
    public async Task<IActionResult> GetUserSavedPosts([FromRoute] string userId)
    {
       try
@@ -254,7 +259,9 @@ public class UserController : ControllerBase
       }
    }
 
-   [HttpGet("user-posts-details/{userId}")]
+   [HttpGet("saved-posts-details/{userId}")]
+   [SwaggerOperation("Get list of saved posts details by user id")]
+   [ProducesResponseType(200, Type = typeof(List<PostDto>))]
    public async Task<IActionResult> GetUserSavedPostsDetails([FromRoute] string userId)
    {
       try

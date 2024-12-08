@@ -27,6 +27,10 @@ public class Post
    public int Likes { get; set; }
    [BsonElement("dislikes")]
    public int Dislikes { get; set; }
+   
+   [BsonElement("saved")]
+   public int Saved { get; set; }
+   
    [BsonElement("tags")] 
    public List<string> Tags { get; set; }
 
