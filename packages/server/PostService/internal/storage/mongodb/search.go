@@ -114,8 +114,7 @@ func (s *Storage) Search(
 				}},
 			}},
 		})
-
-	sortField := "created_at"
+	sortField := "createdAt"
 
 	pipeline = append(pipeline, bson.D{{Key: "$sort", Value: bson.D{{Key: sortField, Value: sortBy}}}})
 
