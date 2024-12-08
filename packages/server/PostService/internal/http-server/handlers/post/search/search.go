@@ -89,8 +89,6 @@ func New(log *slog.Logger, postSearcher interfaces.PostSearcher, fileProvider in
 			return
 		}
 		if posts == nil {
-			w.WriteHeader(http.StatusNotFound)
-
 			render.JSON(w, r, map[string]interface{}{})
 			return
 		}
