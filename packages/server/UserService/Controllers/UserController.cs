@@ -205,30 +205,12 @@ public class UserController : ControllerBase
    }
 
    [HttpPost("saved-posts")]
-   [SwaggerOperation("Add saved post")]
+   [SwaggerOperation("Update saved post")]
    public async Task<IActionResult> AddSavedPost([FromBody] UserSavedPostRequest request)
    {
       try
       {
-         await userService.UpdateSavedPost(request.UserId, request.SavedPostId, true);
-         return Ok();
-      }
-      catch (Exception e)
-      {
-         return ErrorResponseHelper.CreateErrorResponse(
-            Convert.ToInt32(e.Message.Split(":")[0]),
-            nameof(AddUserFollowing),
-            e.Message);
-      }
-   }
-
-   [HttpDelete("saved-posts")]
-   [SwaggerOperation("Delete saved post")]
-   public async Task<IActionResult> DeleteSavedPost([FromBody] UserSavedPostRequest request)
-   {
-      try
-      {
-         await userService.UpdateSavedPost(request.UserId, request.SavedPostId, false);
+         await userService.UpdateSavedPost(request.UserId, request.SavedPostId);
          return Ok();
       }
       catch (Exception e)

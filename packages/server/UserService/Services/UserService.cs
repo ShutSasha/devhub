@@ -221,24 +221,18 @@ public class UserService : IUserService
       return user.Followings.Contains(targetUserId);
    }
 
-   public async Task UpdateSavedPost(string userId, string savedPostId, bool isAdding)
+   public async Task UpdateSavedPost(string userId, string savedPostId)
    {
+      bool isAdded = false;
       var user = await GetById(userId);
-      if (user == null)
-         throw new Exception("404: User not found");
-
-      if (user.SavedPosts.Contains(savedPostId) == isAdding)
-      {
-         var action = isAdding ? "saved" : "deleted";
-         throw new Exception($"400: You've already {action} this post");
-      }
-
+      
+      isAdded = user.SavedPosts.Contains(savedPostId);
       UpdateDefinition<User>? updateDefinition = null;
 
       Post.UserResponse? repsonse = null;
-      switch (isAdding)
+      switch (isAdded)
       {
-         case true:
+         case false:
             updateDefinition = Builders<User>.Update.AddToSet(u => u.SavedPosts, savedPostId);
             repsonse = _postServiceClient.UpdateSavedPost(new Post.UpdateSavedPostRequest
             {
@@ -246,7 +240,7 @@ public class UserService : IUserService
                Value = 1,
             });
             break;
-         case false:
+         case true:
             updateDefinition = Builders<User>.Update.Pull(u => u.SavedPosts, savedPostId);
             repsonse = _postServiceClient.UpdateSavedPost(new Post.UpdateSavedPostRequest
             {
