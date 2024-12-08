@@ -35,7 +35,14 @@ tasks:
       - |
         cd ./ApiGetaway
         dotnet run
-
+  
+  run_chat_service:
+    desc: "Run the C# ChatService"
+    cmds:
+      - |
+        cd ./ChatService
+        dotnet run
+      
   run_all:
     desc: "Run both AuthService and PostService"
     deps:
@@ -44,3 +51,4 @@ tasks:
       - run_user_service
       - run_api_getaway
       - run_comment_service
+      - run_chat_service

@@ -41,6 +41,7 @@ if (app.Environment.IsDevelopment())
       c.SwaggerEndpoint("http://localhost:8080/swagger/doc.json", "PostService");
       c.SwaggerEndpoint("http://localhost:8081/swagger/doc.json", "CommentService");
       c.SwaggerEndpoint("http://localhost:5229/swagger/v1/swagger.json", "UserService");
+      c.SwaggerEndpoint("http://localhost:5230/swagger/v1/swagger.json", "ChatService");
       
       c.RoutePrefix = "";
    });
