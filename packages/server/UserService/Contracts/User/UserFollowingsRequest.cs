@@ -5,8 +5,8 @@ namespace UserService.Contracts.User;
 public record UserFollowingsRequest
 {
    [ObjectIdValidation] 
-   public string userId { get; set; }
+   public string UserId { get; set; }
    
    [ObjectIdValidation] 
-   public string followingUserId { get; set; }
+   public string FollowingUserId { get; set; }
 }

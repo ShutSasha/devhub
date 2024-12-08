@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package post;
 
-option go_package = "github.com/ShutSasha/devhub/packages/server/PostService;post";
+option go_package = "PostService";
 
 service PostService{
   rpc AddCommentToPost (AddCommentRequest) returns (AddCommentToPostResponse);
@@ -33,7 +33,7 @@ message  RemoveCommentResponse{
 
 message UpdateSavedPostRequest{
   string postId = 1;
-  int32 value = 2;
+  int32  value = 2;
 }
 
 message UserResponse{

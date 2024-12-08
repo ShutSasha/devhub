@@ -1,6 +1,7 @@
 using System.Text.Json.Serialization;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using UserService.Dto;
 
 namespace UserService.Models.User;
 public class Post
@@ -11,6 +12,11 @@ public class Post
    public string Id { get; set; }
    [BsonElement("title")]
    public string Title { get; set; }
+   
+   [BsonElement("user")] 
+   [BsonRepresentation(BsonType.ObjectId)]
+   public ObjectId UserId { get; set; }
+   
    [BsonElement("content")]
    public string Content { get; set; }
    [BsonElement("headerImage")]
@@ -23,4 +29,8 @@ public class Post
    public int Dislikes { get; set; }
    [BsonElement("tags")] 
    public List<string> Tags { get; set; }
+
+   [BsonElement("comments")]
+   [BsonRepresentation(BsonType.ObjectId)]
+   public List<string> Comments { get; set; }
 }

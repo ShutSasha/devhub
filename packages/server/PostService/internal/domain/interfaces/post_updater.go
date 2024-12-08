@@ -15,10 +15,4 @@ type PostUpdater interface {
 		headerImage string,
 		tags []string,
 	) error
-	// ToggleReaction(
-	// 	ctx context.Context,
-	// 	postId primitive.ObjectID,
-	// 	userId string,
-	// 	action string, // "like" или "dislike"
-	// ) error
 }
