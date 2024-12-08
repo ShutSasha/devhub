@@ -1,4 +1,5 @@
 import { createApi } from '@reduxjs/toolkit/query/react'
+import qs from 'qs'
 
 import baseQueryWithReauth from './baseQueryWithReauth'
 
@@ -14,12 +15,15 @@ export const api = createApi({
         method: 'GET',
       }),
     }),
-    getPosts: builder.query<IPost[], { page: number; limit: number }>({
-      query: ({ page, limit }) => ({
-        url: 'posts',
-        method: 'GET',
-        params: { page, limit },
-      }),
+    getPosts: builder.query<IPost[], { page: number; limit: number; q?: string; tags?: string[]; sort?: string }>({
+      query: ({ page, limit, q, tags, sort = 'desc' }) => {
+        const queryString = qs.stringify({ page, limit, q, tags, sort }, { arrayFormat: 'brackets' })
+
+        return {
+          url: `posts/search?${queryString}`,
+          method: 'GET',
+        }
+      },
     }),
     createPost: builder.mutation<IPost, FormData>({
       query: body => ({

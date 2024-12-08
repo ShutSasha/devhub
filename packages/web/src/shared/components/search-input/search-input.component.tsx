@@ -4,6 +4,7 @@ import styled from 'styled-components'
 import search from '@assets/images/search.svg'
 
 const Container = styled.div`
+  flex: 1;
   position: relative;
   margin-bottom: 16px;
 `
