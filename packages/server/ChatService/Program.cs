@@ -43,6 +43,8 @@ services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
+app.UseCors("AllowLocalPorts");
+
 app.MapHub<ChatHub>("/chat");
 
 if (app.Environment.IsDevelopment())
