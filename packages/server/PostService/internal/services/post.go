@@ -10,10 +10,19 @@ import (
 type PostService struct {
 	commentToPostAdder     CommentToPostAdder
 	commentFromPostRemover CommentFromPostRemover
+	userSavedUpdater       UserSavedUpdater
 }
 
-func New(commentToPostAdder CommentToPostAdder, commentFromPostRemover CommentFromPostRemover) *PostService {
-	return &PostService{commentToPostAdder, commentFromPostRemover}
+func New(
+	commentToPostAdder CommentToPostAdder,
+	commentFromPostRemover CommentFromPostRemover,
+	userSavedUpdater UserSavedUpdater,
+) *PostService {
+	return &PostService{
+		commentToPostAdder,
+		commentFromPostRemover,
+		userSavedUpdater,
+	}
 }
 
 type CommentToPostAdder interface {
@@ -29,6 +38,14 @@ type CommentFromPostRemover interface {
 		ctx context.Context,
 		postId primitive.ObjectID,
 		commentId primitive.ObjectID,
+	) error
+}
+
+type UserSavedUpdater interface {
+	UserSavedPost(
+		ctx context.Context,
+		postId primitive.ObjectID,
+		value int,
 	) error
 }
 
@@ -71,6 +88,25 @@ func (ps *PostService) RemoveCommentFromPost(
 	}
 
 	if err := ps.commentFromPostRemover.RemoveCommentFromPost(ctx, objectPostId, objectCommentId); err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	return nil
+}
+
+func (ps *PostService) UpdateSavedPost(
+	ctx context.Context,
+	postId string,
+	value int,
+) error {
+	const op = "services.UpdateSavedPost"
+
+	objectPostId, err := primitive.ObjectIDFromHex(postId)
+	if err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	if err := ps.userSavedUpdater.UserSavedPost(ctx, objectPostId, value); err != nil {
 		return fmt.Errorf("%s: %w", op, err)
 	}
 

@@ -5,8 +5,8 @@ import (
 	"log/slog"
 	"time"
 
-	pb "github.com/ShutSasha/devhub/tree/main/packages/server/PostService/gen/go/user"
 	cb "github.com/ShutSasha/devhub/tree/main/packages/server/PostService/gen/go/comment"
+	pb "github.com/ShutSasha/devhub/tree/main/packages/server/PostService/gen/go/user"
 	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/app/grpcapp"
 	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/app/httpapp"
 	"github.com/ShutSasha/devhub/tree/main/packages/server/PostService/internal/services"
@@ -64,7 +64,7 @@ func New(
 
 	grpcCommentClient := cb.NewCommentServiceClient(commentConn)
 
-	postService := services.New(dbStorage, dbStorage)
+	postService := services.New(dbStorage, dbStorage, dbStorage)
 
 	grpcApp := grpcapp.New(log, postService, grpcPort)
 

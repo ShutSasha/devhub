@@ -20,6 +20,7 @@ type PostModel struct {
 	CreatedAt   time.Time          `json:"createdAt" bson:"createdAt"`
 	Likes       int                `json:"likes" bson:"likes"`
 	Dislikes    int                `json:"dislikes" bson:"dislikes"`
+	Saved       int                `json:"saved" bson:"saved"`
 	HeaderImage string             `json:"headerImage" bson:"headerImage"`
 	Comments    []CommentModel     `json:"comments" bson:"comments"`
 	Tags        []string           `json:"tags" bson:"tags"`
