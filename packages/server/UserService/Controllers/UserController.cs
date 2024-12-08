@@ -10,14 +10,14 @@ namespace UserService.Controllers;
 
 [ApiController]
 [Route("api/users")]
-public class UserController(IUserService userService) : ControllerBase
+public class UserController : ControllerBase
 {
 
-   private readonly IUserService _userService;
+   private readonly IUserService userService;
 
    public UserController(IUserService userService)
    {
-      _userService = userService;
+      this.userService = userService;
    }
    
    [HttpPatch]
@@ -89,7 +89,7 @@ public class UserController(IUserService userService) : ControllerBase
 
    [HttpGet("user-reactions/{userId}")]
    [SwaggerOperation("Get user liked and disliked posts")]
-   [ProducesResponseType(200,Type =typeof(UserReactionsResponse))]]
+   [ProducesResponseType(200,Type =typeof(UserReactionsResponse))]
    public async Task<IActionResult> GetUserReactions([ObjectIdValidation] string userId)
    {
       try
