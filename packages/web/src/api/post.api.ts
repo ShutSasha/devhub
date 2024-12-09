@@ -65,6 +65,25 @@ export const api = createApi({
         method: 'DELETE',
       }),
     }),
+    saveFavoritePost: builder.mutation<IPost, { savedPostId: string; userId: string | undefined }>({
+      query: ({ savedPostId, userId }) => ({
+        url: `users/saved-posts`,
+        method: 'POST',
+        body: { userId, savedPostId },
+      }),
+    }),
+    getSavedFavoritePosts: builder.query<{ savedPosts: string[] }, { userId: string | undefined }>({
+      query: ({ userId }) => ({
+        url: `users/saved-posts/${userId}`,
+        method: 'GET',
+      }),
+    }),
+    getSavedFavoritePostsDetails: builder.query<IPost[], { userId: string | undefined }>({
+      query: ({ userId }) => ({
+        url: `users/saved-posts-details/${userId}`,
+        method: 'GET',
+      }),
+    }),
   }),
 })
 
@@ -78,4 +97,7 @@ export const {
   useEditPostMutation,
   useDeletePostMutation,
   useGetPopularTagsQuery,
+  useSaveFavoritePostMutation,
+  useGetSavedFavoritePostsQuery,
+  useGetSavedFavoritePostsDetailsQuery,
 } = api
