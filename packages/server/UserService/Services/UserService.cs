@@ -221,11 +221,12 @@ public class UserService : IUserService
       return user.Followings.Contains(targetUserId);
    }
 
-   public async Task UpdateSavedPost(string userId, string savedPostId)
+   public async Task<PostDto> UpdateSavedPost(string userId, string savedPostId)
    {
+      PostDto updatedPostDto;
       bool isAdded = false;
       var user = await GetById(userId);
-      
+
       isAdded = user.SavedPosts.Contains(savedPostId);
       UpdateDefinition<User>? updateDefinition = null;
 
@@ -263,6 +264,39 @@ public class UserService : IUserService
       {
          throw new Exception("500: Can't update user");
       }
+
+      var updatedPost = await _postCollection
+         .Find(p => p.Id == savedPostId)
+         .FirstOrDefaultAsync();
+
+      var updatedPostAuthor = await _userCollection
+         .Find(u => u.Id == updatedPost.UserId.ToString())
+         .Project(u => new SavedPostUserDto
+         {
+            Id = u.Id,
+            Name = u.Name,
+            Username = u.UserName,
+            Avatar = u.Avatar,
+            DevPoints = u.DevPoints
+         })
+         .FirstOrDefaultAsync();
+
+      updatedPostDto = new PostDto
+      {
+         Id = updatedPost.Id,
+         Comments = updatedPost.Comments,
+         Content = updatedPost.Content,
+         CreatedAt = updatedPost.CreatedAt,
+         Likes = updatedPost.Likes,
+         Dislikes = updatedPost.Dislikes,
+         HeaderImage = updatedPost.HeaderImage,
+         Title = updatedPost.Title,
+         Tags = updatedPost.Tags,
+         Saved = updatedPost.Saved,
+         User = updatedPostAuthor,
+      };
+
+      return updatedPostDto;
    }
 
    public async Task<List<string>> GetSavedPosts(string userId)
@@ -316,6 +350,7 @@ public class UserService : IUserService
             CreatedAt = post.CreatedAt,
             Likes = post.Likes,
             Dislikes = post.Dislikes,
+            Saved = post.Saved,
             HeaderImage = post.HeaderImage,
             Comments = post.Comments,
             Tags = post.Tags
