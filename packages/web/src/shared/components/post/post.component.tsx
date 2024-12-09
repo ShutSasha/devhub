@@ -86,10 +86,6 @@ export const Post: FC<PostProps> = ({
       e.stopPropagation()
       const response = await saveFavoritePost({ savedPostId: post._id, userId: currentUserId }).unwrap()
 
-      if (isSavedList && refetchSavedPostsList) {
-        refetchSavedPostsList()
-      }
-
       updateSavedPosts()
       updatePost(response)
     } catch (e) {
