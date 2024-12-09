@@ -21,9 +21,19 @@ interface PostProps {
   userReactions?: { likedPosts: string[]; dislikedPosts: string[] } | undefined
   updateUserReactions: () => void
   updatePost: (updatedPost: IPost) => void
+  refetchSavedPostsList?: () => void
+  isSavedList?: boolean
 }
 
-export const Post: FC<PostProps> = ({ post, userReactions, currentUserId, updateUserReactions, updatePost }) => {
+export const Post: FC<PostProps> = ({
+  post,
+  userReactions,
+  currentUserId,
+  updateUserReactions,
+  updatePost,
+  isSavedList,
+  refetchSavedPostsList,
+}) => {
   const navigate = useNavigate()
   const [isLiked, setLiked] = useState<boolean>(false)
   const [isDisliked, setDisliked] = useState<boolean>(false)
@@ -41,6 +51,11 @@ export const Post: FC<PostProps> = ({ post, userReactions, currentUserId, update
     try {
       e.stopPropagation()
       const response = await like({ postId: post._id, userId: currentUserId }).unwrap()
+
+      if (isSavedList && refetchSavedPostsList) {
+        refetchSavedPostsList()
+      }
+
       updatePost(response)
       updateUserReactions()
     } catch (e) {
@@ -53,6 +68,11 @@ export const Post: FC<PostProps> = ({ post, userReactions, currentUserId, update
     try {
       e.stopPropagation()
       const response = await dislike({ postId: post._id, userId: currentUserId }).unwrap()
+
+      if (isSavedList && refetchSavedPostsList) {
+        refetchSavedPostsList()
+      }
+
       updatePost(response)
       updateUserReactions()
     } catch (e) {
@@ -65,6 +85,11 @@ export const Post: FC<PostProps> = ({ post, userReactions, currentUserId, update
     try {
       e.stopPropagation()
       const response = await saveFavoritePost({ savedPostId: post._id, userId: currentUserId }).unwrap()
+
+      if (isSavedList && refetchSavedPostsList) {
+        refetchSavedPostsList()
+      }
+
       updateSavedPosts()
       updatePost(response)
     } catch (e) {

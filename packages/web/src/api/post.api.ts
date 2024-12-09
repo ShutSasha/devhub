@@ -78,6 +78,12 @@ export const api = createApi({
         method: 'GET',
       }),
     }),
+    getSavedFavoritePostsDetails: builder.query<IPost[], { userId: string | undefined }>({
+      query: ({ userId }) => ({
+        url: `users/saved-posts-details/${userId}`,
+        method: 'GET',
+      }),
+    }),
   }),
 })
 
@@ -93,4 +99,5 @@ export const {
   useGetPopularTagsQuery,
   useSaveFavoritePostMutation,
   useGetSavedFavoritePostsQuery,
+  useGetSavedFavoritePostsDetailsQuery,
 } = api
