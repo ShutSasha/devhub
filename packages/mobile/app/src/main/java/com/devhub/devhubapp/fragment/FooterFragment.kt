@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import com.devhub.devhubapp.R
 import com.devhub.devhubapp.activity.FollowersActivity
 import com.devhub.devhubapp.activity.MainActivity
+import com.devhub.devhubapp.activity.SearchActivity
 
 class FooterFragment : Fragment() {
 
@@ -33,6 +34,7 @@ class FooterFragment : Fragment() {
 
         val homeIcon: ImageView = view.findViewById(R.id.home_icon)
         val followersIcon: ImageView = view.findViewById(R.id.group_icon)
+        val searchIcon: ImageView = view.findViewById(R.id.search_icon)
 
         val selectedIcon = arguments?.getString(ARG_SELECTED_ICON)
 
@@ -40,10 +42,19 @@ class FooterFragment : Fragment() {
             "home" -> {
                 changeIcon(homeIcon, R.drawable.ic_home_active)
                 changeIcon(followersIcon, R.drawable.ic_friends)
+                changeIcon(searchIcon, R.drawable.ic_search)
             }
+
             "followers" -> {
                 changeIcon(homeIcon, R.drawable.ic_home)
                 changeIcon(followersIcon, R.drawable.ic_friends_active)
+                changeIcon(searchIcon, R.drawable.ic_search)
+            }
+
+            "search" -> {
+                changeIcon(homeIcon, R.drawable.ic_home)
+                changeIcon(followersIcon, R.drawable.ic_friends)
+                changeIcon(searchIcon, R.drawable.ic_search_active)
             }
         }
 
@@ -54,6 +65,11 @@ class FooterFragment : Fragment() {
 
         followersIcon.setOnClickListener {
             val intent = Intent(requireContext(), FollowersActivity::class.java)
+            startActivity(intent)
+        }
+
+        searchIcon.setOnClickListener {
+            val intent = Intent(requireContext(), SearchActivity::class.java)
             startActivity(intent)
         }
 
