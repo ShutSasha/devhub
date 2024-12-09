@@ -210,8 +210,8 @@ public class UserController : ControllerBase
    {
       try
       {
-         await userService.UpdateSavedPost(request.UserId, request.SavedPostId);
-         return Ok();
+         var updateSavedPostResult  = await userService.UpdateSavedPost(request.UserId, request.SavedPostId);
+         return Ok(updateSavedPostResult);
       }
       catch (Exception e)
       {
