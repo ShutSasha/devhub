@@ -2,7 +2,12 @@ import { FC, MouseEvent, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import { ROUTES } from '@pages/router/routes.enum'
-import { useDislikeMutation, useLikeMutation } from '@api/post.api'
+import {
+  useDislikeMutation,
+  useGetSavedFavoritePostsQuery,
+  useLikeMutation,
+  useSaveFavoritePostMutation,
+} from '@api/post.api'
 import { handleServerException } from '@utils/handleServerException.util'
 
 import * as S from './post.style'
@@ -22,8 +27,15 @@ export const Post: FC<PostProps> = ({ post, userReactions, currentUserId, update
   const navigate = useNavigate()
   const [isLiked, setLiked] = useState<boolean>(false)
   const [isDisliked, setDisliked] = useState<boolean>(false)
+  const [isSaved, setSaved] = useState<boolean>(false)
   const [like] = useLikeMutation()
   const [dislike] = useDislikeMutation()
+
+  const [saveFavoritePost] = useSaveFavoritePostMutation()
+  const { data: savedPostsId, refetch: updateSavedPosts } = useGetSavedFavoritePostsQuery(
+    { userId: currentUserId },
+    { skip: !currentUserId },
+  )
 
   const handleLikeClick = async (e: MouseEvent<HTMLElement>) => {
     try {
@@ -49,6 +61,18 @@ export const Post: FC<PostProps> = ({ post, userReactions, currentUserId, update
     }
   }
 
+  const handleFavoriteStarClick = async (e: MouseEvent<HTMLElement>) => {
+    try {
+      e.stopPropagation()
+      const response = await saveFavoritePost({ savedPostId: post._id, userId: currentUserId }).unwrap()
+      updateSavedPosts()
+      updatePost(response)
+    } catch (e) {
+      console.error(e)
+      toast.error(handleServerException(e as ErrorException)?.join(', '))
+    }
+  }
+
   useEffect(() => {
     if (userReactions?.likedPosts) {
       setLiked(userReactions.likedPosts.some(like => like === post._id))
@@ -57,6 +81,12 @@ export const Post: FC<PostProps> = ({ post, userReactions, currentUserId, update
       setDisliked(userReactions.dislikedPosts.some(dislike => dislike === post._id))
     }
   }, [userReactions])
+
+  useEffect(() => {
+    if (savedPostsId?.savedPosts) {
+      setSaved(savedPostsId.savedPosts.some(savedPost => savedPost === post._id))
+    }
+  }, [savedPostsId?.savedPosts])
 
   return (
     <S.Container onClick={() => navigate(`${ROUTES.POST_VIEW.replace(':id', post._id)}`)}>
@@ -68,7 +98,7 @@ export const Post: FC<PostProps> = ({ post, userReactions, currentUserId, update
           <S.StyledAvatar src={post.user.avatar} />
           <S.Username>{post.user.username}</S.Username>
         </S.StyledUserCredentialsContainer>
-        <S.StyledStar $isSaved={false} />
+        <S.StyledStar onClick={handleFavoriteStarClick} $isSaved={isSaved} />
       </S.PostHeader>
       <S.PostTitle>{post.title}</S.PostTitle>
       <S.TagsContainer>{post.tags && post.tags.map((tag, index) => <S.Tag key={index}>#{tag}</S.Tag>)}</S.TagsContainer>
