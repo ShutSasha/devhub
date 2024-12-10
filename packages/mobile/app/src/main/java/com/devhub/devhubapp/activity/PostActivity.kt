@@ -113,6 +113,12 @@ class PostActivity : AppCompatActivity() {
 
         post?.let { displayPost(it) }
 
+
+        val profileImage: ImageView = findViewById(R.id.profile_image)
+        profileImage.setOnClickListener {
+            openUserProfileActivity(post.user._id)
+        }
+
         editPostButton = findViewById(R.id.edit_post_button)
         deletePostButton = findViewById(R.id.delete_post_button)
         editPostButton.setOnClickListener {
@@ -219,6 +225,12 @@ class PostActivity : AppCompatActivity() {
         }
         commentsRecyclerView.adapter = commentAdapter
         commentsRecyclerView.overScrollMode = View.OVER_SCROLL_NEVER
+    }
+
+    private fun openUserProfileActivity(userId: String) {
+        val intent = Intent(this, UserProfileActivity::class.java)
+        intent.putExtra("USER_ID", userId)
+        startActivity(intent)
     }
 
     private fun decrementCommentCount() {
