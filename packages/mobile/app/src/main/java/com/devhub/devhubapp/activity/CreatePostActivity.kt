@@ -167,7 +167,7 @@ class CreatePostActivity : AppCompatActivity() {
                 } else {
                     Log.e(
                         "CreatePostActivity",
-                        "Ошибка создания поста: ${response.errorBody()?.string()}"
+                        "Post creating error: ${response.errorBody()?.string()}"
                     )
                     response.errorBody()?.string()?.let { errorBody ->
                         if (errorBody.contains("Field validation for 'Title' failed")) {

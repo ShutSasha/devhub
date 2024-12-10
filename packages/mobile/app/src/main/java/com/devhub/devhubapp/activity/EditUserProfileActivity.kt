@@ -306,7 +306,7 @@ class EditUserProfileActivity : AppCompatActivity() {
     }
 
     private fun getMimeType(file: File): String? {
-        val extension = file.extension.lowercase() // Получаем расширение файла
+        val extension = file.extension.lowercase()
         return MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension)
     }
 
