@@ -132,9 +132,51 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/posts/get-popular-tags": {
+            "get": {
+                "description": "This endpoint retrieves a list of the most popular tags used in posts.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tags"
+                ],
+                "summary": "Get popular tags",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "Limit the number of tags returned",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of popular tags",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
         "/api/posts/search": {
             "get": {
-                "description": "This endpoint retrieves posts by query.",
+                "description": "\"asc\" - from oldest to newest, \"desc\" - from newest to oldest. Default is \"desc\".",
                 "consumes": [
                     "application/json"
                 ],
@@ -144,19 +186,76 @@ const docTemplate = `{
                 "tags": [
                     "posts"
                 ],
-                "summary": "Get posts by query",
+                "summary": "Search for posts",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "\"Golang\"",
+                        "description": "Search query for post title or content",
+                        "name": "q",
+                        "in": "query"
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "multi",
+                        "example": "\"dev\",\"tech\"",
+                        "description": "Tags to filter posts",
+                        "name": "tags[]",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "asc",
+                            "desc"
+                        ],
+                        "type": "string",
+                        "default": "desc",
+                        "description": "Sort order for posts by date",
+                        "name": "sort",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "Page number for pagination",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "Number of posts per page",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
-                        "description": "The requested posts",
+                        "description": "List of posts",
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.Post"
+                                "$ref": "#/definitions/storage.PostModel"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid pagination or query parameters",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                }
                             }
                         }
                     },
                     "404": {
-                        "description": "Posts not found",
+                        "description": "No posts found",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -166,7 +265,12 @@ const docTemplate = `{
                         "description": "Internal server error",
                         "schema": {
                             "type": "object",
-                            "additionalProperties": true
+                            "additionalProperties": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                }
+                            }
                         }
                     }
                 }
@@ -470,6 +574,9 @@ const docTemplate = `{
                 "likes": {
                     "type": "integer"
                 },
+                "saved": {
+                    "type": "integer"
+                },
                 "tags": {
                     "type": "array",
                     "items": {
@@ -540,6 +647,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "likes": {
+                    "type": "integer"
+                },
+                "saved": {
                     "type": "integer"
                 },
                 "tags": {

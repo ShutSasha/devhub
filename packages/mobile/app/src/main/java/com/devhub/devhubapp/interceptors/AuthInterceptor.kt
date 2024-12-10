@@ -63,6 +63,7 @@ class AuthInterceptor(
                         val user = User(
                             _id = userResponse._id,
                             name = userResponse.name ?: "",
+                            bio = userResponse.bio ?: "",
                             username = userResponse.username,
                             avatar = userResponse.avatar,
                             email = userResponse.email,
@@ -70,7 +71,7 @@ class AuthInterceptor(
                             devPoints = userResponse.devPoints,
                             activationCode = userResponse.activationCode,
                             isActivated = userResponse.isActivated,
-                            roles = arrayOf("user")
+                            userRole = arrayOf("user")
                         )
 
                         encryptedPreferencesManager.saveUserData(user)

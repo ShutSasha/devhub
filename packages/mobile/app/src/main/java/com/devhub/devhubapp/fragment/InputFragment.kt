@@ -19,6 +19,9 @@ class InputFragment : Fragment() {
 
     private var inputType: Int = InputType.TYPE_CLASS_TEXT
     private var hintText: String? = null
+    private var inputText: String? = null
+    private var textColor: Int? = null
+
 
     private lateinit var binding: FragmentInputBinding
     private var listener: InputTextListener? = null
@@ -35,6 +38,12 @@ class InputFragment : Fragment() {
 
         binding.editText.inputType = inputType
         binding.editText.hint = hintText
+        inputText?.let {
+            binding.editText.setText(it)
+        }
+        textColor?.let {
+            binding.editText.setTextColor(it)
+        }
 
         if(binding.editText.inputType == InputType.TYPE_TEXT_VARIATION_PASSWORD){
             binding.editText.transformationMethod = PasswordTransformationMethod.getInstance()
@@ -57,6 +66,20 @@ class InputFragment : Fragment() {
 
     fun setInputHint(text: String) {
         hintText = text
+    }
+
+    fun setInputText(text: String?) {
+        inputText = text
+        if (::binding.isInitialized) {
+            binding.editText.setText(text)
+        }
+    }
+
+    fun setTextColor(color: Int) {
+        textColor = color
+        if (::binding.isInitialized) {
+            binding.editText.setTextColor(color)
+        }
     }
 
     fun clearInputText() {

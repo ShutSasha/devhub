@@ -39,6 +39,10 @@ class MainActivity : AppCompatActivity() {
 
         encryptedPreferencesManager = EncryptedPreferencesManager(this)
         val user = encryptedPreferencesManager.getUserData()
+        val retrofitClient = RetrofitClient.getInstance(this)
+        val userAPI = retrofitClient.userAPI
+
+        encryptedPreferencesManager.fetchAndSaveUserSavedPosts(userAPI)
 
         if (user._id.isEmpty()) {
             startActivity(Intent(this, WelcomeActivity::class.java))
@@ -52,12 +56,11 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
-        val fragmentManager = supportFragmentManager
         if (savedInstanceState == null) {
-            fetchUserReactions()
-            fragmentManager.beginTransaction()
+            val footerFragment = FooterFragment.newInstance("home")
+            supportFragmentManager.beginTransaction()
                 .replace(R.id.header_container, HeaderFragment())
-                .replace(R.id.footer_container, FooterFragment())
+                .replace(R.id.footer_container, footerFragment)
                 .commit()
         }
 
@@ -85,7 +88,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private suspend fun fetchUserReactionsInternal(): UserReactions? {
-
         return try {
             withContext(Dispatchers.IO) {
                 val userId = encryptedPreferencesManager.getUserData()._id
@@ -104,6 +106,7 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
         currentPage = 1
         fetchPostsAndDisplay(currentPage)
+        refreshPosts()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

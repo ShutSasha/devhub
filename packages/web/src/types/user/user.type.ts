@@ -20,6 +20,8 @@ export interface UserDetailsResponse {
   avatar: string
   name: string | null
   username: string
+  followers: string[]
+  followings: string[]
   createdAt: string
   posts: Omit<IPost, 'comments'>[]
   comments: {
@@ -35,3 +37,11 @@ export interface ReqEditUserData {
   name: string
   bio: string
 }
+
+export interface UserFollowersResponse {
+  _id: string
+  username: string
+  avatar: string
+}
+
+export type UserFollowingsResponse = UserFollowersResponse[]

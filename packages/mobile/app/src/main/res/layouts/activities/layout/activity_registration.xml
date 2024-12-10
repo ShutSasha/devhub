@@ -36,7 +36,8 @@
         <FrameLayout
             android:id="@+id/usernameInputContainer"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="10dp"/>
 
         <FrameLayout
             android:id="@+id/usernameErrorTextView"
@@ -49,7 +50,8 @@
         <FrameLayout
             android:id="@+id/emailInputContainer"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="10dp"/>
 
         <FrameLayout
             android:id="@+id/emailErrorTextView"
@@ -62,7 +64,8 @@
         <FrameLayout
             android:id="@+id/passwordInputContainer"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="10dp"/>
 
         <FrameLayout
             android:id="@+id/passwordErrorTextView"
@@ -75,7 +78,8 @@
         <FrameLayout
             android:id="@+id/repeatPasswordInputContainer"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="10dp"/>
 
         <FrameLayout
             android:id="@+id/repeatPasswordErrorTextView"
@@ -97,7 +101,8 @@
             android:id="@+id/primaryButtonContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="9dp"/>
+            android:layout_marginTop="9dp"
+            android:layout_marginHorizontal="10dp"/>
 
         <FrameLayout
             android:id="@+id/lineContainer"

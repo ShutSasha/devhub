@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+package post;
+
+option go_package = "PostService";
+
+service PostService{
+  rpc AddCommentToPost (AddCommentRequest) returns (AddCommentToPostResponse);
+  rpc RemoveCommentFromPost (RemoveCommentRequest) returns (RemoveCommentResponse);
+
+  rpc UpdateSavedPost(UpdateSavedPostRequest) returns (UserResponse);
+}
+
+message  AddCommentRequest{
+  string postId = 1;
+  string commentId = 2;
+}
+
+message AddCommentToPostResponse{
+  bool success = 1;
+  string message = 2;
+}
+
+message  RemoveCommentRequest{
+  string postId = 1;
+  string commentId = 2;
+}
+
+message  RemoveCommentResponse{
+  bool success = 1;
+  string message = 2;
+}
+
+message UpdateSavedPostRequest{
+  string postId = 1;
+  int32  value = 2;
+}
+
+message UserResponse{
+  bool success = 1;
+  string message = 2;
+}

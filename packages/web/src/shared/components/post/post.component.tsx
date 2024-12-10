@@ -2,7 +2,12 @@ import { FC, MouseEvent, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import { ROUTES } from '@pages/router/routes.enum'
-import { useDislikeMutation, useLikeMutation } from '@api/post.api'
+import {
+  useDislikeMutation,
+  useGetSavedFavoritePostsQuery,
+  useLikeMutation,
+  useSaveFavoritePostMutation,
+} from '@api/post.api'
 import { handleServerException } from '@utils/handleServerException.util'
 
 import * as S from './post.style'
@@ -16,19 +21,41 @@ interface PostProps {
   userReactions?: { likedPosts: string[]; dislikedPosts: string[] } | undefined
   updateUserReactions: () => void
   updatePost: (updatedPost: IPost) => void
+  refetchSavedPostsList?: () => void
+  isSavedList?: boolean
 }
 
-export const Post: FC<PostProps> = ({ post, userReactions, currentUserId, updateUserReactions, updatePost }) => {
+export const Post: FC<PostProps> = ({
+  post,
+  userReactions,
+  currentUserId,
+  updateUserReactions,
+  updatePost,
+  isSavedList,
+  refetchSavedPostsList,
+}) => {
   const navigate = useNavigate()
   const [isLiked, setLiked] = useState<boolean>(false)
   const [isDisliked, setDisliked] = useState<boolean>(false)
+  const [isSaved, setSaved] = useState<boolean>(false)
   const [like] = useLikeMutation()
   const [dislike] = useDislikeMutation()
+
+  const [saveFavoritePost] = useSaveFavoritePostMutation()
+  const { data: savedPostsId, refetch: updateSavedPosts } = useGetSavedFavoritePostsQuery(
+    { userId: currentUserId },
+    { skip: !currentUserId },
+  )
 
   const handleLikeClick = async (e: MouseEvent<HTMLElement>) => {
     try {
       e.stopPropagation()
       const response = await like({ postId: post._id, userId: currentUserId }).unwrap()
+
+      if (isSavedList && refetchSavedPostsList) {
+        refetchSavedPostsList()
+      }
+
       updatePost(response)
       updateUserReactions()
     } catch (e) {
@@ -41,8 +68,26 @@ export const Post: FC<PostProps> = ({ post, userReactions, currentUserId, update
     try {
       e.stopPropagation()
       const response = await dislike({ postId: post._id, userId: currentUserId }).unwrap()
+
+      if (isSavedList && refetchSavedPostsList) {
+        refetchSavedPostsList()
+      }
+
       updatePost(response)
       updateUserReactions()
+    } catch (e) {
+      console.error(e)
+      toast.error(handleServerException(e as ErrorException)?.join(', '))
+    }
+  }
+
+  const handleFavoriteStarClick = async (e: MouseEvent<HTMLElement>) => {
+    try {
+      e.stopPropagation()
+      const response = await saveFavoritePost({ savedPostId: post._id, userId: currentUserId }).unwrap()
+
+      updateSavedPosts()
+      updatePost(response)
     } catch (e) {
       console.error(e)
       toast.error(handleServerException(e as ErrorException)?.join(', '))
@@ -58,6 +103,12 @@ export const Post: FC<PostProps> = ({ post, userReactions, currentUserId, update
     }
   }, [userReactions])
 
+  useEffect(() => {
+    if (savedPostsId?.savedPosts) {
+      setSaved(savedPostsId.savedPosts.some(savedPost => savedPost === post._id))
+    }
+  }, [savedPostsId?.savedPosts])
+
   return (
     <S.Container onClick={() => navigate(`${ROUTES.POST_VIEW.replace(':id', post._id)}`)}>
       {post.headerImage && (
@@ -68,7 +119,7 @@ export const Post: FC<PostProps> = ({ post, userReactions, currentUserId, update
           <S.StyledAvatar src={post.user.avatar} />
           <S.Username>{post.user.username}</S.Username>
         </S.StyledUserCredentialsContainer>
-        <S.StyledStar $isSaved={false} />
+        <S.StyledStar onClick={handleFavoriteStarClick} $isSaved={isSaved} />
       </S.PostHeader>
       <S.PostTitle>{post.title}</S.PostTitle>
       <S.TagsContainer>{post.tags && post.tags.map((tag, index) => <S.Tag key={index}>#{tag}</S.Tag>)}</S.TagsContainer>

@@ -228,7 +228,7 @@
                         android:gravity="center"
                         android:orientation="horizontal"
                         app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toStartOf="@id/comment_container"
+                        app:layout_constraintEnd_toStartOf="@id/saved_container"
                         app:layout_constraintStart_toEndOf="@id/like_container"
                         app:layout_constraintTop_toTopOf="parent">
 
@@ -248,8 +248,8 @@
                             android:textSize="16sp" />
                     </LinearLayout>
 
-                    <!--<LinearLayout
-                        android:id="@+id/star_container"
+                    <LinearLayout
+                        android:id="@+id/saved_container"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:gravity="center"
@@ -260,20 +260,20 @@
                         app:layout_constraintTop_toTopOf="parent">
 
                         <ImageView
-                            android:id="@+id/star_icon"
+                            android:id="@+id/saved_icon"
                             android:layout_width="24dp"
                             android:layout_height="24dp"
                             android:layout_marginEnd="4dp"
                             android:src="@drawable/ic_star" />
 
                         <TextView
-                            android:id="@+id/star_count"
+                            android:id="@+id/saved_count"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textColor="@color/white"
                             android:fontFamily="@font/inter_regular_font"
+                            android:textColor="@color/white"
                             android:textSize="16sp" />
-                    </LinearLayout>-->
+                    </LinearLayout>
 
                     <LinearLayout
                         android:id="@+id/comment_container"
@@ -283,7 +283,7 @@
                         android:orientation="horizontal"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toEndOf="@id/dislike_container"
+                        app:layout_constraintStart_toEndOf="@id/saved_container"
                         app:layout_constraintTop_toTopOf="parent">
 
                         <ImageView
@@ -326,7 +326,6 @@
                     app:layout_constraintTop_toBottomOf="@id/secondline" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
-
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>

@@ -169,7 +169,6 @@
          "UpstreamPathTemplate": "/api/posts",
          "UpstreamHttpMethod": ["GET"]
       },
-
       {
          "DownstreamPathTemplate": "/api/users",
          "DownstreamScheme": "http",
@@ -218,6 +217,103 @@
          "UpstreamPathTemplate": "/api/users/user-reactions/{userId}",
          "UpstreamHttpMethod": ["GET"]
       },
+      {
+         "DownstreamPathTemplate": "/api/users/user-followings",
+         "DownstreamScheme": "http",
+         "DownstreamHostAndPorts": [
+            {
+               "Host": "localhost",
+               "Port": 5229
+            }
+         ],
+         "UpstreamPathTemplate": "/api/users/user-followings",
+         "UpstreamHttpMethod": ["POST"]
+      },
+      {
+         "DownstreamPathTemplate": "/api/users/user-followings",
+         "DownstreamScheme": "http",
+         "DownstreamHostAndPorts": [
+            {
+               "Host": "localhost",
+               "Port": 5229
+            }
+         ],
+         "UpstreamPathTemplate": "/api/users/user-followings",
+         "UpstreamHttpMethod": ["DELETE"]
+      },
+      {
+         "DownstreamPathTemplate": "/api/users/user-followings/{userId}",
+         "DownstreamScheme": "http",
+         "DownstreamHostAndPorts": [
+            {
+               "Host": "localhost",
+               "Port": 5229
+            }
+         ],
+         "UpstreamPathTemplate": "/api/users/user-followings/{userId}",
+         "UpstreamHttpMethod": ["GET"]
+      },
+      {
+         "DownstreamPathTemplate": "/api/users/user-followers/{userId}",
+         "DownstreamScheme": "http",
+         "DownstreamHostAndPorts": [
+            {
+               "Host": "localhost",
+               "Port": 5229
+            }
+         ],
+         "UpstreamPathTemplate": "/api/users/user-followers/{userId}",
+         "UpstreamHttpMethod": ["GET"]
+      },
+      {
+         "DownstreamPathTemplate": "/api/users/is-following",
+         "DownstreamScheme": "http",
+         "DownstreamHostAndPorts": [
+            {
+               "Host": "localhost",
+               "Port": 5229
+            }
+         ],
+         "UpstreamPathTemplate": "/api/users/is-following",
+         "UpstreamHttpMethod": ["GET"]
+      },
+      {
+         "DownstreamPathTemplate": "/api/users/saved-posts",
+         "DownstreamScheme": "http",
+         "DownstreamHostAndPorts": [
+            {
+               "Host": "localhost",
+               "Port": 5229
+            }
+         ],
+         "UpstreamPathTemplate": "/api/users/saved-posts",
+         "UpstreamHttpMethod": ["POST"]
+      },
+      {
+         "DownstreamPathTemplate": "/api/users/saved-posts/{userId}",
+         "DownstreamScheme": "http",
+         "DownstreamHostAndPorts": [
+            {
+               "Host": "localhost",
+               "Port": 5229
+            }
+         ],
+         "UpstreamPathTemplate": "/api/users/saved-posts/{userId}",
+         "UpstreamHttpMethod": ["GET"]
+      },
+      {
+         "DownstreamPathTemplate": "/api/users/saved-posts-details/{userId}",
+         "DownstreamScheme": "http",
+         "DownstreamHostAndPorts": [
+            {
+               "Host": "localhost",
+               "Port": 5229
+            }
+         ],
+         "UpstreamPathTemplate": "/api/users/saved-posts-details/{userId}",
+         "UpstreamHttpMethod": ["GET"]
+      },
+      
       
       
       {
@@ -268,6 +364,18 @@
          ],
          "UpstreamPathTemplate": "/api/posts/{id}/dislike",
          "UpstreamHttpMethod": ["POST"]
+      },
+      {
+         "DownstreamPathTemplate": "/api/posts/get-popular-tags",
+         "DownstreamScheme": "http",
+         "DownstreamHostAndPorts": [
+            {
+               "Host": "localhost",
+               "Port": 8080
+            }
+         ],
+         "UpstreamPathTemplate": "/api/posts/get-popular-tags",
+         "UpstreamHttpMethod": ["GET"]
       }
    ],
    "GlobalConfiguration": {

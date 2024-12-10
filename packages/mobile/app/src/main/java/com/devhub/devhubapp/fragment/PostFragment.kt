@@ -22,6 +22,7 @@ import com.devhub.devhubapp.activity.UserProfileActivity
 import com.devhub.devhubapp.classes.EncryptedPreferencesManager
 import com.devhub.devhubapp.classes.RetrofitClient
 import com.devhub.devhubapp.dataClasses.Post
+import com.devhub.devhubapp.dataClasses.SavedPostRequest
 import com.devhub.devhubapp.dataClasses.UserIdRequest
 import com.devhub.devhubapp.dataClasses.UserReactions
 import com.google.android.flexbox.FlexboxLayout
@@ -43,6 +44,8 @@ class PostFragment : Fragment() {
     private lateinit var commentIcon: ImageView
     private lateinit var likedPosts: List<String>
     private lateinit var dislikedPosts: List<String>
+    private lateinit var starIcon: ImageView
+    private lateinit var encryptedPreferencesManager: EncryptedPreferencesManager
 
     private val postDetailLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -60,7 +63,7 @@ class PostFragment : Fragment() {
         private const val ARG_DISLIKED_POSTS = "arg_disliked_posts"
         private const val BASE_URL = "https://mydevhubimagebucket.s3.eu-west-3.amazonaws.com/"
 
-        fun newInstance(post: Post, reactions: UserReactions?): PostFragment {
+        fun newInstance(post: Post, reactions: UserReactions? = null): PostFragment {
             val fragment = PostFragment()
             val args = Bundle().apply {
                 putString(ARG_POST, Gson().toJson(post))
@@ -73,7 +76,13 @@ class PostFragment : Fragment() {
             fragment.arguments = args
             return fragment
         }
+    }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        arguments?.getString(ARG_POST)?.let {
+            post = Gson().fromJson(it, Post::class.java)
+        }
     }
 
     override fun onCreateView(
@@ -82,13 +91,16 @@ class PostFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_post, container, false)
 
-        arguments?.getString(ARG_POST)?.let {
-            post = Gson().fromJson(it, Post::class.java)
-        }
+        starIcon = view.findViewById(R.id.star_icon)
+        encryptedPreferencesManager = EncryptedPreferencesManager(requireContext())
 
-        arguments?.let {
-            likedPosts = it.getStringArrayList(ARG_LIKED_POSTS) ?: emptyList()
-            dislikedPosts = it.getStringArrayList(ARG_DISLIKED_POSTS) ?: emptyList()
+        val savedPostIds = encryptedPreferencesManager.getUserSavedPosts()
+
+        val isSaved = savedPostIds.contains(post._id)
+        starIcon.setImageResource(if (isSaved) R.drawable.ic_star_active else R.drawable.ic_star)
+
+        starIcon.setOnClickListener {
+            toggleSavePost(post._id)
         }
 
         view.setOnClickListener {
@@ -105,12 +117,7 @@ class PostFragment : Fragment() {
         commentIcon = view.findViewById(R.id.comment_icon)
         postImage = view.findViewById(R.id.post_image)
 
-        arguments?.getString(ARG_POST)?.let {
-            val post = Gson().fromJson(it, Post::class.java)
-            postImage.visibility = if (post.headerImage == "") View.GONE else View.VISIBLE
-
-            displayPost(post)
-        }
+        displayPost(post)
 
         return view
     }
@@ -142,8 +149,43 @@ class PostFragment : Fragment() {
         displayPost(post)
     }
 
+    private fun toggleSavePost(postId: String) {
+        val userId = encryptedPreferencesManager.getUserData()._id
+        val request = SavedPostRequest(userId, postId)
+
+        RetrofitClient.getInstance(requireContext()).userAPI.toggleSavePost(request)
+            .enqueue(object : Callback<Post> {
+                override fun onResponse(call: Call<Post>, response: Response<Post>) {
+                    if (response.isSuccessful) {
+                        response.body()?.let { updatedPost ->
+                            post.saved = updatedPost.saved
+                            val savedPostIds =
+                                encryptedPreferencesManager.getUserSavedPosts().toMutableList()
+                            if (savedPostIds.contains(postId)) {
+                                savedPostIds.remove(postId)
+                                starIcon.setImageResource(R.drawable.ic_star)
+                            } else {
+                                savedPostIds.add(postId)
+                                starIcon.setImageResource(R.drawable.ic_star_active)
+                            }
+                            encryptedPreferencesManager.saveUserSavedPosts(savedPostIds)
+                        }
+                    } else {
+                        Log.e(
+                            "PostFragment",
+                            "Failed to toggle save post: ${response.errorBody()?.string()}"
+                        )
+                    }
+                }
+
+                override fun onFailure(call: Call<Post>, t: Throwable) {
+                    Log.e("PostFragment", "Error toggling save post: ${t.message}", t)
+                }
+            })
+    }
+
     private fun toggleLike(postId: String) {
-        val userId = EncryptedPreferencesManager(requireContext()).getUserData()._id
+        val userId = encryptedPreferencesManager.getUserData()._id
 
         val request = UserIdRequest(userId)
         RetrofitClient.getInstance(requireContext()).postAPI.likePost(postId, request)
@@ -156,7 +198,7 @@ class PostFragment : Fragment() {
                             post.dislikes = it.dislikes
 
                             val reactions =
-                                EncryptedPreferencesManager(requireContext()).getUserReactions()
+                                encryptedPreferencesManager.getUserReactions()
                             val updatedLikedPosts = reactions.likedPosts?.toMutableList()
                             val updatedDislikedPosts = reactions.dislikedPosts?.toMutableList()
 
@@ -175,7 +217,7 @@ class PostFragment : Fragment() {
                                 likedPosts = updatedLikedPosts,
                                 dislikedPosts = updatedDislikedPosts
                             )
-                            EncryptedPreferencesManager(requireContext()).saveUserReactions(
+                            encryptedPreferencesManager.saveUserReactions(
                                 updatedReactions
                             )
 
@@ -196,7 +238,7 @@ class PostFragment : Fragment() {
     }
 
     private fun toggleDislike(postId: String) {
-        val userId = EncryptedPreferencesManager(requireContext()).getUserData()._id
+        val userId = encryptedPreferencesManager.getUserData()._id
 
         val request = UserIdRequest(userId)
         RetrofitClient.getInstance(requireContext()).postAPI.dislikePost(postId, request)
@@ -209,7 +251,7 @@ class PostFragment : Fragment() {
                             post.dislikes = it.dislikes
 
                             val reactions =
-                                EncryptedPreferencesManager(requireContext()).getUserReactions()
+                                encryptedPreferencesManager.getUserReactions()
                             val updatedLikedPosts = reactions.likedPosts?.toMutableList()
                             val updatedDislikedPosts = reactions.dislikedPosts?.toMutableList()
 
@@ -228,7 +270,7 @@ class PostFragment : Fragment() {
                                 likedPosts = updatedLikedPosts,
                                 dislikedPosts = updatedDislikedPosts
                             )
-                            EncryptedPreferencesManager(requireContext()).saveUserReactions(
+                            encryptedPreferencesManager.saveUserReactions(
                                 updatedReactions
                             )
 
@@ -264,9 +306,14 @@ class PostFragment : Fragment() {
 
         postTitle.text = post.title
 
-        Glide.with(this)
-            .load(BASE_URL + post.headerImage)
-            .into(postImage)
+        if (post.headerImage.isNullOrEmpty()) {
+            postImage.visibility = View.GONE
+        } else {
+            postImage.visibility = View.VISIBLE
+            Glide.with(this)
+                .load(BASE_URL + post.headerImage)
+                .into(postImage)
+        }
 
         hashtagsContainer.removeAllViews()
         post.tags?.forEach { tag ->
@@ -299,21 +346,19 @@ class PostFragment : Fragment() {
             commentIcon.visibility = View.VISIBLE
         }
 
-
         avatar.setOnClickListener {
             val intent = Intent(requireContext(), UserProfileActivity::class.java)
             Log.e("UserId", post.toString())
             intent.putExtra("USER_ID", post.user._id)
             startActivity(intent)
         }
-
     }
 
     private fun updateReactionIcons(post: Post) {
         val likeIcon = view?.findViewById<ImageView>(R.id.like_icon)
         val dislikeIcon = view?.findViewById<ImageView>(R.id.dislike_icon)
 
-        val userReactions = EncryptedPreferencesManager(requireContext()).getUserReactions()
+        val userReactions = encryptedPreferencesManager.getUserReactions()
 
         val isLiked = userReactions.likedPosts?.contains(post._id) == true
         val isDisliked = userReactions.dislikedPosts?.contains(post._id) == true

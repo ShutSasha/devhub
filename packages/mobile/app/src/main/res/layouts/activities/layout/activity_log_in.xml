@@ -36,7 +36,8 @@
         <FrameLayout
             android:id="@+id/usernameInputContainer"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="10dp"/>
 
         <FrameLayout
             android:id="@+id/usernameErrorTextView"
@@ -46,7 +47,8 @@
         <FrameLayout
             android:id="@+id/passwordInputContainer"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="10dp"/>
 
         <FrameLayout
             android:id="@+id/passwordErrorTextView"
@@ -62,7 +64,8 @@
             android:layout_marginTop="9dp"
             android:id="@+id/primaryButtonContainer"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="10dp"/>
 
         <TextView
             android:id="@+id/forgotPasswordTextview"

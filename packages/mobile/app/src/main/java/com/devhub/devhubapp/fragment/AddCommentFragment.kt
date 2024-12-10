@@ -99,13 +99,13 @@ class AddCommentFragment : Fragment() {
                 } else {
                     Log.e(
                         "AddCommentFragment",
-                        "Ошибка при отправке комментария: ${response.message()}"
+                        "Adding comment error: ${response.message()}"
                     )
                 }
             }
 
             override fun onFailure(call: Call<Comment>, t: Throwable) {
-                Log.e("AddCommentFragment", "Не удалось отправить комментарий")
+                Log.e("AddCommentFragment", "Error with comment adding")
             }
         })
     }

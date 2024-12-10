@@ -3,6 +3,7 @@ import styled from 'styled-components'
 import { Header } from '@shared/components/header/header.component'
 import { colors } from '@shared/consts/colors.const'
 import { Footer } from '@shared/components/footer/footer.component'
+import { useAppSelector } from '@app/store/store'
 
 export const Wrapper = styled.div`
   min-height: 100vh;
@@ -24,9 +25,11 @@ interface MainLayoutProps {
 }
 
 export const UserProfileLayout: FC<MainLayoutProps> = ({ children }) => {
+  const user = useAppSelector(state => state.userSlice.user)
+
   return (
     <Wrapper>
-      <Header />
+      <Header user={user} />
       <Container>{children}</Container>
       <Footer />
     </Wrapper>

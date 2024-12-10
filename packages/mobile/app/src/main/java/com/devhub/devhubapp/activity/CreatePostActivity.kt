@@ -158,14 +158,16 @@ class CreatePostActivity : AppCompatActivity() {
         call.enqueue(object : Callback<Post> {
             override fun onResponse(call: Call<Post>, response: Response<Post>) {
                 if (response.isSuccessful) {
-                    val intent = Intent()
+                    val intent = Intent(this@CreatePostActivity, MainActivity::class.java)
                     intent.putExtra("UPDATE_POSTS", true)
                     setResult(RESULT_OK, intent)
+                    startActivity(intent)
                     finish()
+
                 } else {
                     Log.e(
                         "CreatePostActivity",
-                        "Ошибка создания поста: ${response.errorBody()?.string()}"
+                        "Post creating error: ${response.errorBody()?.string()}"
                     )
                     response.errorBody()?.string()?.let { errorBody ->
                         if (errorBody.contains("Field validation for 'Title' failed")) {

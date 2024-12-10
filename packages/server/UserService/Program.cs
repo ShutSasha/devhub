@@ -1,8 +1,7 @@
-using System.Net;
 using Amazon.S3;
-using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
+using Post;
 using UserService.Abstracts;
 using UserService.Helpers.Config;
 using UserService.Models.Database;
@@ -25,9 +24,18 @@ builder.Services.AddCors(options =>
    });
 });
 
+services.AddGrpcClient<PostService.PostServiceClient>(option =>
+{
+   option.Address = new Uri("http://localhost:5226");
+});
+
 services.AddControllers();
 services.AddEndpointsApiExplorer();
-services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+   options.EnableAnnotations();
+});
+
 services.Configure<MongoDbSettings>(configuration.GetSection("MongoDbSettings"));
 services.AddSingleton<IMongoClient>(sp =>
 {

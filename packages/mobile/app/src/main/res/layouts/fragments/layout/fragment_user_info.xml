@@ -55,6 +55,14 @@
             android:textSize="20sp"
             tools:text="0 followers" />
 
+        <FrameLayout
+            android:id="@+id/btnFollowPrimary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="7"
+            android:layout_marginTop="20dp"
+            android:layout_marginHorizontal="29dp"/>
+
         <LinearLayout
             android:id="@+id/btnContainer"
             android:layout_height="wrap_content"
@@ -65,16 +73,18 @@
             android:layout_marginTop="20dp">
 
             <FrameLayout
-                android:id="@+id/btnPrimary"
+                android:id="@+id/btnUnfollowOutlined"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="4" />
+                android:layout_weight="4"
+                android:layout_marginHorizontal="10dp"/>
 
             <FrameLayout
-                android:id="@+id/btnOutlined"
+                android:id="@+id/btnSendMessageOutlined"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="3" />
+                android:layout_weight="3"
+                android:layout_marginHorizontal="10dp"/>
 
         </LinearLayout>
 

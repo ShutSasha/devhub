@@ -1,9 +1,10 @@
-import { CSSProperties, FC } from 'react'
+import { ChangeEvent, CSSProperties, FC } from 'react'
 import { FONTS } from '@shared/consts/fonts.enum'
 import styled from 'styled-components'
 import search from '@assets/images/search.svg'
 
 const Container = styled.div`
+  flex: 1;
   position: relative;
   margin-bottom: 16px;
 `
@@ -35,7 +36,7 @@ const SearchIcon = styled.img`
 interface SearchInputProps {
   placeholder?: string
   value?: string
-  onChange?: () => void
+  onChange?: (e: ChangeEvent<HTMLInputElement>) => void
   style?: CSSProperties
 }
 

@@ -54,6 +54,7 @@ func (s *Storage) Save(
 		CreatedAt:   time.Now(),
 		Likes:       0,
 		Dislikes:    0,
+		Saved:       0,
 		HeaderImage: headerImage,
 		Comments:    []primitive.ObjectID{},
 		Tags:        tags,

@@ -3,6 +3,7 @@ package com.devhub.devhubapp.dataClasses
 data class UserResponse(
     val _id: String,
     val name: String?,
+    val bio: String?,
     val username: String,
     val avatar: String,
     val email: String,

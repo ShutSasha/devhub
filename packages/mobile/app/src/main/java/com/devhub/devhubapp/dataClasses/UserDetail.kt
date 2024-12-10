@@ -5,6 +5,7 @@ import java.util.Date
 data class UserDetail(
     val _id: String,
     val bio: String? = null,
+    val followers: Array<String>? = null,
     val avatar: String,
     val name: String? = null,
     val username: String,

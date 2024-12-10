@@ -62,7 +62,7 @@ export const SignUp: FC = () => {
 
   const handleGoogleAuth = () => {
     try {
-      const redirectUrl = `${process.env.REACT_APP_GOOGLE_AUTH_API}`
+      const redirectUrl = `${import.meta.env.VITE_GOOGLE_AUTH_API}`
 
       window.location.href = redirectUrl
     } catch (e) {
@@ -72,7 +72,7 @@ export const SignUp: FC = () => {
 
   const handleGithubAuth = async () => {
     try {
-      const redirectUrl = `${process.env.REACT_APP_GITHUB_AUTH_API}`
+      const redirectUrl = `${import.meta.env.VITE_GITHUB_AUTH_API}`
 
       window.location.href = redirectUrl
     } catch (e) {
