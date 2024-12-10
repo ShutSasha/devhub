@@ -1,5 +1,8 @@
+using ChatService;
+using ChatService.Abstractions;
 using ChatService.Hubs;
 using ChatService.Models.Database;
+using ChatService.Services;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 
@@ -33,13 +36,17 @@ services.AddSingleton<IMongoDatabase>(sp =>
    var settings = sp.GetRequiredService<IOptions<MongoDbSettings>>().Value;
    return mongoClient.GetDatabase(settings.DatabaseName);
 });
+services.AddGrpcClient<UserChatService.UserChatServiceClient>(option =>
+{
+   option.Address = new Uri("http://localhost:5228");
+});
 
 services.AddSignalR();
 services.AddEndpointsApiExplorer();
-services.AddSwaggerGen(options =>
-{
-   options.EnableAnnotations();
-});
+services.AddSwaggerGen(options => { options.EnableAnnotations(); });
+
+services.AddScoped<IChatService, ChatService.Services.ChatService>();
+services.AddScoped<IMessageService, MessageService>();
 
 var app = builder.Build();
 

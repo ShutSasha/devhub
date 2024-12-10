@@ -10,9 +10,17 @@ public class Message
    [BsonRepresentation(BsonType.ObjectId)]
    [JsonPropertyName("_id")]
    public string Id { get; set; }
-   
+
+   [BsonElement("chat")]
    [BsonRepresentation(BsonType.ObjectId)]
-   public List<string> Participants { get; set; }
-   public List<string> Messages { get; set; }
-   public DateTime CreatedAt { get; set; } = DateTime.Now;
+   public string Chat { get; set; }
+   
+   [BsonElement("userSender")]
+   [BsonRepresentation(BsonType.ObjectId)]
+   public string UserSender { get; set; }
+
+   [BsonElement("createdAt")]
+   [BsonRepresentation(BsonType.DateTime)]
+   public DateTime CreatedAt { get; set; }
+   
 }

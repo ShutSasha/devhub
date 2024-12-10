@@ -16,6 +16,8 @@ public class PostDto
    public DateTime CreatedAt { get; set; }
    public int Likes { get; set; }
    public int Dislikes { get; set; }
-   public List<string> Tags { get; set;}
+   public int Saved { get; set; }
    public List<string> Comments { get; set; }
+   
+   public List<string> Tags { get; set;}
 }
