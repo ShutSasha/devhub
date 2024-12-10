@@ -95,7 +95,6 @@ class SearchActivity : AppCompatActivity() {
                     Toast.makeText(this, "You can already choose this tag", Toast.LENGTH_SHORT)
                         .show()
                 } else {
-                    // Проверка на количество выбранных тегов
                     if (selectedTags.size + selectedTopTags.size >= 4) {
                         Toast.makeText(this, "You can select up to 4 tags only", Toast.LENGTH_SHORT)
                             .show()

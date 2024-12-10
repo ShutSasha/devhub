@@ -39,6 +39,10 @@ class MainActivity : AppCompatActivity() {
 
         encryptedPreferencesManager = EncryptedPreferencesManager(this)
         val user = encryptedPreferencesManager.getUserData()
+        val retrofitClient = RetrofitClient.getInstance(this)
+        val userAPI = retrofitClient.userAPI
+
+        encryptedPreferencesManager.fetchAndSaveUserSavedPosts(userAPI)
 
         if (user._id.isEmpty()) {
             startActivity(Intent(this, WelcomeActivity::class.java))

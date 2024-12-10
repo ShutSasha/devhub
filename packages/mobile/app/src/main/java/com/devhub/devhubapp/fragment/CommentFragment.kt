@@ -83,16 +83,16 @@ class CommentFragment(
                     commentsList.removeAt(position)
                     notifyItemRemoved(position)
                     notifyItemRangeChanged(position, commentsList.size)
-                    Toast.makeText(view.context, "Комментарий удален", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(view.context, "Comment deleted", Toast.LENGTH_SHORT).show()
                     onCommentDeleted?.invoke()
                     updateCommentCount(view.context)
                 } else {
-                    Toast.makeText(view.context, "Ошибка удаления", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(view.context, "Deleting error", Toast.LENGTH_SHORT).show()
                 }
             }
 
             override fun onFailure(call: Call<Unit>, t: Throwable) {
-                Toast.makeText(view.context, "Ошибка сети", Toast.LENGTH_SHORT).show()
+                Toast.makeText(view.context, "Network error", Toast.LENGTH_SHORT).show()
             }
         })
     }
@@ -103,11 +103,18 @@ class CommentFragment(
         }
     }
 
-    private fun formatDate(dateString: String): String {
-        val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
-        inputFormat.timeZone = TimeZone.getTimeZone("UTC")
-        val outputFormat = SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.getDefault())
-        val date = inputFormat.parse(dateString)
-        return outputFormat.format(date)
+    private fun formatDate(dateString: String?): String {
+        if (dateString.isNullOrEmpty()) {
+            return ""
+        }
+        return try {
+            val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
+            inputFormat.timeZone = TimeZone.getTimeZone("UTC")
+            val outputFormat = SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.getDefault())
+            val date = inputFormat.parse(dateString)
+            outputFormat.format(date)
+        } catch (e: Exception) {
+            ""
+        }
     }
 }

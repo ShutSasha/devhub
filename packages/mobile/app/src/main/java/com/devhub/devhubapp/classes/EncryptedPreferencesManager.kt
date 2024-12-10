@@ -2,11 +2,17 @@ package com.devhub.devhubapp.classes
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.util.Log
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import com.devhub.devhubapp.api.AuthAPI
+import com.devhub.devhubapp.api.UserAPI
+import com.devhub.devhubapp.dataClasses.SavedPostsResponse
 import com.devhub.devhubapp.dataClasses.User
 import com.devhub.devhubapp.dataClasses.UserReactions
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import java.util.Date
 
 class EncryptedPreferencesManager(context: Context) {
@@ -57,7 +63,8 @@ class EncryptedPreferencesManager(context: Context) {
             devPoints = sharedPreferences.getString("devPoints", "0")?.toIntOrNull() ?: 0,
             activationCode = sharedPreferences.getString("activationCode", "") ?: "",
             isActivated = sharedPreferences.getString("isActivated", "false")?.toBoolean() ?: false,
-            userRole = sharedPreferences.getString("roles", "")?.split(",")?.toTypedArray() ?: emptyArray()
+            userRole = sharedPreferences.getString("roles", "")?.split(",")?.toTypedArray()
+                ?: emptyArray()
         )
     }
 
@@ -110,5 +117,38 @@ class EncryptedPreferencesManager(context: Context) {
 
     fun getData(key: String): String? {
         return sharedPreferences.getString(key, null)
+    }
+
+    fun fetchAndSaveUserSavedPosts(userAPI: UserAPI) {
+        val userId = getUserData()._id
+        userAPI.getUserSavedPosts(userId).enqueue(object : Callback<SavedPostsResponse> {
+            override fun onResponse(
+                call: Call<SavedPostsResponse>,
+                response: Response<SavedPostsResponse>
+            ) {
+                if (response.isSuccessful) {
+                    val savedPosts = response.body()?.savedPosts ?: emptyList()
+                    saveUserSavedPosts(savedPosts)
+                }
+            }
+
+            override fun onFailure(call: Call<SavedPostsResponse>, t: Throwable) {
+                Log.e("EncryptedPreferencesManager", "Error fetching user saved posts", t)
+            }
+        })
+    }
+
+    fun saveUserSavedPosts(savedPosts: List<String>) {
+        val savedPostsString = savedPosts.joinToString(",")
+        sharedPreferences.edit().putString("saved_posts", savedPostsString).apply()
+    }
+
+    fun getUserSavedPosts(): List<String> {
+        val savedPostsString = sharedPreferences.getString("saved_posts", "") ?: ""
+        return if (savedPostsString.isNotEmpty()) {
+            savedPostsString.split(",")
+        } else {
+            emptyList()
+        }
     }
 }
