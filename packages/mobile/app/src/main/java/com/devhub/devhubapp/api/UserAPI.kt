@@ -67,7 +67,7 @@ interface UserAPI {
     ): Call<List<Follower>>
 
     @POST("users/saved-posts")
-    fun toggleSavePost(@Body requestBody: SavedPostRequest): Call<Post>
+    fun toggleSavePost(@Body requestBody: SavedPostRequest): Call<SavedPostDetailsResponse>
 
     @GET("users/saved-posts/{userId}")
     fun getUserSavedPosts(@Path("userId") userId: String): Call<SavedPostsResponse>
