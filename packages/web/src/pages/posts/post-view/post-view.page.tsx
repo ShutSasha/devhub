@@ -15,7 +15,7 @@ import { useCreateCommentMutation } from '@api/comment.api'
 import { handleServerException } from '@utils/handleServerException.util'
 import { toast } from 'react-toastify'
 import { ROUTES } from '@pages/router/routes.enum'
-import { useGetUserReactionsQuery } from '@api/user.api'
+import { useGetUserReactionsQuery, useLazyGetReportsByUserQuery, useReportPostMutation } from '@api/user.api'
 import editPostSVG from '@assets/images/post/edit-post-icon.svg'
 import deletePostSVG from '@assets/images/post/delete-post-ic.svg'
 import reportSVG from '@assets/images/post/report.svg'
@@ -45,6 +45,7 @@ import { Comment as CommentComponent } from './components/comment.component'
 import { InputContainer } from './components/write-comment.component'
 
 import { ErrorException } from '~types/error/error.type'
+import { IReport } from '~types/post/post.type'
 
 export const PostView = () => {
   const { id } = useParams()
@@ -60,7 +61,10 @@ export const PostView = () => {
   const [isLiked, setLiked] = useState<boolean>(false)
   const [isDisliked, setDisliked] = useState<boolean>(false)
   const [isDisableBtn, setDisabledBtn] = useState<boolean>(false)
-  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isModalVisible, setModalVisible] = useState(false)
+  const [isClosing, setIsClosing] = useState(false)
+  const [reportPost] = useReportPostMutation()
+  const [getReportsByUser] = useLazyGetReportsByUserQuery()
 
   useEffect(() => {
     refetchReactions()
@@ -139,11 +143,31 @@ export const PostView = () => {
 
   const handleReportPost = async (category: string) => {
     try {
+      if (!user) return toast.error('Log in for reporting posts', { autoClose: 1300 })
+
+      const reports = await getReportsByUser({ userId: user._id }).unwrap()
+
+      const isReported = reports.some((report: IReport) => report.content === post?._id)
+
+      if (isReported) return toast.error('You have already reported this post', { autoClose: 1300 })
+
+      await reportPost({ sender: user._id, content: post?._id, category }).unwrap()
+
       toast.info(`Post reported for ${category}`, { autoClose: 1300 })
-      setIsModalOpen(false)
+      closeModal()
     } catch (e) {
       console.error(e)
     }
+  }
+
+  const openModal = () => {
+    setIsClosing(false)
+    setModalVisible(true)
+  }
+
+  const closeModal = () => {
+    setIsClosing(true)
+    setTimeout(() => setModalVisible(false), 500) // 500ms відповідає тривалості анімації
   }
 
   if (error) {
@@ -196,10 +220,10 @@ export const PostView = () => {
               />
             </div>
           )}
-          <ReportIcon onClick={() => setIsModalOpen(true)} src={reportSVG} />
-          {isModalOpen && (
-            <Overlay onClick={() => setIsModalOpen(false)}>
-              <Modal onClick={e => e.stopPropagation()}>
+          <ReportIcon onClick={openModal} src={reportSVG} />
+          {isModalVisible && (
+            <Overlay className={isClosing ? 'hidden' : 'visible'} onClick={closeModal}>
+              <Modal className={isClosing ? 'hidden' : 'visible'} onClick={e => e.stopPropagation()}>
                 <Title>Report this post by one category</Title>
                 <CategoryButton onClick={() => handleReportPost('Spam')}>Spam</CategoryButton>
                 <CategoryButton onClick={() => handleReportPost('Copyright Infringement')}>
