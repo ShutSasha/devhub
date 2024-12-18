@@ -18,21 +18,27 @@ import { ROUTES } from '@pages/router/routes.enum'
 import { useGetUserReactionsQuery } from '@api/user.api'
 import editPostSVG from '@assets/images/post/edit-post-icon.svg'
 import deletePostSVG from '@assets/images/post/delete-post-ic.svg'
+import reportSVG from '@assets/images/post/report.svg'
 
 import {
   ActionContainer,
   ActionInnerContainer,
+  CategoryButton,
   Comment,
   ContentText,
   Dislike,
   GrayLine,
   Like,
+  Modal,
+  Overlay,
   PostBtn,
   PostCreationData,
   PostImage,
   PostTag,
   PostTagsContainer,
   PostTitle,
+  ReportIcon,
+  Title,
   WriteCommentContainer,
 } from './post-view.style'
 import { Comment as CommentComponent } from './components/comment.component'
@@ -54,6 +60,7 @@ export const PostView = () => {
   const [isLiked, setLiked] = useState<boolean>(false)
   const [isDisliked, setDisliked] = useState<boolean>(false)
   const [isDisableBtn, setDisabledBtn] = useState<boolean>(false)
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
   useEffect(() => {
     refetchReactions()
@@ -130,6 +137,15 @@ export const PostView = () => {
     }
   }
 
+  const handleReportPost = async (category: string) => {
+    try {
+      toast.info(`Post reported for ${category}`, { autoClose: 1300 })
+      setIsModalOpen(false)
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
   if (error) {
     return (
       <PostViewLayout>
@@ -165,7 +181,7 @@ export const PostView = () => {
           />
           <Username style={{ fontSize: '26px', lineHeight: '36px', fontWeight: '500' }}>{post.user.username}</Username>
         </StyledUserCredentialsContainer>
-        <div style={{ alignSelf: 'flex-start' }}>
+        <div style={{ display: 'flex', alignSelf: 'flex-start', gap: '12px' }}>
           {user?._id === post.user._id && (
             <div style={{ display: 'flex', gap: '12px' }}>
               <img
@@ -179,6 +195,19 @@ export const PostView = () => {
                 src={deletePostSVG}
               />
             </div>
+          )}
+          <ReportIcon onClick={() => setIsModalOpen(true)} src={reportSVG} />
+          {isModalOpen && (
+            <Overlay onClick={() => setIsModalOpen(false)}>
+              <Modal onClick={e => e.stopPropagation()}>
+                <Title>Report this post by one category</Title>
+                <CategoryButton onClick={() => handleReportPost('Spam')}>Spam</CategoryButton>
+                <CategoryButton onClick={() => handleReportPost('Copyright Infringement')}>
+                  Copyright Infringement
+                </CategoryButton>
+                <CategoryButton onClick={() => handleReportPost('Misinformation')}>Misinformation</CategoryButton>
+              </Modal>
+            </Overlay>
           )}
         </div>
       </StyledUserCredentialsContainerWrapper>

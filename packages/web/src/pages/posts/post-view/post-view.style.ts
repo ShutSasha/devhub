@@ -160,3 +160,57 @@ export const PostBtn = styled.button`
     color: #f7971d;
   }
 `
+
+export const Overlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+`
+
+export const Modal = styled.div`
+  background-color: ${colors.background};
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 400px;
+  width: 100%;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+`
+
+export const Title = styled.h2`
+  margin: 0 0 16px;
+  font-size: 18px;
+  text-align: center;
+  color: ${colors.textPrimary};
+`
+
+export const CategoryButton = styled.button`
+  width: 100%;
+  padding: 10px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 4px;
+  background-color: ${colors.bgPage};
+  cursor: pointer;
+  font-size: 16px;
+  transition: 0.15s ease-in;
+  color: ${colors.textPrimary};
+
+  &:hover {
+    background-color: #e0e0e0;
+    color: ${colors.text};
+  }
+`
+
+export const ReportIcon = styled.img`
+  align-self: flex-start;
+  cursor: pointer;
+  width: 24px;
+  height: 24px;
+`
