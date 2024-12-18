@@ -10,7 +10,7 @@ using UserService.Helpers.Response;
 namespace UserService.Controllers;
 
 [ApiController]
-[Route("api/report")]
+[Route("api/reports")]
 public class ReportController : ControllerBase
 {
    private readonly IReportService _reportService;
