@@ -64,4 +64,17 @@ interface PostAPI {
         @Body requestBody: UserIdRequest
     ): Call<Post>
 
+    @GET("posts/search")
+    suspend fun searchPosts(
+        @Query("q") query: String?,
+        @Query("tags[]") tags: List<String>?,
+        @Query("sort") sort: String?,
+        @Query("page") page: Int = 1,
+        @Query("limit") limit: Int = 10
+    ): List<Post>
+
+    @GET("posts/get-popular-tags")
+    suspend fun getTopTags(
+        @Query("limit") limit: Int = 10
+    ): List<String>
 }

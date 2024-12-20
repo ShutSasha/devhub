@@ -176,7 +176,7 @@ const docTemplate = `{
         },
         "/api/posts/search": {
             "get": {
-                "description": "Searches posts based on query string, tags, and sorting order.",
+                "description": "\"asc\" - from oldest to newest, \"desc\" - from newest to oldest. Default is \"desc\".",
                 "consumes": [
                     "application/json"
                 ],
@@ -574,6 +574,9 @@ const docTemplate = `{
                 "likes": {
                     "type": "integer"
                 },
+                "saved": {
+                    "type": "integer"
+                },
                 "tags": {
                     "type": "array",
                     "items": {
@@ -644,6 +647,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "likes": {
+                    "type": "integer"
+                },
+                "saved": {
                     "type": "integer"
                 },
                 "tags": {

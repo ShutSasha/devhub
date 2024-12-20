@@ -24,17 +24,11 @@ builder.Services.AddCors(options =>
    });
 });
 
-services.AddGrpcClient<PostService.PostServiceClient>(option =>
-{
-   option.Address = new Uri("http://localhost:5226");
-});
+services.AddGrpcClient<PostService.PostServiceClient>(option => { option.Address = new Uri("http://localhost:5226"); });
 
 services.AddControllers();
 services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(options =>
-{
-   options.EnableAnnotations();
-});
+builder.Services.AddSwaggerGen(options => { options.EnableAnnotations(); });
 
 services.Configure<MongoDbSettings>(configuration.GetSection("MongoDbSettings"));
 services.AddSingleton<IMongoClient>(sp =>
@@ -54,8 +48,9 @@ services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 services.AddGrpc();
 services.Configure<AwsOptions>(configuration.GetSection("AWS"));
 services.AddSingleton<IAmazonS3>(AwsS3ClientFactory.CreateS3Client(configuration));
-services.AddScoped<IUserService,UserService.Services.UserService>();
+services.AddScoped<IUserService, UserService.Services.UserService>();
 services.AddScoped<IStorageService, StorageService>();
+services.AddScoped<IReportService, ReportService>();
 
 
 var app = builder.Build();

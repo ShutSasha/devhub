@@ -17,7 +17,7 @@ import (
 // New handles the search for posts with optional query parameters like sorting, pagination, and tags.
 //
 // @Summary      Search for posts
-// @Description  Searches posts based on query string, tags, and sorting order.
+// @Description  "asc" - from oldest to newest, "desc" - from newest to oldest. Default is "desc".
 // @Tags         posts
 // @Accept       json
 // @Produce      json
@@ -89,8 +89,6 @@ func New(log *slog.Logger, postSearcher interfaces.PostSearcher, fileProvider in
 			return
 		}
 		if posts == nil {
-			w.WriteHeader(http.StatusNotFound)
-
 			render.JSON(w, r, map[string]interface{}{})
 			return
 		}

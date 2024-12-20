@@ -37,4 +37,8 @@ public class Post
    [BsonElement("comments")]
    [BsonRepresentation(BsonType.ObjectId)]
    public List<string> Comments { get; set; }
+   
+   [BsonElement("reports")]
+   [BsonRepresentation(BsonType.ObjectId)]
+   public List<string> Reports { get; set; }
 }

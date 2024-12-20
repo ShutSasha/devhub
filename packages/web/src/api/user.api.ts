@@ -9,6 +9,7 @@ import {
   UserFollowersResponse,
   UserFollowingsResponse,
 } from '~types/user/user.type'
+import { IReport } from '~types/post/post.type'
 
 export const api = createApi({
   reducerPath: 'userApi',
@@ -68,6 +69,19 @@ export const api = createApi({
         body,
       }),
     }),
+    reportPost: builder.mutation<any, { sender: string | undefined; content: string | undefined; category: string }>({
+      query: body => ({
+        url: `reports`,
+        method: 'POST',
+        body,
+      }),
+    }),
+    getReportsByUser: builder.query<IReport[], { userId: string | undefined }>({
+      query: ({ userId }) => ({
+        url: `reports/${userId}`,
+        method: 'GET',
+      }),
+    }),
   }),
 })
 
@@ -80,4 +94,6 @@ export const {
   useGetUserFollowingsQuery,
   useDeleteUserFollowingMutation,
   useAddFollowingUserFollowingMutation,
+  useReportPostMutation,
+  useLazyGetReportsByUserQuery,
 } = api

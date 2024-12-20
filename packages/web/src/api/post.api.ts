@@ -1,4 +1,5 @@
 import { createApi } from '@reduxjs/toolkit/query/react'
+import qs from 'qs'
 
 import baseQueryWithReauth from './baseQueryWithReauth'
 
@@ -14,11 +15,20 @@ export const api = createApi({
         method: 'GET',
       }),
     }),
-    getPosts: builder.query<IPost[], { page: number; limit: number }>({
-      query: ({ page, limit }) => ({
-        url: 'posts',
+    getPosts: builder.query<IPost[], { page: number; limit: number; q?: string; tags?: string[]; sort?: string }>({
+      query: ({ page, limit, q, tags, sort }) => {
+        const queryString = qs.stringify({ page, limit, q, tags, sort }, { arrayFormat: 'brackets' })
+
+        return {
+          url: `posts/search?${queryString}`,
+          method: 'GET',
+        }
+      },
+    }),
+    getPopularTags: builder.query<string[], void>({
+      query: () => ({
+        url: `posts/get-popular-tags?limit=5`,
         method: 'GET',
-        params: { page, limit },
       }),
     }),
     createPost: builder.mutation<IPost, FormData>({
@@ -55,6 +65,25 @@ export const api = createApi({
         method: 'DELETE',
       }),
     }),
+    saveFavoritePost: builder.mutation<IPost, { savedPostId: string; userId: string | undefined }>({
+      query: ({ savedPostId, userId }) => ({
+        url: `users/saved-posts`,
+        method: 'POST',
+        body: { userId, savedPostId },
+      }),
+    }),
+    getSavedFavoritePosts: builder.query<{ savedPosts: string[] }, { userId: string | undefined }>({
+      query: ({ userId }) => ({
+        url: `users/saved-posts/${userId}`,
+        method: 'GET',
+      }),
+    }),
+    getSavedFavoritePostsDetails: builder.query<IPost[], { userId: string | undefined }>({
+      query: ({ userId }) => ({
+        url: `users/saved-posts-details/${userId}`,
+        method: 'GET',
+      }),
+    }),
   }),
 })
 
@@ -67,4 +96,8 @@ export const {
   useLikeMutation,
   useEditPostMutation,
   useDeletePostMutation,
+  useGetPopularTagsQuery,
+  useSaveFavoritePostMutation,
+  useGetSavedFavoritePostsQuery,
+  useGetSavedFavoritePostsDetailsQuery,
 } = api

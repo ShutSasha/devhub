@@ -14,6 +14,7 @@ import { UserEditProfile } from '@pages/user/edit-profile/edit-profile.page'
 import { EditPost } from '@pages/posts/edit-post/edit-post.page'
 import { Followers } from '@pages/friends/followers/followers.page'
 import { FollowedList } from '@pages/friends/followed-list/followed-list.page'
+import { Starred } from '@pages/starred/starred.page'
 
 import { ROUTES } from './routes.enum'
 
@@ -77,6 +78,10 @@ const router = createBrowserRouter([
   {
     path: `${ROUTES.USER_FRIENDS_FOLLOWED_LIST}`,
     element: <FollowedList />,
+  },
+  {
+    path: `${ROUTES.STARRED}`,
+    element: <Starred />,
   },
 ])
 

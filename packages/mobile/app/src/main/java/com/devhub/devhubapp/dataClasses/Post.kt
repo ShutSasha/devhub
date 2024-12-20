@@ -9,6 +9,7 @@ data class Post(
     val createdAt: String,
     var likes: Int,
     var dislikes: Int,
+    var saved: Int,
     val comments: List<Comment>?,
     val tags: List<String>?
 )

@@ -1,6 +1,5 @@
 package com.devhub.devhubapp.activity
 
-import com.devhub.devhubapp.fragment.CommentFragment
 import android.content.Intent
 import android.icu.text.SimpleDateFormat
 import android.icu.util.TimeZone
@@ -14,31 +13,35 @@ import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
-import com.bumptech.glide.Glide
-import com.devhub.devhubapp.R
-import com.devhub.devhubapp.dataClasses.Post
-import com.devhub.devhubapp.fragment.HeaderFragment
-import com.google.android.flexbox.FlexboxLayout
-import com.google.gson.Gson
-import androidx.core.content.ContextCompat
-import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.devhub.devhubapp.dataClasses.Comment
-import com.devhub.devhubapp.fragment.AddCommentFragment
-import java.util.Locale
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import com.bumptech.glide.Glide
+import com.devhub.devhubapp.R
 import com.devhub.devhubapp.api.PostAPI
 import com.devhub.devhubapp.classes.EncryptedPreferencesManager
 import com.devhub.devhubapp.classes.RetrofitClient
+import com.devhub.devhubapp.dataClasses.Comment
+import com.devhub.devhubapp.dataClasses.Post
+import com.devhub.devhubapp.dataClasses.SavedPostDetailsResponse
+import com.devhub.devhubapp.dataClasses.SavedPostRequest
+import com.devhub.devhubapp.dataClasses.SavedPostsResponse
 import com.devhub.devhubapp.dataClasses.UserIdRequest
 import com.devhub.devhubapp.dataClasses.UserReactions
+import com.devhub.devhubapp.fragment.AddCommentFragment
+import com.devhub.devhubapp.fragment.CommentFragment
+import com.devhub.devhubapp.fragment.HeaderFragment
+import com.google.android.flexbox.FlexboxLayout
+import com.google.gson.Gson
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import java.util.Locale
 
 class PostActivity : AppCompatActivity() {
     private lateinit var commentsRecyclerView: RecyclerView
@@ -49,6 +52,8 @@ class PostActivity : AppCompatActivity() {
     private lateinit var deletePostButton: ImageView
     private lateinit var likeCountTextView: TextView
     private lateinit var dislikeCountTextView: TextView
+    private lateinit var saveCountTextView: TextView
+    private lateinit var starIcon: ImageView
     private lateinit var userReactions: UserReactions
     private lateinit var encryptedPreferencesManager: EncryptedPreferencesManager
     private lateinit var postAPI: PostAPI
@@ -110,6 +115,12 @@ class PostActivity : AppCompatActivity() {
 
         post?.let { displayPost(it) }
 
+
+        val profileImage: ImageView = findViewById(R.id.profile_image)
+        profileImage.setOnClickListener {
+            openUserProfileActivity(post.user._id)
+        }
+
         editPostButton = findViewById(R.id.edit_post_button)
         deletePostButton = findViewById(R.id.delete_post_button)
         editPostButton.setOnClickListener {
@@ -131,17 +142,25 @@ class PostActivity : AppCompatActivity() {
         dislikeIcon = findViewById(R.id.dislike_icon)
         likeCountTextView = findViewById(R.id.like_count)
         dislikeCountTextView = findViewById(R.id.dislike_count)
+        saveCountTextView = findViewById(R.id.saved_count)
+        starIcon = findViewById(R.id.saved_icon)
 
         likeCountTextView.text = post.likes.toString()
         dislikeCountTextView.text = post.dislikes.toString()
+        saveCountTextView.text = post.saved.toString()
 
         updateReactionIcons(post._id)
+        updateStarIcon(post._id)
 
         likeIcon.setOnClickListener {
             handleLikeDislike(post._id, true)
         }
         dislikeIcon.setOnClickListener {
             handleLikeDislike(post._id, false)
+        }
+
+        starIcon.setOnClickListener {
+            toggleSavePost(post._id)
         }
 
         findViewById<LinearLayout>(R.id.back_button_container).setOnClickListener {
@@ -163,6 +182,7 @@ class PostActivity : AppCompatActivity() {
         val likeCount: TextView = findViewById(R.id.like_count)
         val dislikeCount: TextView = findViewById(R.id.dislike_count)
         val commentCount: TextView = findViewById(R.id.comment_count)
+        val saveCount: TextView = findViewById(R.id.saved_count)
         val commentsRecyclerView: RecyclerView = findViewById(R.id.comments_recycler_view)
 
         Glide.with(this)
@@ -193,6 +213,7 @@ class PostActivity : AppCompatActivity() {
         postContent.text = post.content
         likeCount.text = formatCount(post.likes)
         dislikeCount.text = formatCount(post.dislikes)
+        saveCount.text = formatCount(post.saved)
         if (post.comments.isNullOrEmpty()) {
             commentCount.text = "0"
         } else {
@@ -206,6 +227,12 @@ class PostActivity : AppCompatActivity() {
         }
         commentsRecyclerView.adapter = commentAdapter
         commentsRecyclerView.overScrollMode = View.OVER_SCROLL_NEVER
+    }
+
+    private fun openUserProfileActivity(userId: String) {
+        val intent = Intent(this, UserProfileActivity::class.java)
+        intent.putExtra("USER_ID", userId)
+        startActivity(intent)
     }
 
     private fun decrementCommentCount() {
@@ -251,7 +278,6 @@ class PostActivity : AppCompatActivity() {
         })
     }
 
-
     private fun openEditPostActivity() {
         val intent = Intent(this, EditPostActivity::class.java)
         intent.putExtra("post", Gson().toJson(post))
@@ -276,6 +302,12 @@ class PostActivity : AppCompatActivity() {
 
         likeIcon.setImageResource(if (liked) R.drawable.ic_like_active else R.drawable.ic_like)
         dislikeIcon.setImageResource(if (disliked) R.drawable.ic_dislike_active else R.drawable.ic_dislike)
+    }
+
+    private fun updateStarIcon(postId: String) {
+        val savedPostIds = encryptedPreferencesManager.getUserSavedPosts()
+        val isSaved = savedPostIds.contains(postId)
+        starIcon.setImageResource(if (isSaved) R.drawable.ic_star_active else R.drawable.ic_star)
     }
 
     private fun handleLikeDislike(postId: String, isLike: Boolean) {
@@ -338,6 +370,41 @@ class PostActivity : AppCompatActivity() {
         })
     }
 
+    private fun toggleSavePost(postId: String) {
+        val userId = encryptedPreferencesManager.getUserData()._id
+        val request = SavedPostRequest(userId, postId)
+
+        RetrofitClient.getInstance(this).userAPI.toggleSavePost(request)
+            .enqueue(object : Callback<SavedPostDetailsResponse> {
+                override fun onResponse(call: Call<SavedPostDetailsResponse>, response: Response<SavedPostDetailsResponse>) {
+                    if (response.isSuccessful) {
+                        response.body()?.let { updatedPost ->
+                            post.saved = updatedPost.saved
+                            val savedPostIds =
+                                encryptedPreferencesManager.getUserSavedPosts().toMutableList()
+                            if (savedPostIds.contains(postId)) {
+                                savedPostIds.remove(postId)
+                                starIcon.setImageResource(R.drawable.ic_star)
+                            } else {
+                                savedPostIds.add(postId)
+                                starIcon.setImageResource(R.drawable.ic_star_active)
+                            }
+                            encryptedPreferencesManager.saveUserSavedPosts(savedPostIds)
+                            saveCountTextView.text = formatCount(updatedPost.saved)
+                        }
+                    } else {
+                        Log.e(
+                            "PostActivity",
+                            "Failed to toggle save post: ${response.errorBody()?.string()}"
+                        )
+                    }
+                }
+
+                override fun onFailure(call: Call<SavedPostDetailsResponse>, t: Throwable) {
+                    Log.e("PostActivity", "Error toggling save post: ${t.message}", t)
+                }
+            })
+    }
 
     private fun refreshPost() {
         postAPI.getPostById(post._id).enqueue(object : Callback<Post> {

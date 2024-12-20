@@ -287,7 +287,7 @@
             }
          ],
          "UpstreamPathTemplate": "/api/users/saved-posts",
-         "UpstreamHttpMethod": ["POST","DELETE"]
+         "UpstreamHttpMethod": ["POST"]
       },
       {
          "DownstreamPathTemplate": "/api/users/saved-posts/{userId}",
@@ -312,6 +312,42 @@
          ],
          "UpstreamPathTemplate": "/api/users/saved-posts-details/{userId}",
          "UpstreamHttpMethod": ["GET"]
+      },
+      {
+         "DownstreamPathTemplate": "/api/reports",
+         "DownstreamScheme": "http",
+         "DownstreamHostAndPorts": [
+            {
+               "Host": "localhost",
+               "Port": 5229
+            }
+         ],
+         "UpstreamPathTemplate": "/api/reports",
+         "UpstreamHttpMethod": ["POST"]
+      },
+      {
+         "DownstreamPathTemplate": "/api/reports/{userId}",
+         "DownstreamScheme": "http",
+         "DownstreamHostAndPorts": [
+            {
+               "Host": "localhost",
+               "Port": 5229
+            }
+         ],
+         "UpstreamPathTemplate": "/api/reports/{userId}",
+         "UpstreamHttpMethod": ["GET"]
+      },
+      {
+         "DownstreamPathTemplate": "/api/reports/{reportId}",
+         "DownstreamScheme": "http",
+         "DownstreamHostAndPorts": [
+            {
+               "Host": "localhost",
+               "Port": 5229
+            }
+         ],
+         "UpstreamPathTemplate": "/api/reports/{reportId}",
+         "UpstreamHttpMethod": ["DELETE"]
       },
       
       

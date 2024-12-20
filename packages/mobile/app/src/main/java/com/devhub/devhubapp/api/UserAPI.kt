@@ -7,6 +7,10 @@ import com.devhub.devhubapp.dataClasses.UpdatePhotoResponse
 import com.devhub.devhubapp.dataClasses.UserDetail
 import com.devhub.devhubapp.dataClasses.UserReactions
 import com.devhub.devhubapp.dataClasses.Follower
+import com.devhub.devhubapp.dataClasses.Post
+import com.devhub.devhubapp.dataClasses.SavedPostDetailsResponse
+import com.devhub.devhubapp.dataClasses.SavedPostRequest
+import com.devhub.devhubapp.dataClasses.SavedPostsResponse
 import okhttp3.MultipartBody
 import okhttp3.ResponseBody
 import retrofit2.Call
@@ -62,4 +66,12 @@ interface UserAPI {
         @Path("userId") id: String?,
     ): Call<List<Follower>>
 
+    @POST("users/saved-posts")
+    fun toggleSavePost(@Body requestBody: SavedPostRequest): Call<SavedPostDetailsResponse>
+
+    @GET("users/saved-posts/{userId}")
+    fun getUserSavedPosts(@Path("userId") userId: String): Call<SavedPostsResponse>
+
+    @GET("users/saved-posts-details/{userId}")
+    fun getSavedPosts(@Path("userId") userId: String): Call<List<SavedPostDetailsResponse>>
 }
