@@ -1,15 +1,19 @@
 package com.devhub.devhubapp.activity
 
+import android.app.AlertDialog
 import android.content.Intent
 import android.icu.text.SimpleDateFormat
 import android.icu.util.TimeZone
 import android.os.Bundle
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -24,10 +28,13 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.devhub.devhubapp.R
 import com.devhub.devhubapp.api.PostAPI
+import com.devhub.devhubapp.api.ReportAPI
 import com.devhub.devhubapp.classes.EncryptedPreferencesManager
 import com.devhub.devhubapp.classes.RetrofitClient
 import com.devhub.devhubapp.dataClasses.Comment
 import com.devhub.devhubapp.dataClasses.Post
+import com.devhub.devhubapp.dataClasses.ReportRequest
+import com.devhub.devhubapp.dataClasses.ReportResponse
 import com.devhub.devhubapp.dataClasses.SavedPostDetailsResponse
 import com.devhub.devhubapp.dataClasses.SavedPostRequest
 import com.devhub.devhubapp.dataClasses.SavedPostsResponse
@@ -60,6 +67,9 @@ class PostActivity : AppCompatActivity() {
     private lateinit var post: Post
     private lateinit var usernameTextView: TextView
     private lateinit var currentUserId: String
+    private lateinit var reportPostButton: ImageView
+    private lateinit var reportAPI: ReportAPI
+    private var userReports: List<ReportResponse> = emptyList()
     private val REQUEST_CODE_EDIT_POST = 100
     private val postDetailLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -133,6 +143,23 @@ class PostActivity : AppCompatActivity() {
             finish()
         }
 
+        reportAPI = RetrofitClient.getInstance(this).reportAPI
+
+        reportPostButton = findViewById(R.id.report_post_button)
+        if (post.user._id == currentUserId) {
+            reportPostButton.visibility = View.GONE
+        } else {
+            reportPostButton.setOnClickListener {
+                if (isPostReported()) {
+                    Toast.makeText(this, "You have already reported this post", Toast.LENGTH_SHORT)
+                        .show()
+                } else {
+                    showReportDialog()
+                }
+            }
+        }
+
+
         userReactions = encryptedPreferencesManager.getUserReactions()
         usernameTextView = findViewById(R.id.username)
 
@@ -169,6 +196,9 @@ class PostActivity : AppCompatActivity() {
             setResult(RESULT_OK, intent)
             finish()
         }
+
+        fetchUserReports()
+
     }
 
     private fun displayPost(post: Post) {
@@ -285,6 +315,95 @@ class PostActivity : AppCompatActivity() {
         finish()
     }
 
+    private fun fetchUserReports() {
+        reportAPI.getUserReports(currentUserId).enqueue(object : Callback<List<ReportResponse>> {
+            override fun onResponse(
+                call: Call<List<ReportResponse>>,
+                response: Response<List<ReportResponse>>
+            ) {
+                if (response.isSuccessful) {
+                    userReports = response.body() ?: emptyList()
+                    if (isPostReported()) {
+                        reportPostButton.setImageResource(R.drawable.ic_report_active)
+                    }
+                } else {
+                    Log.e(
+                        "PostActivity",
+                        "Failed to fetch user reports: ${response.errorBody()?.string()}"
+                    )
+                }
+            }
+
+            override fun onFailure(call: Call<List<ReportResponse>>, t: Throwable) {
+                Log.e("PostActivity", "Error fetching user reports: ${t.message}", t)
+            }
+        })
+    }
+
+    private fun isPostReported(): Boolean {
+        return userReports.any { it.content == post._id }
+    }
+
+    private fun showReportDialog() {
+        val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_report, null)
+        val dialog = AlertDialog.Builder(this)
+            .setView(dialogView)
+            .create()
+
+        dialogView.findViewById<Button>(R.id.btn_spam).setOnClickListener {
+            sendReport("Spam")
+            dialog.dismiss()
+        }
+
+        dialogView.findViewById<Button>(R.id.btn_misinformation).setOnClickListener {
+            sendReport("Misinformation")
+            dialog.dismiss()
+        }
+
+        dialogView.findViewById<Button>(R.id.btn_copyright).setOnClickListener {
+            sendReport("Copyright Infringement")
+            dialog.dismiss()
+        }
+
+        dialog.show()
+    }
+
+    private fun sendReport(category: String) {
+        val reportRequest = ReportRequest(
+            sender = currentUserId,
+            content = post._id,
+            category = category
+        )
+
+        reportAPI.sendReport(reportRequest).enqueue(object : Callback<ReportResponse> {
+            override fun onResponse(
+                call: Call<ReportResponse>,
+                response: Response<ReportResponse>
+            ) {
+                if (response.isSuccessful) {
+                    Log.d("PostActivity", "Report sent successfully: ${response.body()}")
+                    reportPostButton.setImageResource(R.drawable.ic_report_active)
+                    Toast.makeText(
+                        this@PostActivity,
+                        "Post reported successfully",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    userReports = userReports + response.body()!!
+                } else {
+                    Log.e(
+                        "PostActivity",
+                        "Failed to send report: ${response.errorBody()?.string()}"
+                    )
+                }
+            }
+
+            override fun onFailure(call: Call<ReportResponse>, t: Throwable) {
+                Log.e("PostActivity", "Error sending report: ${t.message}", t)
+            }
+        })
+    }
+
+
     private fun updateCommentsList(newComment: Comment) {
         val currentComments = (commentsRecyclerView.adapter as CommentFragment).commentsList
         currentComments.add(0, newComment)
@@ -376,7 +495,10 @@ class PostActivity : AppCompatActivity() {
 
         RetrofitClient.getInstance(this).userAPI.toggleSavePost(request)
             .enqueue(object : Callback<SavedPostDetailsResponse> {
-                override fun onResponse(call: Call<SavedPostDetailsResponse>, response: Response<SavedPostDetailsResponse>) {
+                override fun onResponse(
+                    call: Call<SavedPostDetailsResponse>,
+                    response: Response<SavedPostDetailsResponse>
+                ) {
                     if (response.isSuccessful) {
                         response.body()?.let { updatedPost ->
                             post.saved = updatedPost.saved
