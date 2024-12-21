@@ -82,7 +82,10 @@ func (h *NotificationHandler) GetNotifications(w http.ResponseWriter, r *http.Re
 	}
 
 	if len(notifications) == 0 {
-		render.JSON(w, r, map[interface{}]interface{}{})
+		w.WriteHeader(http.StatusNotFound)
+
+		render.JSON(w, r, map[string]interface{}{})
+		return
 	}
 
 	render.JSON(w, r, notifications)
