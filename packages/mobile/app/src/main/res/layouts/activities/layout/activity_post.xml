@@ -92,6 +92,16 @@
                     app:layout_constraintTop_toTopOf="@id/profile_image" />
 
                 <ImageView
+                    android:id="@+id/report_post_button"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:src="@drawable/ic_report"
+                    app:layout_constraintEnd_toStartOf="@id/edit_post_button"
+                    app:layout_constraintTop_toTopOf="@id/profile_image" />
+
+                <ImageView
                     android:id="@+id/edit_post_button"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
