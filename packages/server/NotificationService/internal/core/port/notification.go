@@ -10,12 +10,14 @@ import (
 
 type NotificationService interface {
 	Create(ctx context.Context, notification models.Notification) (primitive.ObjectID, error)
-	GetNotifications(ctx context.Context, userId primitive.ObjectID, limit, page int) ([]dtos.NotificationDto, error)
+	GetNotifications(ctx context.Context, userId primitive.ObjectID, isRead bool) ([]dtos.NotificationDto, error)
 	GetByID(ctx context.Context, id primitive.ObjectID) (dtos.NotificationDto, error)
+	ReadNotification(ctx context.Context, id primitive.ObjectID) error
 }
 
 type NotificationRepository interface {
 	Create(ctx context.Context, notification models.Notification) (primitive.ObjectID, error)
-	GetNotifications(ctx context.Context, userId primitive.ObjectID, limit, page int) ([]dtos.NotificationDto, error)
+	GetNotifications(ctx context.Context, userId primitive.ObjectID, isRead bool) ([]dtos.NotificationDto, error)
 	GetByID(ctx context.Context, id primitive.ObjectID) (dtos.NotificationDto, error)
+	ReadNotification(ctx context.Context, id primitive.ObjectID) error
 }

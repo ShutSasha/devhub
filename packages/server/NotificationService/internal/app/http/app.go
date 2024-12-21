@@ -50,9 +50,8 @@ func New(
 		httpSwagger.URL(fmt.Sprintf("http://localhost:%d/swagger/doc.json", port)),
 	))
 
-	router.Route("/api/notifications", func(r chi.Router) {
-		r.Get("/{user_id}", notificationHandler.GetNotifications)
-	})
+	router.Get("/api/notifications/{user_id}", notificationHandler.GetNotifications)
+	router.Patch("/api/notifications/{notification_id}", notificationHandler.ReadNotification)
 
 	httpServer := &http.Server{
 		Addr:         ":" + strconv.Itoa(port),

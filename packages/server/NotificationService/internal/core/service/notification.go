@@ -17,8 +17,8 @@ func NewNotificationService(repo port.NotificationService) *NotificationService 
 	return &NotificationService{repo}
 }
 
-func (s *NotificationService) GetNotifications(ctx context.Context, userId primitive.ObjectID, limit, page int) ([]dtos.NotificationDto, error) {
-	return s.repo.GetNotifications(ctx, userId, limit, page)
+func (s *NotificationService) GetNotifications(ctx context.Context, userId primitive.ObjectID, isRead bool) ([]dtos.NotificationDto, error) {
+	return s.repo.GetNotifications(ctx, userId, isRead)
 }
 
 func (s *NotificationService) Create(ctx context.Context, model models.Notification) (primitive.ObjectID, error) {
@@ -27,4 +27,8 @@ func (s *NotificationService) Create(ctx context.Context, model models.Notificat
 
 func (s *NotificationService) GetByID(ctx context.Context, id primitive.ObjectID) (dtos.NotificationDto, error) {
 	return s.repo.GetByID(ctx, id)
+}
+
+func (s *NotificationService) ReadNotification(ctx context.Context, id primitive.ObjectID) error {
+	return s.repo.ReadNotification(ctx, id)
 }

@@ -21,7 +21,7 @@ func NewNotificationRepository(storage *mongodb.Storage) *NotificationRepository
 	}
 }
 
-func (r *NotificationRepository) GetNotifications(ctx context.Context, userId primitive.ObjectID, limit, page int) ([]dtos.NotificationDto, error) {
+func (r *NotificationRepository) GetNotifications(ctx context.Context, userId primitive.ObjectID, isRead bool) ([]dtos.NotificationDto, error) {
 	const op = "NotificationRepository.GetNotifications"
 
 	collection := r.storage.Database("DevHubDB").Collection("notifications")
@@ -29,6 +29,7 @@ func (r *NotificationRepository) GetNotifications(ctx context.Context, userId pr
 		bson.D{
 			{Key: "$match", Value: bson.D{
 				{Key: "reciever", Value: userId},
+				{Key: "isRead", Value: isRead},
 			}},
 		},
 		bson.D{
@@ -57,12 +58,6 @@ func (r *NotificationRepository) GetNotifications(ctx context.Context, userId pr
 			{Key: "$sort", Value: bson.D{
 				{Key: "createdAt", Value: -1},
 			}},
-		},
-		bson.D{
-			{Key: "$skip", Value: int64((page - 1) * limit)},
-		},
-		bson.D{
-			{Key: "$limit", Value: int64(limit)},
 		},
 	}
 
@@ -104,4 +99,17 @@ func (r *NotificationRepository) GetByID(ctx context.Context, id primitive.Objec
 	}
 
 	return notification, nil
+}
+
+func (r *NotificationRepository) ReadNotification(ctx context.Context, id primitive.ObjectID) error {
+	const op = "NotificationRepository.ReadNotification"
+
+	collection := r.storage.Database("DevHubDB").Collection("notifications")
+
+	_, err := collection.UpdateOne(ctx, bson.M{"_id": id}, bson.M{"$set": bson.M{"isRead": true}})
+	if err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	return nil
 }
