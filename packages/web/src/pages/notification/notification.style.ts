@@ -2,6 +2,8 @@ import { FONTS } from '@shared/consts/fonts.enum'
 import styled from 'styled-components'
 import { Link } from 'react-router-dom'
 import { colors } from '@shared/consts/colors.const'
+import checkNotification from '@assets/images/notification/checked.svg'
+import checkNotificationFilled from '@assets/images/notification/checked-filled.svg'
 
 export const ChangeList = styled.div`
   display: flex;
@@ -60,10 +62,17 @@ export const UserName = styled.p`
   color: ${colors.textPrimary};
 `
 
-export const OpenChatIcon = styled.img`
+export const ReadNotificationIcon = styled.div`
   width: 24px;
   height: 24px;
+  background-image: url(${checkNotification});
+  background-size: cover;
   cursor: pointer;
+  transition: background-image 0.3s;
+
+  &:hover {
+    background-image: url(${checkNotificationFilled});
+  }
 `
 
 export const UnFollowButton = styled.button`

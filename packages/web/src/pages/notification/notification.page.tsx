@@ -1,22 +1,34 @@
-import { SearchInput } from '@shared/components/search-input/search-input.component'
 import { MainLayout } from '@shared/layouts/main.layout'
 import { ROUTES } from '@pages/router/routes.enum'
-import { useAppSelector } from '@app/store/store'
+import { useAppDispatch, useAppSelector } from '@app/store/store'
 import { useNavigate, useParams } from 'react-router-dom'
-import openChatSvg from '@assets/images/chat/open-chat.svg'
-import { useGetUserFollowersQuery } from '@api/user.api'
+import { useLazyGetNotificationsByUserQuery, useReadNotificationByIdMutation } from '@api/notification.api'
+import { setNotifications } from '@features/notification/notifications.slice'
 
 import * as _ from './notification.style'
 
 export const Notification = () => {
   const { id } = useParams()
-  const { data: followers, isLoading } = useGetUserFollowersQuery({ userId: id })
+  const notifications = useAppSelector(state => state.notificationSlice.notifications)
+  const dispatch = useAppDispatch()
+  const [getNotifications] = useLazyGetNotificationsByUserQuery()
+  const [readNotificationById] = useReadNotificationByIdMutation()
   const navigate = useNavigate()
   const user = useAppSelector(state => state.userSlice.user)
-  const currentUrl = window.location.href
 
   const handleRedirectToUserProfile = (id: string) => {
     navigate(ROUTES.USER_PROFILE.replace(':id', id))
+  }
+
+  const handleReadNotification = async () => {
+    try {
+      await readNotificationById({ notification_id: id }).unwrap()
+      const { data } = await getNotifications({ user_id: user?._id })
+
+      dispatch(setNotifications(data))
+    } catch (e) {
+      console.error(e)
+    }
   }
 
   if (!user) {
@@ -27,31 +39,15 @@ export const Notification = () => {
     <MainLayout>
       <div></div>
       <div>
-        <SearchInput placeholder="Search by users..." />
-        <_.ChangeList>
-          <_.ListText
-            $underline={currentUrl.includes(ROUTES.USER_FRIENDS_FOLLOWERS.replace(':id', ''))}
-            to={ROUTES.USER_FRIENDS_FOLLOWERS.replace(':id', user._id)}
-          >
-            Followers
-          </_.ListText>
-          <_.ListText
-            $underline={currentUrl.includes(ROUTES.USER_FRIENDS_FOLLOWED_LIST.replace(':id', ''))}
-            to={ROUTES.USER_FRIENDS_FOLLOWED_LIST.replace(':id', user._id)}
-          >
-            Followed
-          </_.ListText>
-        </_.ChangeList>
-        {isLoading && <p>Loading...</p>}
         <_.UsersList>
-          {followers &&
-            followers.map(follower => (
-              <_.UserListItem key={follower._id}>
-                <_.UserListItemDataContainer onClick={() => handleRedirectToUserProfile(follower._id)}>
-                  <_.UserAvatar src={follower.avatar} alt="avatar" />
-                  <_.UserName>{follower.username}</_.UserName>
+          {notifications?.unread.length &&
+            notifications?.unread.map(notification => (
+              <_.UserListItem key={notification.id}>
+                <_.UserListItemDataContainer onClick={() => handleRedirectToUserProfile(notification.sender.id)}>
+                  <_.UserAvatar src={notification.sender.avatar} alt="avatar" />
+                  <_.UserName>{notification.sender.username}</_.UserName>
                 </_.UserListItemDataContainer>
-                <_.OpenChatIcon src={openChatSvg} alt="open chat" />
+                <_.ReadNotificationIcon onClick={handleReadNotification} />
               </_.UserListItem>
             ))}
         </_.UsersList>
