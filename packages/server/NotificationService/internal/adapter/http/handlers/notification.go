@@ -3,8 +3,8 @@ package handlers
 import (
 	"log/slog"
 	"net/http"
-	"strconv"
 
+	"github.com/ShutSasha/devhub/packages/server/NotificationService/internal/core/domain/dtos"
 	"github.com/ShutSasha/devhub/packages/server/NotificationService/internal/core/port"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -34,8 +34,6 @@ func NewNotificationHandler(
 // @Accept json
 // @Produce json
 // @Param user_id path string true "user_id"
-// @Param limit query int false "limit"
-// @Param page query int false "page"
 // @Router       /api/notifications/{user_id} [get]
 func (h *NotificationHandler) GetNotifications(w http.ResponseWriter, r *http.Request) {
 	const op = "NotificationHandler.GetNotifications"
@@ -61,19 +59,7 @@ func (h *NotificationHandler) GetNotifications(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	limit, err := strconv.Atoi(r.URL.Query().Get("limit"))
-	if err != nil || limit <= 0 {
-		log.Info("invalid limit parameter, defaulting to 10", slog.Any("limit", limit))
-		limit = 10
-	}
-
-	page, err := strconv.Atoi(r.URL.Query().Get("page"))
-	if err != nil || page <= 0 {
-		log.Info("invalid page parameter, defaulting to 1", slog.Any("page", page))
-		page = 1
-	}
-
-	notifications, err := h.svc.GetNotifications(r.Context(), userObjectId, limit, page)
+	unreadNotifications, err := h.svc.GetNotifications(r.Context(), userObjectId, false)
 	if err != nil {
 		log.Error("failed to get notifications", slog.Any("err", err.Error()))
 		w.WriteHeader(http.StatusInternalServerError)
@@ -81,12 +67,66 @@ func (h *NotificationHandler) GetNotifications(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	if len(notifications) == 0 {
-		w.WriteHeader(http.StatusNotFound)
+	if len(unreadNotifications) == 0 {
+		unreadNotifications = []dtos.NotificationDto{}
+	}
 
-		render.JSON(w, r, map[string]interface{}{})
+	readNotifications, err := h.svc.GetNotifications(r.Context(), userObjectId, true)
+	if err != nil {
+		log.Error("failed to get notifications", slog.Any("err", err.Error()))
+		w.WriteHeader(http.StatusInternalServerError)
+		render.JSON(w, r, map[string]string{"error": "failed to get notifications"})
 		return
 	}
 
-	render.JSON(w, r, notifications)
+	if len(readNotifications) == 0 {
+		readNotifications = []dtos.NotificationDto{}
+	}
+
+	render.JSON(w, r, map[string]interface{}{
+		"unread": unreadNotifications,
+		"read":   readNotifications,
+	})
+}
+
+// ReadNotification godoc
+// @Summary Read notification
+// @Description Read notification
+// @Tags notifications
+// @Accept json
+// @Produce json
+// @Param notification_id path string true "notification_id"
+// @Router /api/notifications/{notification_id} [patch]
+func (h *NotificationHandler) ReadNotification(w http.ResponseWriter, r *http.Request) {
+	const op = "NotificationHandler.ReadNotification"
+
+	log := h.logger.With(
+		slog.String("operation", op),
+		slog.String("request_id", middleware.GetReqID(r.Context())),
+	)
+
+	notificationId := chi.URLParam(r, "notification_id")
+	if notificationId == "" {
+		log.Error("post_id is required")
+		w.WriteHeader(http.StatusBadRequest)
+		render.JSON(w, r, map[string]string{"error": "post_id is required"})
+		return
+	}
+
+	notificationObjectId, err := primitive.ObjectIDFromHex(notificationId)
+	if err != nil {
+		log.Error("invalid post_id", slog.Any("notification_id", notificationId))
+		w.WriteHeader(http.StatusBadRequest)
+		render.JSON(w, r, map[string]string{"error": "invalid notification id"})
+		return
+	}
+
+	if err := h.svc.ReadNotification(r.Context(), notificationObjectId); err != nil {
+		log.Error("failed to read notification", slog.Any("err", err.Error()))
+		w.WriteHeader(http.StatusInternalServerError)
+		render.JSON(w, r, map[string]string{"error": "failed to read notification"})
+		return
+	}
+
+	render.JSON(w, r, map[string]string{"message": "notification read"})
 }

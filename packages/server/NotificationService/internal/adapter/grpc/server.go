@@ -52,6 +52,7 @@ func (s *serverAPI) CreateNotification(
 		Reciever:  recieverId,
 		Sender:    senderId,
 		Content:   req.Content,
+		IsRead:    false,
 		CreatedAt: time.Now(),
 	}
 

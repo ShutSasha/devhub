@@ -422,6 +422,18 @@
          ],
          "UpstreamPathTemplate": "/api/notifications/{user_id}",
          "UpstreamHttpMethod": ["GET"]
+      },
+      {
+         "DownstreamPathTemplate": "/api/notifications/{notification_id}",
+         "DownstreamScheme": "http",
+         "DownstreamHostAndPorts": [
+            {
+               "Host": "localhost",
+               "Port": 8082
+            }
+         ],
+         "UpstreamPathTemplate": "/api/notifications/{notification_id}",
+         "UpstreamHttpMethod": ["PATCH"]
       }
    ],
    "GlobalConfiguration": {
