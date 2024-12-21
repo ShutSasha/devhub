@@ -1,6 +1,7 @@
 using AutoMapper;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
+using NotificationService;
 using Post;
 using UserService.Abstracts;
 using UserService.Contracts.User;
@@ -16,6 +17,7 @@ public class UserService : IUserService
    private readonly IStorageService _storageService;
    private readonly IMapper _mapper;
    private readonly PostService.PostServiceClient _postServiceClient;
+   private readonly NotificationService.NotificationService.NotificationServiceClient _notificationServiceClient;
    private readonly IMongoCollection<User> _userCollection;
    private readonly IMongoCollection<Models.User.Post> _postCollection;
    private readonly IMongoCollection<Comment> _commentCollection;
@@ -23,12 +25,14 @@ public class UserService : IUserService
 
    public UserService(IMongoDatabase mongoDatabase, IOptions<MongoDbSettings> mongoDbSettings,
       ILogger<UserService> logger, IStorageService storageService, IMapper mapper,
-      PostService.PostServiceClient postServiceClient)
+      PostService.PostServiceClient postServiceClient,
+      NotificationService.NotificationService.NotificationServiceClient _notificationServiceClient)
    {
       _logger = logger;
       _storageService = storageService;
       _mapper = mapper;
       _postServiceClient = postServiceClient;
+      this._notificationServiceClient = _notificationServiceClient;
       _commentCollection = mongoDatabase.GetCollection<Comment>("comments");
       _postCollection = mongoDatabase.GetCollection<Models.User.Post>("posts");
       _userCollection = mongoDatabase.GetCollection<User>(mongoDbSettings.Value.CollectionName);
@@ -146,6 +150,22 @@ public class UserService : IUserService
          throw new Exception("500: Failed to update user or target user data");
 
       user.Followings.Add(followingId);
+
+      CreateNotificationRequest request = new CreateNotificationRequest
+      {
+         Content = "followed you",
+         Receiver = followingId,
+         Sender = userId,
+      };
+      
+      var createNotificationResponse = _notificationServiceClient
+         .CreateNotification(request);
+
+      if (!createNotificationResponse.Success)
+      {
+         throw new Exception("500: Cannot create notification");
+      }
+      
       return _mapper.Map<User, UserDto>(user);
    }
 

@@ -10,6 +10,7 @@ configs = [
     ".\\packages\\server\\AuthService\\appsettings.Development.json.temp",
     ".\\packages\\server\\UserService\\appsettings.Development.json.temp",
     ".\\packages\\server\\ApiGetaway\\appsettings.Development.json.temp"
+    ".\\packages\\server\\NotificationService\\config\\config.yaml.temp"
 ]
 
 load_dotenv()

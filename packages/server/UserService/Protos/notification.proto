@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package post;
+
+option csharp_namespace = "NotificationService"; 
+
+service NotificationService{
+  rpc CreateNotification(CreateNotificationRequest) returns (Response);
+}
+
+message CreateNotificationRequest{
+  string sender = 1;
+  string receiver = 2;
+  string content = 3;
+}
+
+message Response{
+  bool success = 1;
+  string message = 2;
+}
