@@ -420,7 +420,7 @@
          "DownstreamHostAndPorts": [
             {
                "Host": "localhost",
-               "Port": 5230
+               "Port": 5231
             }
          ],
          "UpstreamPathTemplate": "/api/chat/{userId}",
