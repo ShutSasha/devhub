@@ -8,10 +8,10 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/ShutSasha/devhub/packages/server/CommentService/internal/adapter/config"
-	"github.com/ShutSasha/devhub/packages/server/CommentService/internal/app"
-	"github.com/ShutSasha/devhub/packages/server/CommentService/internal/lib/logger/handlers/slogpretty"
-	"github.com/ShutSasha/devhub/packages/server/CommentService/internal/lib/logger/sl"
+	"github.com/ShutSasha/devhub/packages/server/NotificationService/internal/adapter/config"
+	"github.com/ShutSasha/devhub/packages/server/NotificationService/internal/app"
+	"github.com/ShutSasha/devhub/packages/server/NotificationService/internal/lib/logger/handlers/slogpretty"
+	"github.com/ShutSasha/devhub/packages/server/NotificationService/internal/lib/logger/sl"
 )
 
 const (
@@ -30,9 +30,7 @@ func main() {
 		cfg.StoragePath,
 		cfg.Http.Port,
 		cfg.Http.Timeout,
-		cfg.Grpc.PostServicePort,
-		cfg.Grpc.UserServicePort,
-		cfg.Grpc.CommentServicePort,
+		cfg.Grpc.Port,
 	)
 
 	done := make(chan os.Signal, 1)
@@ -40,33 +38,33 @@ func main() {
 
 	go func() {
 		if err := application.HttpApp.Run(); err != nil {
-			log.Error("commentService: failed to start comment server", sl.Err(err))
+			log.Error("failed to start server", sl.Err(err))
 		}
 	}()
 
-	log.Info("commentService: http server started")
+	log.Info("http server started")
 
 	go func() {
 		if err := application.GrpcApp.Run(); err != nil {
-			log.Error("commentService: failed to start grpc server", sl.Err(err))
+			log.Error("failed to start grpc server", sl.Err(err))
 		}
 	}()
 
-	log.Info("commentService: grpc server started")
+	log.Info("grpc server started")
 
 	<-done
-	log.Info("commentService: stopping server")
+	log.Info("stopping server")
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
 	if err := application.HttpApp.Server.Shutdown(ctx); err != nil {
-		log.Error("commentService: failed to stop http server", sl.Err(err))
+		log.Error("failed to stop http server", sl.Err(err))
 
 		return
 	}
 
-	log.Info("commentService: server stopped")
+	log.Info("server stopped")
 }
 
 func setupLogger(env string) *slog.Logger {

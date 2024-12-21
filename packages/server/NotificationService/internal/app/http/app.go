@@ -8,18 +8,14 @@ import (
 	"strconv"
 	"time"
 
-	_ "github.com/ShutSasha/devhub/packages/server/CommentService/docs"
-	pb "github.com/ShutSasha/devhub/packages/server/CommentService/gen/go/post"
-	ub "github.com/ShutSasha/devhub/packages/server/CommentService/gen/go/user"
-	handler "github.com/ShutSasha/devhub/packages/server/CommentService/internal/adapter/handler/http"
-	mwLogger "github.com/ShutSasha/devhub/packages/server/CommentService/internal/adapter/handler/http/middleware/logger"
-	"github.com/ShutSasha/devhub/packages/server/CommentService/internal/core/port"
+	_ "github.com/ShutSasha/devhub/packages/server/NotificationService/docs"
+	"github.com/ShutSasha/devhub/packages/server/NotificationService/internal/adapter/http/handlers"
+	mwLogger "github.com/ShutSasha/devhub/packages/server/NotificationService/internal/adapter/http/middleware/logger"
+	"github.com/ShutSasha/devhub/packages/server/NotificationService/internal/core/port"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/rs/cors"
 	httpSwagger "github.com/swaggo/http-swagger/v2"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 )
 
 type App struct {
@@ -29,11 +25,9 @@ type App struct {
 
 func New(
 	log *slog.Logger,
-	svc port.CommentService,
+	svc port.NotificationService,
 	port int,
 	timout time.Duration,
-	postServicePort int,
-	userServicePort int,
 ) *App {
 	corsHandler := cors.New(cors.Options{
 		AllowedOrigins:   []string{"http://localhost:5295"},
@@ -42,25 +36,7 @@ func New(
 		AllowCredentials: true,
 	})
 
-	connPost, err := grpc.NewClient(
-		fmt.Sprintf("localhost:%d", postServicePort),
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
-	)
-	if err != nil {
-		panic("failed to connect to post gRPC server")
-	}
-	grpcPostClient := pb.NewPostServiceClient(connPost)
-
-	connUser, err := grpc.NewClient(
-		fmt.Sprintf("localhost:%d", userServicePort),
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
-	)
-	if err != nil {
-		panic("failed to connect to user gRPC server")
-	}
-	grpcUserClient := ub.NewUserServiceClient(connUser)
-
-	commentHandler := handler.NewCommentHandler(svc, log, grpcPostClient, grpcUserClient)
+	notificationHandler := handlers.NewNotificationHandler(svc, log)
 
 	router := chi.NewRouter()
 
@@ -74,10 +50,8 @@ func New(
 		httpSwagger.URL(fmt.Sprintf("http://localhost:%d/swagger/doc.json", port)),
 	))
 
-	router.Route("/api/comments", func(r chi.Router) {
-		r.Get("/{id}", commentHandler.GetById())
-		r.Delete("/{id}", commentHandler.Delete())
-		r.Post("/", commentHandler.Create())
+	router.Route("/api/notifications", func(r chi.Router) {
+		r.Get("/{user_id}", notificationHandler.GetNotifications)
 	})
 
 	httpServer := &http.Server{

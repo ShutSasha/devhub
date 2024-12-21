@@ -15,7 +15,6 @@ type PrettyHandlerOptions struct {
 }
 
 type PrettyHandler struct {
-	opts PrettyHandlerOptions
 	slog.Handler
 	l     *stdLog.Logger
 	attrs []slog.Attr
@@ -72,7 +71,7 @@ func (h *PrettyHandler) Handle(_ context.Context, r slog.Record) error {
 
 	h.l.Println(
 		timeStr,
-		"Comment:",
+		"Notification:",
 		level,
 		msg,
 		color.WhiteString(string(b)),

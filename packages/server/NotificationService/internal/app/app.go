@@ -4,11 +4,11 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/ShutSasha/devhub/packages/server/CommentService/internal/adapter/storage/mongodb"
-	"github.com/ShutSasha/devhub/packages/server/CommentService/internal/adapter/storage/mongodb/repository"
-	"github.com/ShutSasha/devhub/packages/server/CommentService/internal/app/http"
-	"github.com/ShutSasha/devhub/packages/server/CommentService/internal/app/grpc"
-	"github.com/ShutSasha/devhub/packages/server/CommentService/internal/core/service"
+	"github.com/ShutSasha/devhub/packages/server/NotificationService/internal/adapter/storage/mongodb"
+	"github.com/ShutSasha/devhub/packages/server/NotificationService/internal/adapter/storage/mongodb/repository"
+	"github.com/ShutSasha/devhub/packages/server/NotificationService/internal/app/grpc"
+	"github.com/ShutSasha/devhub/packages/server/NotificationService/internal/app/http"
+	"github.com/ShutSasha/devhub/packages/server/NotificationService/internal/core/service"
 )
 
 type App struct {
@@ -21,28 +21,28 @@ func New(
 	storagePath string,
 	httpPort int,
 	timeout time.Duration,
-	postServicePort int,
-	userServicePort int,
-	commentServicePort int,
+	notificationServicePort int,
 ) *App {
 	storage, err := mongodb.New(storagePath)
 	if err != nil {
 		panic(err)
 	}
 
-	repos := repository.NewCommentRepository(storage)
-	service := service.NewCommentService(repos)
+	repos := repository.NewNotificationRepository(storage)
+	service := service.NewNotificationService(repos)
 
 	httpApp := http.New(
 		log,
 		service,
 		httpPort,
 		timeout,
-		postServicePort,
-		userServicePort,
 	)
 
-	grpcApp := grpc.New(log, service, commentServicePort)
+	grpcApp := grpc.New(
+		log,
+		service,
+		notificationServicePort,
+	)
 
 	return &App{
 		HttpApp: httpApp,
