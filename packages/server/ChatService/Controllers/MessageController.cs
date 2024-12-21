@@ -1,4 +1,5 @@
 ﻿using ChatService.Abstractions;
+using ChatService.Contracts;
 using ChatService.Helpers.Response;
 using ChatService.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -32,6 +33,23 @@ public class MessageController : ControllerBase
          return ErrorResponseHelper.CreateErrorResponse(  
             Convert.ToInt32(e.Message.Split(":")[0]),  
             nameof(GetMessagesByChatId),  
+            e.Message);
+      }
+   }
+   
+   [HttpPost]
+   public async Task<IActionResult> AddMessageToChat([FromBody] AddMessageRequest request)
+   {
+      try
+      {
+         await _messageService.AddMessageToChat(request.ChatId, request.UserId, request.Content);
+         return Ok();
+      }
+      catch (Exception e)
+      {
+         return ErrorResponseHelper.CreateErrorResponse(
+            Convert.ToInt32(e.Message.Split(":")[0]),
+            nameof(AddMessageRequest),
             e.Message);
       }
    }

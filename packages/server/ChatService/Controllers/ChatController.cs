@@ -9,36 +9,36 @@ using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using Swashbuckle.AspNetCore.Annotations;
 
-namespace ChatService.Controllers;  
-  
-[ApiController]  
-[Route("api/chat")]  
-public class ChatController : ControllerBase  
-{  
-   private readonly IChatService _chatService;  
-  
-   public ChatController(IChatService chatService)  
-   {  
-      _chatService = chatService;  
-   }  
-  
-   [HttpPost]  
-   [SwaggerOperation("Add chat")]  
-   public async Task<IActionResult> CreateChat([FromQuery] CreateChatRequest request)  
-   {  
-      try  
-      {  
-         var chatCreationResult = await _chatService.CreateChat(request.UserId, request.TargetUserId);  
-  
-         return Ok(new { ChatId = chatCreationResult });  
-      }  
-      catch (Exception e)  
-      {  
-         return ErrorResponseHelper.CreateErrorResponse(  
-            Convert.ToInt32(e.Message.Split(":")[0]),  
-            nameof(CreateChat),  
-            e.Message);  
-      }  
+namespace ChatService.Controllers;
+
+[ApiController]
+[Route("api/chat")]
+public class ChatController : ControllerBase
+{
+   private readonly IChatService _chatService;
+
+   public ChatController(IChatService chatService)
+   {
+      _chatService = chatService;
+   }
+
+   [HttpPost]
+   [SwaggerOperation("Add chat")]
+   public async Task<IActionResult> CreateChat([FromQuery] CreateChatRequest request)
+   {
+      try
+      {
+         var chatCreationResult = await _chatService.CreateChat(request.UserId, request.TargetUserId);
+
+         return Ok(new { ChatId = chatCreationResult });
+      }
+      catch (Exception e)
+      {
+         return ErrorResponseHelper.CreateErrorResponse(
+            Convert.ToInt32(e.Message.Split(":")[0]),
+            nameof(CreateChat),
+            e.Message);
+      }
    }
 
    [HttpDelete]
@@ -52,10 +52,10 @@ public class ChatController : ControllerBase
       }
       catch (Exception e)
       {
-         return ErrorResponseHelper.CreateErrorResponse(  
-            Convert.ToInt32(e.Message.Split(":")[0]),  
-            nameof(CreateChat),  
-            e.Message); 
+         return ErrorResponseHelper.CreateErrorResponse(
+            Convert.ToInt32(e.Message.Split(":")[0]),
+            nameof(CreateChat),
+            e.Message);
       }
    }
 
@@ -70,11 +70,11 @@ public class ChatController : ControllerBase
       }
       catch (Exception e)
       {
-         return ErrorResponseHelper.CreateErrorResponse(  
-            Convert.ToInt32(e.Message.Split(":")[0]),  
-            nameof(GetChatDetails),  
-            e.Message); 
+         return ErrorResponseHelper.CreateErrorResponse(
+            Convert.ToInt32(e.Message.Split(":")[0]),
+            nameof(GetChatDetails),
+            e.Message);
       }
-      
    }
+
 }

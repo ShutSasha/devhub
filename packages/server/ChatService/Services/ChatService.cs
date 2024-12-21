@@ -96,7 +96,10 @@ public class ChatService : IChatService
 
       foreach (var chat in userChats)
       {
-         var lastMessage = chat.Messages.LastOrDefault();
+         var lastMessage = await _messageCollection
+            .Find(m => m.Chat == chat.Id)
+            .SortByDescending(m => m.CreatedAt)
+            .FirstOrDefaultAsync();
 
          var participantsDetails = new ParticipantDetail();
          foreach (var participantId in chat.Participants.Where(p => p != userId))
@@ -107,7 +110,7 @@ public class ChatService : IChatService
             participantsDetails = new ParticipantDetail
             {
                Id = user.Id,
-               UserName = user.Name,
+               Username = user.Name,
                AvatarUrl = user.Avatar,
             };
          }
@@ -115,29 +118,11 @@ public class ChatService : IChatService
          chatPreviews.Add(new UserChatPreview
          {
             ChatId = chat.Id,
-            LastMessage = lastMessage,
+            LastMessage = lastMessage?.Content ?? "No messages yet",
             Participants = participantsDetails,
          });
       }
 
       return chatPreviews.OrderByDescending(c => c.Timestamp).ToList();
-   }
-
-   public async Task AddMessageToChat(string chatId, string senderId, string content)
-   {
-      var chat = await GetById(chatId);
-
-      var message = new Message
-      {
-         Chat = chatId,
-         CreatedAt = DateTime.Now,
-         UserSender = senderId,
-      };
-
-      await _messageCollection.InsertOneAsync(message);
-
-      chat.Messages.Add(message.Id);
-
-      await _chatCollection.ReplaceOneAsync(c => c.Id == chatId, chat);
    }
 }

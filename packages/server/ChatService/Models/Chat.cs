@@ -13,6 +13,11 @@ public class Chat
    
    [BsonRepresentation(BsonType.ObjectId)]
    public List<string> Participants { get; set; }
+
+   [BsonElement("Messages")]
+   [BsonRepresentation(BsonType.ObjectId)]
    public List<string> Messages { get; set; }
+   
+   [BsonElement("CreatedAt")]
    public DateTime CreatedAt { get; set; }
 }

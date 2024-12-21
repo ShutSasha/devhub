@@ -8,6 +8,5 @@ public interface IChatService
    Task<string> CreateChat(string userId, string targetUserId);
    Task DeleteChat(string chatId);
    Task<List<UserChatPreview>> GetUserChats(string userId);
-   Task AddMessageToChat(string chatId, string senderId, string content);
 
 }

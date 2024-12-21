@@ -14,13 +14,15 @@ public class Message
    [BsonElement("chat")]
    [BsonRepresentation(BsonType.ObjectId)]
    public string Chat { get; set; }
-   
+
    [BsonElement("userSender")]
    [BsonRepresentation(BsonType.ObjectId)]
    public string UserSender { get; set; }
 
+   [BsonElement("content")]
+   public string Content { get; set; }
+
    [BsonElement("createdAt")]
    [BsonRepresentation(BsonType.DateTime)]
    public DateTime CreatedAt { get; set; }
-   
 }

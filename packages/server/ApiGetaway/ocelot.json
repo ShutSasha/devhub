@@ -412,6 +412,19 @@
          ],
          "UpstreamPathTemplate": "/api/posts/get-popular-tags",
          "UpstreamHttpMethod": ["GET"]
+      },
+
+      {
+         "DownstreamPathTemplate": "/api/chat/{userId}",
+         "DownstreamScheme": "http",
+         "DownstreamHostAndPorts": [
+            {
+               "Host": "localhost",
+               "Port": 5230
+            }
+         ],
+         "UpstreamPathTemplate": "/api/chat/{userId}",
+         "UpstreamHttpMethod": ["GET"]
       }
    ],
    "GlobalConfiguration": {

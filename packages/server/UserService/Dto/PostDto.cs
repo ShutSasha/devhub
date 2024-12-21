@@ -19,5 +19,4 @@ public class PostDto
    public int Saved { get; set; }
    public List<string> Tags { get; set;}
    public List<string> Comments { get; set; }
-   public List<string> Tags { get; set;}
 }
