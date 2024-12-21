@@ -1,11 +1,12 @@
 import { FC } from 'react'
+import { toast } from 'react-toastify'
 import { useNavigate } from 'react-router-dom'
 import logo from '@assets/images/logo.svg'
+import notificationSVG from '@assets/images/header/notification.svg'
 import { ROUTES } from '@pages/router/routes.enum'
 import { useAppDispatch, useAppSelector } from '@app/store/store'
 import { useLogoutMutation } from '@api/auth.api'
 import { logout as logoutStore } from '@features/user/user.slice'
-import { toast } from 'react-toastify'
 
 import {
   AuthContainer,
@@ -18,6 +19,7 @@ import {
   NavList,
   UserAvatar,
   Wrapper,
+  NoficationImg,
 } from './header.style'
 import { NavItem } from './nav-item.component'
 import { navElements } from './consts/header-elements.const'
@@ -50,12 +52,20 @@ const AuthDisplay = () => {
     }
   }
 
+  const handleClickNotification = () => {
+    if (user?._id) navigate(ROUTES.NOTIFICATION.replace(':id', user?._id))
+    else {
+      toast.error('Try to refresh your page or log in one more time')
+    }
+  }
+
   return (
     <>
       {user ? (
         <>
           <CreatePost onClick={handleCreatePostBtn}>Create Post</CreatePost>
           <UserAvatar src={user.avatar} onClick={handleClickAvatar} />
+          <NoficationImg src={notificationSVG} onClick={handleClickNotification} />
           <Logout onClick={handleLogout} />
         </>
       ) : (

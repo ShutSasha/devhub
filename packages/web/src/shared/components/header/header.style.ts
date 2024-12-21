@@ -15,7 +15,7 @@ export const Container = styled.div`
   margin: 0 auto;
 
   display: grid;
-  grid-template-columns: 300px minmax(300px, 1fr) 300px;
+  grid-template-columns: 300px minmax(300px, 1fr) 340px;
   align-items: center;
 `
 
@@ -130,4 +130,12 @@ export const Logout = styled.button`
 
   object-fit: cover;
   cursor: pointer;
+`
+
+export const NoficationImg = styled.img`
+  position: relative;
+  cursor: pointer;
+  height: 24px;
+  width: 24px;
+  object-fit: cover;
 `

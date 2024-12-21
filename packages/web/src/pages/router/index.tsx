@@ -15,6 +15,7 @@ import { EditPost } from '@pages/posts/edit-post/edit-post.page'
 import { Followers } from '@pages/friends/followers/followers.page'
 import { FollowedList } from '@pages/friends/followed-list/followed-list.page'
 import { Starred } from '@pages/starred/starred.page'
+import { Notification } from '@pages/notification/notification.page'
 
 import { ROUTES } from './routes.enum'
 
@@ -82,6 +83,10 @@ const router = createBrowserRouter([
   {
     path: `${ROUTES.STARRED}`,
     element: <Starred />,
+  },
+  {
+    path: `${ROUTES.NOTIFICATION}`,
+    element: <Notification />,
   },
 ])
 
