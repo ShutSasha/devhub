@@ -349,9 +349,7 @@
          "UpstreamPathTemplate": "/api/reports/{reportId}",
          "UpstreamHttpMethod": ["DELETE"]
       },
-      
-      
-      
+            
       {
          "DownstreamPathTemplate": "/api/comments",
          "DownstreamScheme": "http",
@@ -411,6 +409,18 @@
             }
          ],
          "UpstreamPathTemplate": "/api/posts/get-popular-tags",
+         "UpstreamHttpMethod": ["GET"]
+      },
+      {
+         "DownstreamPathTemplate": "/api/notifications/{user_id}",
+         "DownstreamScheme": "http",
+         "DownstreamHostAndPorts": [
+            {
+               "Host": "localhost",
+               "Port": 8082
+            }
+         ],
+         "UpstreamPathTemplate": "/api/notifications/{user_id}",
          "UpstreamHttpMethod": ["GET"]
       }
    ],
