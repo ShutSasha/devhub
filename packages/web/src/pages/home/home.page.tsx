@@ -153,7 +153,7 @@ export const Home = () => {
           veritatis dolores eveniet!
         </div>
         <_.PostsContainer>
-          <SearchInput placeholder="Search by post title..." />
+          <SearchInput isChatSearch={false} placeholder="Search by post title..." />
           {isLoading && <p>Loading...</p>}
         </_.PostsContainer>
         <div>
@@ -188,7 +188,7 @@ export const Home = () => {
               <_.ApplyButton onClick={applyFilters}>Apply</_.ApplyButton>
             </_.DropdownContent>
           </_.DropdownContainer>
-          <SearchInput onChange={handleSearchChangeInput} placeholder="Search by post title..." />
+          <SearchInput isChatSearch={false} onChange={handleSearchChangeInput} placeholder="Search by post title..." />
           <_.DropdownContainer>
             <_.DropdownButton onClick={toggleFilterDropdown}>Filter</_.DropdownButton>
             <_.DropdownContent $isOpen={isFilterOpen}>

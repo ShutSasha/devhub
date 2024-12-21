@@ -17,6 +17,7 @@ import { FollowedList } from '@pages/friends/followed-list/followed-list.page'
 import { Starred } from '@pages/starred/starred.page'
 
 import { ROUTES } from './routes.enum'
+import { ChatPage } from '@pages/chat/chat.page'
 
 const router = createBrowserRouter([
   {
@@ -83,6 +84,10 @@ const router = createBrowserRouter([
     path: `${ROUTES.STARRED}`,
     element: <Starred />,
   },
+  {
+    path: `${ROUTES.CHAT}`,
+    element: <ChatPage/>
+  }
 ])
 
 export default router

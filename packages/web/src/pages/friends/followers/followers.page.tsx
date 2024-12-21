@@ -27,7 +27,7 @@ export const Followers = () => {
     <MainLayout>
       <div></div>
       <div>
-        <SearchInput placeholder="Search by users..." />
+        <SearchInput isChatSearch={false} placeholder="Search by users..." />
         <_.ChangeList>
           <_.ListText
             $underline={currentUrl.includes(ROUTES.USER_FRIENDS_FOLLOWERS.replace(':id', ''))}
