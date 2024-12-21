@@ -4,12 +4,15 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.drawerlayout.widget.DrawerLayout
+import com.bumptech.glide.Glide
 import com.devhub.devhubapp.R
 import com.devhub.devhubapp.classes.EncryptedPreferencesManager
 import com.devhub.devhubapp.classes.RetrofitClient
@@ -18,6 +21,7 @@ import com.devhub.devhubapp.dataClasses.UserReactions
 import com.devhub.devhubapp.fragment.FooterFragment
 import com.devhub.devhubapp.fragment.HeaderFragment
 import com.devhub.devhubapp.fragment.PostFragment
+import com.google.android.material.navigation.NavigationView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -27,6 +31,8 @@ class MainActivity : AppCompatActivity() {
     @SuppressLint("CommitTransaction")
     private var currentPage = 1
     private var isLoading = false
+    private lateinit var drawerLayout: DrawerLayout
+    private lateinit var navigationView: NavigationView
     private lateinit var encryptedPreferencesManager: EncryptedPreferencesManager
     private lateinit var userReactions: UserReactions
     private val existingPostsIds = mutableSetOf<String>()
@@ -36,6 +42,13 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
+
+        drawerLayout = findViewById(R.id.drawer_layout)
+        navigationView = findViewById(R.id.nav_view) // Инициализация navigationView
+
+        val displayMetrics = resources.displayMetrics
+        navigationView.layoutParams.width = displayMetrics.widthPixels
+        navigationView.requestLayout()
 
         encryptedPreferencesManager = EncryptedPreferencesManager(this)
         val user = encryptedPreferencesManager.getUserData()
@@ -79,6 +92,47 @@ class MainActivity : AppCompatActivity() {
             refreshPosts()
             intent.removeExtra("UPDATE_POSTS")
         }
+
+        setupDrawer()
+    }
+
+    private fun setupDrawer() {
+        val headerView = navigationView.getHeaderView(0)
+        val avatarImageView = headerView.findViewById<ImageView>(R.id.nav_user_avatar)
+        val closeImageView = headerView.findViewById<ImageView>(R.id.nav_close)
+
+        val user = encryptedPreferencesManager.getUserData()
+        if (user.avatar.isNotEmpty()) {
+            Glide.with(this)
+                .load(user.avatar)
+                .into(avatarImageView)
+        }
+
+        closeImageView.setOnClickListener {
+            drawerLayout.closeDrawers()
+        }
+
+        navigationView.setNavigationItemSelectedListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.nav_my_posts -> {
+                    // Handle My Posts action
+                    true
+                }
+                R.id.nav_notifications -> {
+                    // Handle Notifications action
+                    true
+                }
+                R.id.nav_logout -> {
+                    // Handle Log Out action
+                    true
+                }
+                else -> false
+            }
+        }
+    }
+
+    fun openDrawer() {
+        drawerLayout.openDrawer(navigationView)
     }
 
     private fun fetchUserReactions() {

@@ -25,6 +25,7 @@ class HeaderFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_header, container, false)
 
+        val burgerMenu = view.findViewById<ImageView>(R.id.burger_menu)
         val avatarImageView = view.findViewById<ImageView>(R.id.user_avatar)
         val createPostButton = view.findViewById<ImageView>(R.id.create_post_button)
         val avatar = view.findViewById<ImageView>(R.id.user_avatar)
@@ -47,6 +48,10 @@ class HeaderFragment : Fragment() {
             val intent = Intent(requireContext(), UserProfileActivity::class.java)
             intent.putExtra("USER_ID", user._id)
             startActivity(intent)
+        }
+
+        burgerMenu.setOnClickListener {
+            (activity as? MainActivity)?.openDrawer()
         }
 
         return view
