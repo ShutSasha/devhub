@@ -51,4 +51,3 @@ tasks:
       - run_user_service
       - run_api_getaway
       - run_comment_service
-      - run_chat_service

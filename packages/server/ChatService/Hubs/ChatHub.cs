@@ -16,9 +16,17 @@ public class ChatHub : Hub
 
    public async Task JoinChat(string userId, string targetUserId)
    {
-      var chatId = await _chatService.CreateChat(userId, targetUserId);
+      string? chatId = null;
+      
+      chatId = await _chatService.IsChatExsist(userId, targetUserId);
+
+      if (string.IsNullOrEmpty(chatId))
+      {
+         chatId = await _chatService.CreateChat(userId, targetUserId);
+      }
 
       await Groups.AddToGroupAsync(Context.ConnectionId, chatId);
+      await Clients.Caller.SendAsync("JoinedChat", chatId);
    }
 
    public async Task SendMessage(string chatId, string userId, string content)
@@ -28,11 +36,13 @@ public class ChatHub : Hub
 
       await Clients.Group(chatId).SendAsync("ReceiveMessage", new
       {
-         ChatId = chatId,
-         SenderId = userId,
+         _Id = chatId,
+         UserSender = userId,
+         Chat = chatId,
          Content = content,
-         Timestamp = DateTime.Now,
+         CreatedAt = DateTime.Now,
       });
+      
    }
    
    public override async Task OnConnectedAsync()

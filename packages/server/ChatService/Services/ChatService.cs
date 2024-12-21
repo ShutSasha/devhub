@@ -1,4 +1,5 @@
 ﻿using ChatService.Abstractions;
+using ChatService.Contracts;
 using ChatService.Models;
 using ChatService.Models.Database;
 using ChatService.Models.Enums;
@@ -124,5 +125,126 @@ public class ChatService : IChatService
       }
 
       return chatPreviews.OrderByDescending(c => c.Timestamp).ToList();
+   }
+
+   public async Task<ChatResponse> GetChat(string chatId, string userId)
+   {
+      var chat = await _chatCollection
+         .Find(c => c.Id == chatId)
+         .FirstOrDefaultAsync();
+
+      if (chat == null)
+         throw new Exception("404: Chat not found");
+
+      var otherParticipantId = chat.Participants
+         .FirstOrDefault(p => p != userId);
+
+      if (otherParticipantId == null)
+         throw new Exception("Chat does not have another participant");
+
+      var otherParticipant = await _userCollection
+         .Find(u => u.Id == otherParticipantId)
+         .FirstOrDefaultAsync();
+
+      if (otherParticipant == null)
+         throw new Exception("404: Participant not found");
+
+      var participantsDetails = new ParticipantDetail
+      {
+         Id = otherParticipant.Id,
+         Username = otherParticipant.Name,
+         AvatarUrl = otherParticipant.Avatar,
+      };
+
+      var messages = await _messageCollection
+         .Find(m => m.Chat == chatId)
+         .SortBy(m => m.CreatedAt)
+         .ToListAsync();
+
+      messages ??= new List<Message>();
+
+      var chatResponse = new ChatResponse
+      {
+         ChatId = chatId,
+         ChatMessages = messages,
+         ParticipantDetails = participantsDetails
+      };
+
+      return chatResponse;
+   }
+
+   public async Task<string> IsChatExsist(string userId, string targetUserId)
+   {
+      var existingChat = await _chatCollection
+         .Find(chat => chat.Participants.Contains(userId) && chat.Participants.Contains(targetUserId))
+         .FirstOrDefaultAsync();
+
+      return existingChat.Id;
+   }
+
+   public async Task<ChatResponse> GetFirstChat(string userId)
+   {
+      var userChats = await _chatCollection
+         .Find(chat => chat.Participants.Contains(userId))
+         .ToListAsync();
+
+      if (userChats == null || !userChats.Any())
+      {
+         throw new Exception("404: No chats found for the user.");
+      }
+
+      var latestMessage = await _messageCollection
+         .Find(message => userChats.Select(chat => chat.Id).Contains(message.Chat))
+         .SortByDescending(m => m.CreatedAt)
+         .FirstOrDefaultAsync();
+
+      if (latestMessage == null)
+      {
+         throw new Exception("404: No messages found in any chat.");
+      }
+
+      var latestChat = userChats.FirstOrDefault(chat => chat.Id == latestMessage.Chat);
+
+      if (latestChat == null)
+      {
+         throw new Exception("404: Chat for the latest message not found.");
+      }
+
+      var targetUserId = latestChat.Participants.FirstOrDefault(participantId => participantId != userId);
+
+      if (string.IsNullOrEmpty(targetUserId))
+      {
+         throw new Exception("404: No target user found in the chat.");
+      }
+
+      var targetUser = await _userCollection
+         .Find(u => u.Id == targetUserId)
+         .FirstOrDefaultAsync();
+
+      if (targetUser == null)
+      {
+         throw new Exception("404: Target user not found.");
+      }
+
+      var participantDetails = new ParticipantDetail
+      {
+         Id = targetUser.Id,
+         Username = targetUser.Name,
+         AvatarUrl = targetUser.Avatar
+      };
+
+      var chatMessages = await _messageCollection
+         .Find(m => m.Chat == latestChat.Id)
+         .SortBy(m => m.CreatedAt) // Сортируем по дате
+         .ToListAsync();
+
+      var chatResponse = new ChatResponse
+      {
+         ChatId = latestChat.Id,
+         ChatMessages = chatMessages,
+         ParticipantDetails = participantDetails
+      };
+
+      return chatResponse;
    }
 }

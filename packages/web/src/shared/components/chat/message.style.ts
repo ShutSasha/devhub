@@ -2,18 +2,18 @@ import styled from 'styled-components'
 import { colors } from '@shared/consts/colors.const'
 import { FONTS } from '@shared/consts/fonts.enum'
 
-export  const MessagesContainer = styled.div`
+export const MessagesContainer = styled.div`
     flex: 1;
     padding: 20px;
     display: flex;
     flex-direction: column;
     gap: 10px;
-    overflow-y: auto; 
+    overflow-y: auto;
     max-height: calc(100vh - 300px);
     background-color: transparent;
-    scrollbar-width: thin; 
+    scrollbar-width: thin;
     scrollbar-color: #ccc transparent;
-    
+
     &::-webkit-scrollbar {
         width: 8px;
     }
@@ -31,6 +31,7 @@ export  const MessagesContainer = styled.div`
         background: #999;
     }
 `;
+
 
 export  const MessageBubble = styled.div<{ isOwnMessage: boolean }>`
   max-width: 60%;

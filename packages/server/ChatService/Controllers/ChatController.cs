@@ -41,6 +41,23 @@ public class ChatController : ControllerBase
       }
    }
 
+   [HttpGet("{chatId}/{userId}")]
+   public async Task<IActionResult> GetChatById([FromRoute] string chatId, string userId)
+   {
+      try
+      {
+         var mainChatDetails = await _chatService.GetChat(chatId, userId);
+         return Ok(mainChatDetails);
+      }
+      catch (Exception e)
+      {
+         return ErrorResponseHelper.CreateErrorResponse(
+            Convert.ToInt32(e.Message.Split(":")[0]),
+            nameof(GetChatById),
+            e.Message);
+      }
+   }
+
    [HttpDelete]
    [SwaggerOperation("Delete chat")]
    public async Task<IActionResult> DeleteChat([FromQuery] string chatId)
@@ -77,4 +94,21 @@ public class ChatController : ControllerBase
       }
    }
 
+   
+   [HttpGet("main-chat/{userId}")]
+   public async Task<IActionResult> GetLastChat([FromRoute] string userId)
+   {
+      try
+      {
+         var lastChat = await _chatService.GetFirstChat(userId);
+         return Ok(lastChat);
+      }
+      catch (Exception e)
+      {
+         return ErrorResponseHelper.CreateErrorResponse(
+            Convert.ToInt32(e.Message.Split(":")[0]),
+            nameof(GetLastChat),
+            e.Message);
+      }
+   }
 }
