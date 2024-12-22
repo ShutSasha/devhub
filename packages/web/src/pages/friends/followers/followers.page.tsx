@@ -41,7 +41,8 @@ export const Followers = () => {
       // console.log('id', id)
       // console.log('follower_id', follower_id)
       await connection?.start()
-      await connection?.invoke('JoinChat', id, follower_id)
+
+      if (id && follower_id) await connection?.invoke('JoinChat', id, follower_id)
 
       connection?.on('JoinedChat', chatId => {
         console.log(chatId)

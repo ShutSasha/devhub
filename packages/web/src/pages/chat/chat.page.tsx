@@ -84,7 +84,9 @@ export const ChatPage = () => {
         try {
           await connection.start()
           console.log('Connection started')
-          await connection.invoke('JoinChat', id, lastChat.participantDetails.id)
+          if (id && lastChat.participantDetails.id) {
+            await connection.invoke('JoinChat', id, lastChat.participantDetails.id)
+          }
           connection.on('ReceiveMessage', (message: IMessage) => {
             console.log('prevMessages', messages)
             setMessages(prevMessages => {
@@ -100,7 +102,9 @@ export const ChatPage = () => {
         try {
           await connection.start()
           console.log('Connection started')
-          await connection.invoke('JoinChat', id, lastChat?.participantDetails.id)
+          if (id && lastChat?.participantDetails.id) {
+            await connection.invoke('JoinChat', id, lastChat?.participantDetails.id)
+          }
 
           connection.on('ReceiveMessage', (message: IMessage) => {
             console.log('prevMessages', messages)
