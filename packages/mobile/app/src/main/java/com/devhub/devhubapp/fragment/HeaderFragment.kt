@@ -15,6 +15,7 @@ import com.devhub.devhubapp.activity.CreatePostActivity
 import com.devhub.devhubapp.activity.MainActivity
 import com.devhub.devhubapp.activity.UserProfileActivity
 import com.devhub.devhubapp.classes.EncryptedPreferencesManager
+import com.devhub.devhubapp.activity.DrawerHandler
 
 class HeaderFragment : Fragment() {
     private val REQUEST_CODE_CREATE_POST = 101
@@ -25,6 +26,7 @@ class HeaderFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_header, container, false)
 
+        val burgerMenu = view.findViewById<ImageView>(R.id.burger_menu)
         val avatarImageView = view.findViewById<ImageView>(R.id.user_avatar)
         val createPostButton = view.findViewById<ImageView>(R.id.create_post_button)
         val avatar = view.findViewById<ImageView>(R.id.user_avatar)
@@ -49,12 +51,17 @@ class HeaderFragment : Fragment() {
             startActivity(intent)
         }
 
+        burgerMenu.setOnClickListener {
+            (activity as? DrawerHandler)?.openDrawer()
+        }
+
         return view
     }
 
-    private val createPostLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            (activity as? MainActivity)?.refreshPosts()
+    private val createPostLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                (activity as? MainActivity)?.refreshPosts()
+            }
         }
-    }
 }

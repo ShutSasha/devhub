@@ -16,6 +16,7 @@
     <Protobuf Include="Protos\user.proto" GrpcServices="Server"/>
     <Protobuf Include="Protos\post.proto" GrpcServices="Client"/>
     <Protobuf Include="Protos\chat.proto" GrpcServices="Server"/>
+    <Protobuf Include="Protos\notification.proto" GrpcServices="Client"/>
     <PackageReference Include="Swashbuckle.AspNetCore" Version="7.1.0" />
     <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="7.1.0" />
     <PackageReference Include="Google.Protobuf" Version="3.28.3" />

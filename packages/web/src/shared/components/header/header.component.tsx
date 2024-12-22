@@ -1,11 +1,14 @@
-import { FC } from 'react'
+import { FC, useEffect } from 'react'
+import { toast } from 'react-toastify'
 import { useNavigate } from 'react-router-dom'
 import logo from '@assets/images/logo.svg'
+import notificationSVG from '@assets/images/header/notification.svg'
 import { ROUTES } from '@pages/router/routes.enum'
 import { useAppDispatch, useAppSelector } from '@app/store/store'
 import { useLogoutMutation } from '@api/auth.api'
+import { setNotifications } from '@features/notification/notifications.slice'
+import { useGetNotificationsByUserQuery } from '@api/notification.api'
 import { logout as logoutStore } from '@features/user/user.slice'
-import { toast } from 'react-toastify'
 
 import {
   AuthContainer,
@@ -18,6 +21,8 @@ import {
   NavList,
   UserAvatar,
   Wrapper,
+  NotificationImg,
+  NotificationImgContainer,
 } from './header.style'
 import { NavItem } from './nav-item.component'
 import { navElements } from './consts/header-elements.const'
@@ -28,7 +33,13 @@ const AuthDisplay = () => {
   const navigate = useNavigate()
   const dispatch = useAppDispatch()
   const user = useAppSelector(state => state.userSlice.user)
+  const notifications = useAppSelector(state => state.notificationSlice.notifications)
+  const { data: notification } = useGetNotificationsByUserQuery({ user_id: user?._id })
   const [logout] = useLogoutMutation()
+
+  useEffect(() => {
+    dispatch(setNotifications(notification))
+  }, [notification])
 
   const handleCreatePostBtn = () => {
     navigate(ROUTES.CREATE_POST)
@@ -50,12 +61,22 @@ const AuthDisplay = () => {
     }
   }
 
+  const handleClickNotification = () => {
+    if (user?._id) navigate(ROUTES.NOTIFICATION.replace(':id', user?._id))
+    else {
+      toast.error('Try to refresh your page or log in one more time')
+    }
+  }
+
   return (
     <>
       {user ? (
         <>
           <CreatePost onClick={handleCreatePostBtn}>Create Post</CreatePost>
           <UserAvatar src={user.avatar} onClick={handleClickAvatar} />
+          <NotificationImgContainer $count={notifications?.unread.length || 0}>
+            <NotificationImg src={notificationSVG} onClick={handleClickNotification} />
+          </NotificationImgContainer>
           <Logout onClick={handleLogout} />
         </>
       ) : (

@@ -1,0 +1,44 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/shape_background_main"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:fontFamily="@font/montserrat_medium_font"
+        android:paddingBottom="16dp"
+        android:text="Select Report Category"
+        android:textColor="@color/text_primary"
+        android:textSize="18sp" />
+
+    <Button
+        android:id="@+id/btn_spam"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Spam"
+        android:textAllCaps="false"
+        android:textColor="@color/bg_elements"
+        android:textSize="18sp" />
+
+    <Button
+        android:id="@+id/btn_misinformation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Misinformation"
+        android:textAllCaps="false"
+        android:textColor="@color/bg_elements"
+        android:textSize="18sp" />
+
+    <Button
+        android:id="@+id/btn_copyright"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Copyright Infringement"
+        android:textAllCaps="false"
+        android:textColor="@color/bg_elements"
+        android:textSize="18sp" />
+</LinearLayout>

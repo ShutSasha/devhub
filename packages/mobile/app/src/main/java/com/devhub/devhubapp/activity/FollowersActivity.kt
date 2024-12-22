@@ -24,12 +24,19 @@ import com.devhub.devhubapp.interfaces.OnFollowStateChangedListener
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import android.content.Intent
+import android.widget.ImageView
+import androidx.drawerlayout.widget.DrawerLayout
+import com.bumptech.glide.Glide
+import com.google.android.material.navigation.NavigationView
 
-class FollowersActivity : AppCompatActivity(), OnFollowStateChangedListener {
+class FollowersActivity : AppCompatActivity(), DrawerHandler, OnFollowStateChangedListener {
     private lateinit var binding: ActivityFollowersBinding
     private lateinit var encryptedPreferencesManager: EncryptedPreferencesManager
     private lateinit var followings: List<Follower>
     private lateinit var followers: List<Follower>
+    private lateinit var drawerLayout: DrawerLayout
+    private lateinit var navigationView: NavigationView
     private var userId: String = ""
     private var username: String = ""
 
@@ -39,6 +46,13 @@ class FollowersActivity : AppCompatActivity(), OnFollowStateChangedListener {
         enableEdgeToEdge()
         binding = ActivityFollowersBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        drawerLayout = findViewById(R.id.drawer_layout)
+        navigationView = findViewById(R.id.nav_view)
+
+        val displayMetrics = resources.displayMetrics
+        navigationView.layoutParams.width = displayMetrics.widthPixels
+        navigationView.requestLayout()
 
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -60,6 +74,51 @@ class FollowersActivity : AppCompatActivity(), OnFollowStateChangedListener {
         username = intent.getStringExtra("USERNAME") ?: ""
 
         setUpFragments()
+
+        setupDrawer()
+    }
+
+    private fun setupDrawer() {
+        val headerView = navigationView.getHeaderView(0)
+        val avatarImageView = headerView.findViewById<ImageView>(R.id.nav_user_avatar)
+        val closeImageView = headerView.findViewById<ImageView>(R.id.nav_close)
+
+        val user = encryptedPreferencesManager.getUserData()
+        if (user.avatar.isNotEmpty()) {
+            Glide.with(this)
+                .load(user.avatar)
+                .into(avatarImageView)
+        }
+
+        closeImageView.setOnClickListener {
+            drawerLayout.closeDrawers()
+        }
+
+        navigationView.setNavigationItemSelectedListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.nav_my_posts -> {
+                    // Handle My Posts action
+                    true
+                }
+
+                R.id.nav_notifications -> {
+                    val intent = Intent(this, NotificationsActivity::class.java)
+                    startActivity(intent)
+                    true
+                }
+
+                R.id.nav_logout -> {
+                    // Handle Log Out action
+                    true
+                }
+
+                else -> false
+            }
+        }
+    }
+
+    override fun openDrawer() {
+        drawerLayout.openDrawer(androidx.core.view.GravityCompat.START)
     }
 
     private fun setUpFragments() {

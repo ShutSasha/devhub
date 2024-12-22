@@ -147,31 +147,19 @@ export const Home = () => {
   if (isLoading || userReactionsLoading) {
     return (
       <MainLayout>
-        <div>
-          Lorem ipsum, dolor sit amet consectetur adipisicing elit. Libero odio est asperiores nulla non rem tempore.
-          Accusamus qui voluptatem repellendus necessitatibus esse, consequatur perspiciatis voluptas totam quaerat
-          veritatis dolores eveniet!
-        </div>
+        <div></div>
         <_.PostsContainer>
           <SearchInput isChatSearch={false} placeholder="Search by post title..." />
           {isLoading && <p>Loading...</p>}
         </_.PostsContainer>
-        <div>
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis dicta sed ullam quidem dolorem et
-          voluptates itaque quaerat. Sunt deserunt asperiores nobis officiis odio suscipit cum veritatis vero officia
-          magnam.
-        </div>
+        <div></div>
       </MainLayout>
     )
   }
 
   return (
     <MainLayout>
-      <div>
-        Lorem ipsum, dolor sit amet consectetur adipisicing elit. Libero odio est asperiores nulla non rem tempore.
-        Accusamus qui voluptatem repellendus necessitatibus esse, consequatur perspiciatis voluptas totam quaerat
-        veritatis dolores eveniet!
-      </div>
+      <div></div>
       <_.PostsContainer>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: '14px' }}>
           <_.DropdownContainer>
@@ -218,10 +206,7 @@ export const Home = () => {
           <p>No posts available.</p>
         )}
       </_.PostsContainer>
-      <div>
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis dicta sed ullam quidem dolorem et voluptates
-        itaque quaerat. Sunt deserunt asperiores nobis officiis odio suscipit cum veritatis vero officia magnam.
-      </div>
+      <div></div>
     </MainLayout>
   )
 }

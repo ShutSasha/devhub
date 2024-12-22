@@ -24,7 +24,15 @@ builder.Services.AddCors(options =>
    });
 });
 
-services.AddGrpcClient<PostService.PostServiceClient>(option => { option.Address = new Uri("http://localhost:5226"); });
+services.AddGrpcClient<PostService.PostServiceClient>(option =>
+{
+   option.Address = new Uri("http://localhost:5226");
+});
+
+services.AddGrpcClient<NotificationService.NotificationService.NotificationServiceClient>(option =>
+{
+   option.Address = new Uri("http://localhost:5230");
+});
 
 services.AddControllers();
 services.AddEndpointsApiExplorer();

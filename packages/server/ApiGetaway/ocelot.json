@@ -408,6 +408,7 @@
             "DELETE"
          ]
       },
+            
       {
          "DownstreamPathTemplate": "/api/comments",
          "DownstreamScheme": "http",
@@ -475,51 +476,31 @@
             }
          ],
          "UpstreamPathTemplate": "/api/posts/get-popular-tags",
-         "UpstreamHttpMethod": [
-            "GET"
-         ]
+         "UpstreamHttpMethod": ["GET"]
       },
       {
-         "DownstreamPathTemplate": "/api/chat/{userId}",
+         "DownstreamPathTemplate": "/api/notifications/{user_id}",
          "DownstreamScheme": "http",
          "DownstreamHostAndPorts": [
             {
                "Host": "localhost",
-               "Port": 5231
+               "Port": 8082
             }
          ],
-         "UpstreamPathTemplate": "/api/chat/{userId}",
-         "UpstreamHttpMethod": [
-            "GET"
-         ]
+         "UpstreamPathTemplate": "/api/notifications/{user_id}",
+         "UpstreamHttpMethod": ["GET"]
       },
       {
-         "DownstreamPathTemplate": "/api/{chatId}/{userId}",
+         "DownstreamPathTemplate": "/api/notifications/{notification_id}",
          "DownstreamScheme": "http",
          "DownstreamHostAndPorts": [
             {
                "Host": "localhost",
-               "Port": 5231
+               "Port": 8082
             }
          ],
-         "UpstreamPathTemplate": "/api/{chatId}/{userId}",
-         "UpstreamHttpMethod": [
-            "GET"
-         ]
-      },
-      {
-         "DownstreamPathTemplate": "/api/main-chat/{userId}",
-         "DownstreamScheme": "http",
-         "DownstreamHostAndPorts": [
-            {
-               "Host": "localhost",
-               "Port": 5231
-            }
-         ],
-         "UpstreamPathTemplate": "/api/main-chat/{userId}",
-         "UpstreamHttpMethod": [
-            "GET"
-         ]
+         "UpstreamPathTemplate": "/api/notifications/{notification_id}",
+         "UpstreamHttpMethod": ["PATCH"]
       }
    ],
    "GlobalConfiguration": {
