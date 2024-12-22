@@ -15,6 +15,7 @@ import com.devhub.devhubapp.activity.CreatePostActivity
 import com.devhub.devhubapp.activity.MainActivity
 import com.devhub.devhubapp.activity.UserProfileActivity
 import com.devhub.devhubapp.classes.EncryptedPreferencesManager
+import com.devhub.devhubapp.activity.DrawerHandler
 
 class HeaderFragment : Fragment() {
     private val REQUEST_CODE_CREATE_POST = 101
@@ -51,15 +52,16 @@ class HeaderFragment : Fragment() {
         }
 
         burgerMenu.setOnClickListener {
-            (activity as? MainActivity)?.openDrawer()
+            (activity as? DrawerHandler)?.openDrawer()
         }
 
         return view
     }
 
-    private val createPostLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            (activity as? MainActivity)?.refreshPosts()
+    private val createPostLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                (activity as? MainActivity)?.refreshPosts()
+            }
         }
-    }
 }

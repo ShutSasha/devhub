@@ -27,7 +27,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), DrawerHandler {
     @SuppressLint("CommitTransaction")
     private var currentPage = 1
     private var isLoading = false
@@ -135,8 +135,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun openDrawer() {
-        drawerLayout.openDrawer(navigationView)
+    override fun openDrawer() {
+        drawerLayout.openDrawer(androidx.core.view.GravityCompat.START)
     }
 
     private fun fetchUserReactions() {
