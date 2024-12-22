@@ -1,5 +1,7 @@
 import { createApi } from '@reduxjs/toolkit/query/react'
+
 import baseQueryWithReauth from './baseQueryWithReauth'
+
 import { ChatResponse, MainChatResponse } from '~types/chat/chat.type'
 
 export const api = createApi({
@@ -13,7 +15,7 @@ export const api = createApi({
       }),
     }),
     getFirstChat: builder.query<MainChatResponse, { userId: string | undefined }>({
-      query: ({userId}) => ({
+      query: ({ userId }) => ({
         url: `chat/main-chat/${userId}`,
         method: 'GET',
       }),

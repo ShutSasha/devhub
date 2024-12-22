@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom'
 import React, { FC, useEffect, useRef, useState } from 'react'
 import {
   ChatContainer,
@@ -9,24 +10,37 @@ import {
 import { StyledAvatar, StyledUserCredentialsContainer, Username } from '@shared/components/post/post.style'
 import { MessagesContainer } from '@shared/components/chat/message.style'
 import { Message } from '@shared/components/chat/message.component'
+
 import { IMessage, MainChatResponse } from '~types/chat/chat.type'
+import { ROUTES } from '@pages/router/routes.enum'
+import { IndentStyle } from 'typescript'
 
 interface IChatProps {
   messages: IMessage[]
-  username: string,
+  username: string
   avatarUrl: string
   chatId: string
   userId: string
+  userReceiverId?: string
   sendMessage: (messageInput: string) => void
 }
 
-export const Chat: FC<IChatProps> = ({ username,avatarUrl, messages, chatId, userId, sendMessage }) => {
+export const Chat: FC<IChatProps> = ({
+  username,
+  avatarUrl,
+  messages,
+  chatId,
+  userId,
+  userReceiverId,
+  sendMessage,
+}) => {
+  const navigate = useNavigate()
   const [messageInput, setMessageInput] = useState<string>('')
   const messagesEndRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView()
-  }, [messages]);
+  }, [messages])
   const onSendMessage = () => {
     sendMessage(messageInput)
     setMessageInput('')
@@ -39,11 +53,17 @@ export const Chat: FC<IChatProps> = ({ username,avatarUrl, messages, chatId, use
     }
   }
 
+  const handleRedirectToUserProfile = (id: string | undefin) => {
+    if (id) {
+      navigate(ROUTES.USER_PROFILE.replace(':id', id))
+    }
+  }
+
   return (
     <ChatContainer>
       <SideBarHeader>
         <StyledUserCredentialsContainer>
-          <StyledAvatar src={avatarUrl} />
+          <StyledAvatar onClick={() => handleRedirectToUserProfile(userReceiverId)} src={avatarUrl} />
           <Username>{username}</Username>
         </StyledUserCredentialsContainer>
       </SideBarHeader>

@@ -164,6 +164,7 @@ export const ChatPage = () => {
           sendMessage={sendMessage}
           chatId={activeChat.chatId}
           userId={id}
+          userReceiverId={activeChat.participantDetails.id}
           username={activeChat.participantDetails.username || 'Unknown User'}
           avatarUrl={activeChat.participantDetails.avatarUrl || '/default-avatar.png'}
           messages={messages}
@@ -173,6 +174,7 @@ export const ChatPage = () => {
           sendMessage={sendMessage}
           chatId={lastChat.chatId}
           userId={id}
+          userReceiverId={activeChat?.participantDetails.id}
           username={lastChat.participantDetails.username || 'Unknown User'}
           avatarUrl={lastChat.participantDetails.avatarUrl || '/default-avatar.png'}
           messages={messages}
