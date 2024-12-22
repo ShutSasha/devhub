@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { ChatLayout } from '@shared/layouts/chat/chat.layout'
 import { ChatListContainer } from '@pages/chat/chat.style'
 import { SearchInput } from '@shared/components/search-input/search-input.component'
@@ -21,6 +21,7 @@ export const ChatPage = () => {
   const [messages, setMessages] = useState<IMessage[]>([])
   const dispatch = useAppDispatch()
   const activeChatId = useAppSelector(state => state.chatSlice.activeChatId)
+  const isInitialFetch = useRef(true)
 
   const { data: activeChat, refetch: refetchMainChat } = useGetChatByIdQuery(
     activeChatId
@@ -36,6 +37,11 @@ export const ChatPage = () => {
   }, [activeChatId])
 
   useEffect(() => {
+    if (isInitialFetch.current && process.env.NODE_ENV === 'development') {
+      isInitialFetch.current = false
+      return
+    }
+
     const newConnection = new HubConnectionBuilder()
       .withUrl('http://localhost:5231/chat')
       .withAutomaticReconnect()
@@ -48,7 +54,7 @@ export const ChatPage = () => {
         newConnection.stop()
       }
     }
-  }, [])
+  }, [activeChatId])
 
   useEffect(() => {
     if (activeChat) {
@@ -64,14 +70,13 @@ export const ChatPage = () => {
     }
 
     dispatch(setActiveChatId(chatId))
-
-    refetchMainChat()
   }
 
   useEffect(() => {
     const initiateConnection = async () => {
       if (connection && !activeChat && lastChat) {
         try {
+          await connection.stop()
           await connection.start()
 
           if (id && lastChat.participantDetails.id) {
@@ -89,10 +94,11 @@ export const ChatPage = () => {
         }
       } else if (connection && activeChat) {
         try {
+          await connection.stop()
           await connection.start()
 
           if (id && lastChat?.participantDetails.id) {
-            await connection.invoke('JoinChat', id, lastChat?.participantDetails.id)
+            await connection.invoke('JoinChat', id, activeChat.participantDetails.id)
           }
 
           connection.on('ReceiveMessage', (message: IMessage) => {
