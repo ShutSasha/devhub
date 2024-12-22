@@ -44,7 +44,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         drawerLayout = findViewById(R.id.drawer_layout)
-        navigationView = findViewById(R.id.nav_view) // Инициализация navigationView
+        navigationView = findViewById(R.id.nav_view)
 
         val displayMetrics = resources.displayMetrics
         navigationView.layoutParams.width = displayMetrics.widthPixels
@@ -118,14 +118,18 @@ class MainActivity : AppCompatActivity() {
                     // Handle My Posts action
                     true
                 }
+
                 R.id.nav_notifications -> {
-                    // Handle Notifications action
+                    val intent = Intent(this, NotificationsActivity::class.java)
+                    startActivity(intent)
                     true
                 }
+
                 R.id.nav_logout -> {
                     // Handle Log Out action
                     true
                 }
+
                 else -> false
             }
         }
