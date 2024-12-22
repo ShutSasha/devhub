@@ -11,7 +11,7 @@ import userSlice from '@features/user/user.slice'
 import authSlice from '@features/auth/auth.slice'
 import postsSlice from '@features/posts/posts.slice'
 import notificationsSlice from '@features/notification/notifications.slice'
-
+import chatsSlice from '@features/chat/chat.slice'
 
 export const store = configureStore({
   reducer: {
@@ -22,6 +22,7 @@ export const store = configureStore({
     [chatApi.reducerPath]: chatApi.reducer,
     [notificationApi.reducerPath]: notificationApi.reducer,
     [notificationsSlice.name]: notificationsSlice.reducer,
+    [chatsSlice.name]: chatsSlice.reducer,
     [authSlice.name]: authSlice.reducer,
     [userSlice.name]: userSlice.reducer,
     [postsSlice.name]: postsSlice.reducer,
@@ -33,7 +34,7 @@ export const store = configureStore({
       postApi.middleware,
       commentApi.middleware,
       notificationApi.middleware,
-      chatApi.middleware
+      chatApi.middleware,
     ),
 })
 

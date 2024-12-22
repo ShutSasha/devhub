@@ -43,6 +43,10 @@ export const Followers = () => {
       await connection?.start()
       await connection?.invoke('JoinChat', id, follower_id)
 
+      connection?.on('JoinedChat', chatId => {
+        console.log(chatId)
+      })
+
       navigate(ROUTES.CHAT.replace(':id', id))
     }
   }

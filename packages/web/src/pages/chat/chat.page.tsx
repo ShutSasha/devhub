@@ -8,6 +8,8 @@ import { useGetChatsByUserQuery, useGetChatByIdQuery, useGetFirstChatQuery } fro
 import { useParams } from 'react-router-dom'
 import { HubConnection, HubConnectionBuilder } from '@microsoft/signalr'
 import { skipToken } from '@reduxjs/toolkit/query'
+import { useAppDispatch, useAppSelector } from '@app/store/store'
+import { setActiveChatId } from '@features/chat/chat.slice'
 
 import { IMessage } from '~types/chat/chat.type'
 
@@ -17,7 +19,8 @@ export const ChatPage = () => {
   const { data: lastChat } = useGetFirstChatQuery({ userId: id })
   const [connection, setConnection] = useState<HubConnection | null>(null)
   const [messages, setMessages] = useState<IMessage[]>([])
-  const [activeChatId, setActiveChatId] = useState<string | null>(null)
+  const dispatch = useAppDispatch()
+  const activeChatId = useAppSelector(state => state.chatSlice.activeChatId)
 
   const { data: activeChat, refetch: refetchMainChat } = useGetChatByIdQuery(
     activeChatId
@@ -70,7 +73,7 @@ export const ChatPage = () => {
       await connection.stop()
       console.log('Connection stopped')
     }
-    setActiveChatId(chatId)
+    dispatch(setActiveChatId(chatId))
 
     refetchMainChat()
   }
