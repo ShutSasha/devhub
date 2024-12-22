@@ -38,18 +38,21 @@ export const Followers = () => {
 
   const handleRedirectToChat = async (follower_id: string) => {
     if (id) {
-      // console.log('id', id)
-      // console.log('follower_id', follower_id)
-      await connection?.start()
-      await connection?.invoke('JoinChat', id, follower_id)
+      try {
+        await connection?.start();
 
-      connection?.on('JoinedChat', chatId => {
-        console.log(chatId)
-      })
+        connection?.on('JoinedChat', (chatId: string) => {
+          console.log(chatId);
+        });
 
-      navigate(ROUTES.CHAT.replace(':id', id))
+        await connection?.invoke('JoinChat', id, follower_id);
+        navigate(ROUTES.CHAT.replace(':id', id));
+      } catch (error) {
+        console.error('Error in handleRedirectToChat:', error);
+      }
     }
-  }
+  };
+
 
   if (!user) {
     return null
