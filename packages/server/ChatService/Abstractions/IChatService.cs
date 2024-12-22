@@ -10,7 +10,7 @@ public interface IChatService
    Task DeleteChat(string chatId);
    Task<List<UserChatPreview>> GetUserChats(string userId);
    Task<ChatResponse> GetChat(string chatId,string userId);
-   Task<string> IsChatExsist(string userId, string targetUserId);
+   Task<string?> IsChatExsist(string userId, string targetUserId);
    Task<ChatResponse> GetFirstChat(string userId);
 
 }

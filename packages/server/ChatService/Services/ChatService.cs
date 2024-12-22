@@ -173,7 +173,7 @@ public class ChatService : IChatService
       return chatResponse;
    }
 
-   public async Task<string> IsChatExsist(string userId, string targetUserId)
+   public async Task<string?> IsChatExsist(string userId, string targetUserId)
    {
       var existingChat = await _chatCollection
          .Find(chat => chat.Participants.Contains(userId) && chat.Participants.Contains(targetUserId))
