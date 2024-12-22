@@ -64,14 +64,16 @@ export const Chat: FC<IChatProps> = ({ username, avatarUrl, messages, userId, us
       </SideBarHeader>
 
       <MessagesContainer ref={chatContainerRef}>
-        {messages.map((message, index) => (
+        {messages.length > 0 ? messages.map((message, index) => (
           <Message
             key={index}
             text={message.content}
             isOwnMessage={message.userSender === userId}
             createdAt={message.createdAt}
           />
-        ))}
+        )) : (
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flex: '1' }}>No messages</div>
+        )}
       </MessagesContainer>
 
       <MessageInputContainer>

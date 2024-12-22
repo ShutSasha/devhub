@@ -9,6 +9,6 @@ type NavItem = { title: string; icon: string; path: string }
 export const navElements: NavItem[] = [
   { title: 'Home', icon: home, path: ROUTES.HOME },
   { title: 'Friends', icon: friends, path: ROUTES.USER_FRIENDS_FOLLOWERS },
-  { title: 'Starred', icon: star, path: ROUTES.HOME },
+  { title: 'Starred', icon: star, path: ROUTES.STARRED },
   { title: 'Chats', icon: chats, path: ROUTES.CHAT },
 ]

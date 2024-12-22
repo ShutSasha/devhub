@@ -9,7 +9,9 @@ export const MessagesContainer = styled.div`
   flex-direction: column;
   gap: 10px;
   overflow-y: auto;
-  max-height: calc(100vh - 300px);
+    min-height: calc(100vh - 300px);
+    max-height: calc(100vh - 300px);
+
   background-color: transparent;
 
   &::-webkit-scrollbar {
