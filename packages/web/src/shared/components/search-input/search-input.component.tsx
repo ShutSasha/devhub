@@ -4,11 +4,11 @@ import styled from 'styled-components'
 import search from '@assets/images/search.svg'
 
 interface ContainerProps {
-  isChatSearch: boolean
+  $isChatSearch: boolean
 }
 
 const Container = styled.div<ContainerProps>`
-  flex: ${({ isChatSearch }) => (isChatSearch ? 'none' : '1')};
+  flex: ${({ $isChatSearch }) => ($isChatSearch ? 'none' : '1')};
   position: relative;
   margin-bottom: 16px;
 `
@@ -45,9 +45,9 @@ interface SearchInputProps {
   style?: CSSProperties
 }
 
-export const SearchInput: FC<SearchInputProps> = ({ placeholder, value, onChange,isChatSearch }) => {
+export const SearchInput: FC<SearchInputProps> = ({ placeholder, value, onChange, isChatSearch }) => {
   return (
-    <Container isChatSearch={isChatSearch}>
+    <Container $isChatSearch={isChatSearch}>
       <Input placeholder={placeholder} value={value} onChange={onChange}></Input>
       <SearchIcon src={search} />
     </Container>

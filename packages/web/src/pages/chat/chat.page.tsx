@@ -7,8 +7,9 @@ import { ChatPreview } from '@pages/chat/components/chat-preview.component'
 import { useGetChatsByUserQuery, useGetChatByIdQuery, useGetFirstChatQuery } from '@api/chat.api'
 import { useParams } from 'react-router-dom'
 import { HubConnection, HubConnectionBuilder } from '@microsoft/signalr'
-import { IMessage } from '~types/chat/chat.type'
 import { skipToken } from '@reduxjs/toolkit/query'
+
+import { IMessage } from '~types/chat/chat.type'
 
 export const ChatPage = () => {
   const { id } = useParams()
@@ -96,7 +97,7 @@ export const ChatPage = () => {
         try {
           await connection.start()
           console.log('Connection started')
-          await connection.invoke('JoinChat', id, lastChat.participantDetails.id)
+          await connection.invoke('JoinChat', id, lastChat?.participantDetails.id)
 
           connection.on('ReceiveMessage', (message: IMessage) => {
             console.log('prevMessages', messages)
