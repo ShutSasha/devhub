@@ -1,5 +1,6 @@
 import styled from 'styled-components'
 import { FONTS } from '@shared/consts/fonts.enum'
+import { colors } from '@shared/consts/colors.const'
 
 export const MessagesContainer = styled.div`
   flex: 1;
@@ -10,24 +11,22 @@ export const MessagesContainer = styled.div`
   overflow-y: auto;
   max-height: calc(100vh - 300px);
   background-color: transparent;
-  scrollbar-width: thin;
-  scrollbar-color: #ccc transparent;
 
   &::-webkit-scrollbar {
     width: 8px;
   }
 
-  &::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
   &::-webkit-scrollbar-thumb {
-    background: #ccc;
-    border-radius: 4px;
+    background-color: ${colors.background};
+    border-radius: 15px;
   }
 
   &::-webkit-scrollbar-thumb:hover {
-    background: #999;
+    background-color: ${colors.accent};
+  }
+
+  &::-webkit-scrollbar-track {
+    background-color: transparent;
   }
 `
 

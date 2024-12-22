@@ -11,6 +11,7 @@ import { StyledAvatar, StyledUserCredentialsContainer, Username } from '@shared/
 import { MessagesContainer } from '@shared/components/chat/message.style'
 import { Message } from '@shared/components/chat/message.component'
 import { ROUTES } from '@pages/router/routes.enum'
+import sendSVG from '@assets/images/chat/send.svg'
 
 import { IMessage } from '~types/chat/chat.type'
 
@@ -27,15 +28,18 @@ interface IChatProps {
 export const Chat: FC<IChatProps> = ({ username, avatarUrl, messages, userId, userReceiverId, sendMessage }) => {
   const navigate = useNavigate()
   const [messageInput, setMessageInput] = useState<string>('')
-  const messagesEndRef = useRef<HTMLDivElement | null>(null)
+  const chatContainerRef = useRef<HTMLDivElement | null>(null)
 
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView()
-  }, [messages])
   const onSendMessage = () => {
     sendMessage(messageInput)
     setMessageInput('')
   }
+
+  useEffect(() => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight
+    }
+  }, [messages])
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -59,10 +63,10 @@ export const Chat: FC<IChatProps> = ({ username, avatarUrl, messages, userId, us
         </StyledUserCredentialsContainer>
       </SideBarHeader>
 
-      <MessagesContainer>
-        {messages.map(message => (
+      <MessagesContainer ref={chatContainerRef}>
+        {messages.map((message, index) => (
           <Message
-            key={message._id}
+            key={index}
             text={message.content}
             isOwnMessage={message.userSender === userId}
             createdAt={message.createdAt}
@@ -78,7 +82,7 @@ export const Chat: FC<IChatProps> = ({ username, avatarUrl, messages, userId, us
           onKeyDown={handleKeyDown}
         />
         <SendButton onClick={onSendMessage}>
-          <img src="/src/assets/images/chat/send.svg" alt="send button" />
+          <img src={sendSVG} alt="send button" />
         </SendButton>
       </MessageInputContainer>
     </ChatContainer>
