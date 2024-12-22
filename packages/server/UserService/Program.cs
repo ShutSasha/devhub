@@ -74,6 +74,7 @@ app.UseRouting();
 app.UseGrpcWeb(new GrpcWebOptions { DefaultEnabled = true });
 
 app.MapGrpcService<UserGrpcService>().EnableGrpcWeb();
+app.MapGrpcService<UserChatService>().EnableGrpcWeb();
 app.MapControllers();
 
 app.Run();

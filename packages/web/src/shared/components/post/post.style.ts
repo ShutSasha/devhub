@@ -58,6 +58,7 @@ export const StyledAvatar = styled.img`
   height: 42px;
   width: 42px;
   border-radius: 50%;
+  cursor: pointer;
 
   object-fit: cover;
 `

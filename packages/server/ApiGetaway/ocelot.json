@@ -10,7 +10,9 @@
             }
          ],
          "UpstreamPathTemplate": "/api/auth/register",
-         "UpstreamHttpMethod": ["POST"]
+         "UpstreamHttpMethod": [
+            "POST"
+         ]
       },
       {
          "DownstreamPathTemplate": "/api/auth/login",
@@ -22,7 +24,9 @@
             }
          ],
          "UpstreamPathTemplate": "/api/auth/login",
-         "UpstreamHttpMethod": ["POST"]
+         "UpstreamHttpMethod": [
+            "POST"
+         ]
       },
       {
          "DownstreamPathTemplate": "/api/auth/verify-email",
@@ -34,7 +38,9 @@
             }
          ],
          "UpstreamPathTemplate": "/api/auth/verify-email",
-         "UpstreamHttpMethod": ["POST"]
+         "UpstreamHttpMethod": [
+            "POST"
+         ]
       },
       {
          "DownstreamPathTemplate": "/api/auth/refresh",
@@ -46,7 +52,9 @@
             }
          ],
          "UpstreamPathTemplate": "/api/auth/refresh",
-         "UpstreamHttpMethod": ["POST"]
+         "UpstreamHttpMethod": [
+            "POST"
+         ]
       },
       {
          "DownstreamPathTemplate": "/api/auth/password-verification-code",
@@ -58,7 +66,9 @@
             }
          ],
          "UpstreamPathTemplate": "/api/auth/password-verification-code",
-         "UpstreamHttpMethod": ["PATCH"]
+         "UpstreamHttpMethod": [
+            "PATCH"
+         ]
       },
       {
          "DownstreamPathTemplate": "/api/auth/change-password",
@@ -70,7 +80,9 @@
             }
          ],
          "UpstreamPathTemplate": "/api/auth/change-password",
-         "UpstreamHttpMethod": ["PATCH"]
+         "UpstreamHttpMethod": [
+            "PATCH"
+         ]
       },
       {
          "DownstreamPathTemplate": "/api/auth/testinfo",
@@ -82,7 +94,9 @@
             }
          ],
          "UpstreamPathTemplate": "/api/auth/testinfo",
-         "UpstreamHttpMethod": ["GET"]
+         "UpstreamHttpMethod": [
+            "GET"
+         ]
       },
       {
          "DownstreamPathTemplate": "/api/auth/logout",
@@ -94,7 +108,9 @@
             }
          ],
          "UpstreamPathTemplate": "/api/auth/logout",
-         "UpstreamHttpMethod": ["POST"]
+         "UpstreamHttpMethod": [
+            "POST"
+         ]
       },
       {
          "DownstreamPathTemplate": "/api/auth/google-login",
@@ -106,7 +122,9 @@
             }
          ],
          "UpstreamPathTemplate": "/api/auth/google-login",
-         "UpstreamHttpMethod": ["GET"]
+         "UpstreamHttpMethod": [
+            "GET"
+         ]
       },
       {
          "DownstreamPathTemplate": "/api/auth/github-login",
@@ -118,9 +136,10 @@
             }
          ],
          "UpstreamPathTemplate": "/api/auth/github-login",
-         "UpstreamHttpMethod": ["GET"]
+         "UpstreamHttpMethod": [
+            "GET"
+         ]
       },
-      
       {
          "DownstreamPathTemplate": "/api/posts",
          "DownstreamScheme": "http",
@@ -131,7 +150,9 @@
             }
          ],
          "UpstreamPathTemplate": "/api/posts",
-         "UpstreamHttpMethod": ["POST"]
+         "UpstreamHttpMethod": [
+            "POST"
+         ]
       },
       {
          "DownstreamPathTemplate": "/api/posts/{id}",
@@ -143,7 +164,11 @@
             }
          ],
          "UpstreamPathTemplate": "/api/posts/{id}",
-         "UpstreamHttpMethod": ["PATCH","DELETE","GET"]
+         "UpstreamHttpMethod": [
+            "PATCH",
+            "DELETE",
+            "GET"
+         ]
       },
       {
          "DownstreamPathTemplate": "/api/posts/search",
@@ -155,7 +180,9 @@
             }
          ],
          "UpstreamPathTemplate": "/api/posts/search",
-         "UpstreamHttpMethod": ["GET"]
+         "UpstreamHttpMethod": [
+            "GET"
+         ]
       },
       {
          "DownstreamPathTemplate": "/api/posts",
@@ -167,7 +194,9 @@
             }
          ],
          "UpstreamPathTemplate": "/api/posts",
-         "UpstreamHttpMethod": ["GET"]
+         "UpstreamHttpMethod": [
+            "GET"
+         ]
       },
       {
          "DownstreamPathTemplate": "/api/users",
@@ -179,7 +208,9 @@
             }
          ],
          "UpstreamPathTemplate": "/api/users",
-         "UpstreamHttpMethod": ["PATCH"]
+         "UpstreamHttpMethod": [
+            "PATCH"
+         ]
       },
       {
          "DownstreamPathTemplate": "/api/users/update-photo/{userId}",
@@ -191,7 +222,9 @@
             }
          ],
          "UpstreamPathTemplate": "/api/users/update-photo/{userId}",
-         "UpstreamHttpMethod": ["POST"]
+         "UpstreamHttpMethod": [
+            "POST"
+         ]
       },
       {
          "DownstreamPathTemplate": "/api/users/user-details/{userId}",
@@ -203,7 +236,9 @@
             }
          ],
          "UpstreamPathTemplate": "/api/users/user-details/{userId}",
-         "UpstreamHttpMethod": ["GET"]
+         "UpstreamHttpMethod": [
+            "GET"
+         ]
       },
       {
          "DownstreamPathTemplate": "/api/users/user-reactions/{userId}",
@@ -215,7 +250,9 @@
             }
          ],
          "UpstreamPathTemplate": "/api/users/user-reactions/{userId}",
-         "UpstreamHttpMethod": ["GET"]
+         "UpstreamHttpMethod": [
+            "GET"
+         ]
       },
       {
          "DownstreamPathTemplate": "/api/users/user-followings",
@@ -227,7 +264,9 @@
             }
          ],
          "UpstreamPathTemplate": "/api/users/user-followings",
-         "UpstreamHttpMethod": ["POST"]
+         "UpstreamHttpMethod": [
+            "POST"
+         ]
       },
       {
          "DownstreamPathTemplate": "/api/users/user-followings",
@@ -239,7 +278,9 @@
             }
          ],
          "UpstreamPathTemplate": "/api/users/user-followings",
-         "UpstreamHttpMethod": ["DELETE"]
+         "UpstreamHttpMethod": [
+            "DELETE"
+         ]
       },
       {
          "DownstreamPathTemplate": "/api/users/user-followings/{userId}",
@@ -251,7 +292,9 @@
             }
          ],
          "UpstreamPathTemplate": "/api/users/user-followings/{userId}",
-         "UpstreamHttpMethod": ["GET"]
+         "UpstreamHttpMethod": [
+            "GET"
+         ]
       },
       {
          "DownstreamPathTemplate": "/api/users/user-followers/{userId}",
@@ -263,7 +306,9 @@
             }
          ],
          "UpstreamPathTemplate": "/api/users/user-followers/{userId}",
-         "UpstreamHttpMethod": ["GET"]
+         "UpstreamHttpMethod": [
+            "GET"
+         ]
       },
       {
          "DownstreamPathTemplate": "/api/users/is-following",
@@ -275,7 +320,9 @@
             }
          ],
          "UpstreamPathTemplate": "/api/users/is-following",
-         "UpstreamHttpMethod": ["GET"]
+         "UpstreamHttpMethod": [
+            "GET"
+         ]
       },
       {
          "DownstreamPathTemplate": "/api/users/saved-posts",
@@ -287,7 +334,9 @@
             }
          ],
          "UpstreamPathTemplate": "/api/users/saved-posts",
-         "UpstreamHttpMethod": ["POST"]
+         "UpstreamHttpMethod": [
+            "POST"
+         ]
       },
       {
          "DownstreamPathTemplate": "/api/users/saved-posts/{userId}",
@@ -299,7 +348,9 @@
             }
          ],
          "UpstreamPathTemplate": "/api/users/saved-posts/{userId}",
-         "UpstreamHttpMethod": ["GET"]
+         "UpstreamHttpMethod": [
+            "GET"
+         ]
       },
       {
          "DownstreamPathTemplate": "/api/users/saved-posts-details/{userId}",
@@ -311,7 +362,9 @@
             }
          ],
          "UpstreamPathTemplate": "/api/users/saved-posts-details/{userId}",
-         "UpstreamHttpMethod": ["GET"]
+         "UpstreamHttpMethod": [
+            "GET"
+         ]
       },
       {
          "DownstreamPathTemplate": "/api/reports",
@@ -323,7 +376,9 @@
             }
          ],
          "UpstreamPathTemplate": "/api/reports",
-         "UpstreamHttpMethod": ["POST"]
+         "UpstreamHttpMethod": [
+            "POST"
+         ]
       },
       {
          "DownstreamPathTemplate": "/api/reports/{userId}",
@@ -335,7 +390,9 @@
             }
          ],
          "UpstreamPathTemplate": "/api/reports/{userId}",
-         "UpstreamHttpMethod": ["GET"]
+         "UpstreamHttpMethod": [
+            "GET"
+         ]
       },
       {
          "DownstreamPathTemplate": "/api/reports/{reportId}",
@@ -347,7 +404,9 @@
             }
          ],
          "UpstreamPathTemplate": "/api/reports/{reportId}",
-         "UpstreamHttpMethod": ["DELETE"]
+         "UpstreamHttpMethod": [
+            "DELETE"
+         ]
       },
             
       {
@@ -360,9 +419,10 @@
             }
          ],
          "UpstreamPathTemplate": "/api/comments",
-         "UpstreamHttpMethod": ["POST"]
+         "UpstreamHttpMethod": [
+            "POST"
+         ]
       },
-
       {
          "DownstreamPathTemplate": "/api/comments/{id}",
          "DownstreamScheme": "http",
@@ -373,7 +433,10 @@
             }
          ],
          "UpstreamPathTemplate": "/api/comments/{id}",
-         "UpstreamHttpMethod": ["GET", "DELETE"]
+         "UpstreamHttpMethod": [
+            "GET",
+            "DELETE"
+         ]
       },
       {
          "DownstreamPathTemplate": "/api/posts/{id}/like",
@@ -385,7 +448,9 @@
             }
          ],
          "UpstreamPathTemplate": "/api/posts/{id}/like",
-         "UpstreamHttpMethod": ["POST"]
+         "UpstreamHttpMethod": [
+            "POST"
+         ]
       },
       {
          "DownstreamPathTemplate": "/api/posts/{id}/dislike",
@@ -397,7 +462,9 @@
             }
          ],
          "UpstreamPathTemplate": "/api/posts/{id}/dislike",
-         "UpstreamHttpMethod": ["POST"]
+         "UpstreamHttpMethod": [
+            "POST"
+         ]
       },
       {
          "DownstreamPathTemplate": "/api/posts/get-popular-tags",
@@ -434,10 +501,58 @@
          ],
          "UpstreamPathTemplate": "/api/notifications/{notification_id}",
          "UpstreamHttpMethod": ["PATCH"]
+      },
+      
+      {
+         "DownstreamPathTemplate": "/api/{chatId}/{userId}",
+         "DownstreamScheme": "http",
+         "DownstreamHostAndPorts": [
+            {
+               "Host": "localhost",
+               "Port": 5231
+            }
+         ],
+         "UpstreamPathTemplate": "/api/{chatId}/{userId}",
+         "UpstreamHttpMethod": ["GET"]
+      },
+      {
+         "DownstreamPathTemplate": "/api/chat-details/{userId}",
+         "DownstreamScheme": "http",
+         "DownstreamHostAndPorts": [
+            {
+               "Host": "localhost",
+               "Port": 5231
+            }
+         ],
+         "UpstreamPathTemplate": "/api/chat-details/{userId}",
+         "UpstreamHttpMethod": ["GET"]
+      },
+      {
+         "DownstreamPathTemplate": "/api/main-chat/{userId}",
+         "DownstreamScheme": "http",
+         "DownstreamHostAndPorts": [
+            {
+               "Host": "localhost",
+               "Port": 5231
+            }
+         ],
+         "UpstreamPathTemplate": "/api/main-chat/{userId}",
+         "UpstreamHttpMethod": ["GET"]
+      },
+      {
+         "DownstreamPathTemplate": "/api/chat",
+         "DownstreamScheme": "http",
+         "DownstreamHostAndPorts": [
+            {
+               "Host": "localhost",
+               "Port": 5231
+            }
+         ],
+         "UpstreamPathTemplate": "/api/chat",
+         "UpstreamHttpMethod": ["POST"]
       }
    ],
    "GlobalConfiguration": {
       "BaseUrl": "http://localhost:5295"
    }
-   
 }
