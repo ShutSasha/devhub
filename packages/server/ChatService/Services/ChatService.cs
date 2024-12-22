@@ -179,6 +179,11 @@ public class ChatService : IChatService
          .Find(chat => chat.Participants.Contains(userId) && chat.Participants.Contains(targetUserId))
          .FirstOrDefaultAsync();
 
+      if (existingChat == null)
+      {
+         return null;
+      }
+      
       return existingChat.Id;
    }
 
