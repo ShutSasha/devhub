@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { ChatLayout } from '@shared/layouts/chat/chat.layout'
 import { ChatListContainer } from '@pages/chat/chat.style'
 import { SearchInput } from '@shared/components/search-input/search-input.component'
@@ -32,6 +32,10 @@ export const ChatPage = () => {
   )
 
   useEffect(() => {
+    refetchPreviews()
+  }, [activeChatId])
+
+  useEffect(() => {
     const newConnection = new HubConnectionBuilder()
       .withUrl('http://localhost:5231/chat')
       .withAutomaticReconnect()
@@ -54,25 +58,11 @@ export const ChatPage = () => {
     }
   }, [activeChat, lastChat])
 
-  useEffect(() => {
-    if (connection) {
-      const handleReceiveMessage = (message: IMessage) => {
-        setMessages(prevMessages => [...prevMessages, message])
-      }
-
-      connection.on('ReceiveMessage', handleReceiveMessage)
-
-      return () => {
-        connection.off('ReceiveMessage', handleReceiveMessage)
-      }
-    }
-  }, [connection])
-
   const handleChatSelect = async (chatId: string) => {
     if (connection) {
       await connection.stop()
-      console.log('Connection stopped')
     }
+
     dispatch(setActiveChatId(chatId))
 
     refetchMainChat()
@@ -83,12 +73,11 @@ export const ChatPage = () => {
       if (connection && !activeChat && lastChat) {
         try {
           await connection.start()
-          console.log('Connection started')
+
           if (id && lastChat.participantDetails.id) {
             await connection.invoke('JoinChat', id, lastChat.participantDetails.id)
           }
           connection.on('ReceiveMessage', (message: IMessage) => {
-            console.log('prevMessages', messages)
             setMessages(prevMessages => {
               const updatedMessages = [...prevMessages, message]
               refetchPreviews()
@@ -101,17 +90,15 @@ export const ChatPage = () => {
       } else if (connection && activeChat) {
         try {
           await connection.start()
-          console.log('Connection started')
+
           if (id && lastChat?.participantDetails.id) {
             await connection.invoke('JoinChat', id, lastChat?.participantDetails.id)
           }
 
           connection.on('ReceiveMessage', (message: IMessage) => {
-            console.log('prevMessages', messages)
             setMessages(prevMessages => {
-              console.log('prev', prevMessages)
               const updatedMessages = [...prevMessages, message]
-              console.log('updatedMessages', updatedMessages)
+
               refetchPreviews()
               return updatedMessages
             })

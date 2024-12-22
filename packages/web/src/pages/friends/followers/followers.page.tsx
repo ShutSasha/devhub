@@ -2,11 +2,12 @@ import { useEffect, useState } from 'react'
 import { SearchInput } from '@shared/components/search-input/search-input.component'
 import { MainLayout } from '@shared/layouts/main.layout'
 import { ROUTES } from '@pages/router/routes.enum'
-import { useAppSelector } from '@app/store/store'
+import { useAppDispatch, useAppSelector } from '@app/store/store'
 import { useNavigate, useParams } from 'react-router-dom'
 import openChatSvg from '@assets/images/chat/open-chat.svg'
 import { useGetUserFollowersQuery } from '@api/user.api'
 import { HubConnection, HubConnectionBuilder } from '@microsoft/signalr'
+import { setActiveChatId } from '@features/chat/chat.slice'
 
 import * as _ from './followers.style'
 
@@ -17,6 +18,7 @@ export const Followers = () => {
   const [connection, setConnection] = useState<HubConnection | null>(null)
   const user = useAppSelector(state => state.userSlice.user)
   const currentUrl = window.location.href
+  const dispatch = useAppDispatch()
 
   useEffect(() => {
     const newConnection = new HubConnectionBuilder()
@@ -39,22 +41,21 @@ export const Followers = () => {
   const handleRedirectToChat = async (follower_id: string) => {
     if (id) {
       try {
-        await connection?.start();
+        await connection?.start()
 
-      if (id && follower_id) await connection?.invoke('JoinChat', id, follower_id)
+        if (id && follower_id) await connection?.invoke('JoinChat', id, follower_id)
 
         connection?.on('JoinedChat', (chatId: string) => {
-          console.log(chatId);
-        });
+          dispatch(setActiveChatId(chatId))
+        })
 
-        await connection?.invoke('JoinChat', id, follower_id);
-        navigate(ROUTES.CHAT.replace(':id', id));
+        await connection?.invoke('JoinChat', id, follower_id)
+        navigate(ROUTES.CHAT.replace(':id', id))
       } catch (error) {
-        console.error('Error in handleRedirectToChat:', error);
+        console.error('Error in handleRedirectToChat:', error)
       }
     }
-  };
-
+  }
 
   if (!user) {
     return null
