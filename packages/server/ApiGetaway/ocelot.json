@@ -501,6 +501,55 @@
          ],
          "UpstreamPathTemplate": "/api/notifications/{notification_id}",
          "UpstreamHttpMethod": ["PATCH"]
+      },
+      
+      {
+         "DownstreamPathTemplate": "/api/{chatId}/{userId}",
+         "DownstreamScheme": "http",
+         "DownstreamHostAndPorts": [
+            {
+               "Host": "localhost",
+               "Port": 5231
+            }
+         ],
+         "UpstreamPathTemplate": "/api/{chatId}/{userId}",
+         "UpstreamHttpMethod": ["GET"]
+      },
+      {
+         "DownstreamPathTemplate": "/api/chat-details/{userId}",
+         "DownstreamScheme": "http",
+         "DownstreamHostAndPorts": [
+            {
+               "Host": "localhost",
+               "Port": 5231
+            }
+         ],
+         "UpstreamPathTemplate": "/api/chat-details/{userId}",
+         "UpstreamHttpMethod": ["GET"]
+      },
+      {
+         "DownstreamPathTemplate": "/api/main-chat/{userId}",
+         "DownstreamScheme": "http",
+         "DownstreamHostAndPorts": [
+            {
+               "Host": "localhost",
+               "Port": 5231
+            }
+         ],
+         "UpstreamPathTemplate": "/api/main-chat/{userId}",
+         "UpstreamHttpMethod": ["GET"]
+      },
+      {
+         "DownstreamPathTemplate": "/api/chat",
+         "DownstreamScheme": "http",
+         "DownstreamHostAndPorts": [
+            {
+               "Host": "localhost",
+               "Port": 5231
+            }
+         ],
+         "UpstreamPathTemplate": "/api/chat",
+         "UpstreamHttpMethod": ["POST"]
       }
    ],
    "GlobalConfiguration": {
