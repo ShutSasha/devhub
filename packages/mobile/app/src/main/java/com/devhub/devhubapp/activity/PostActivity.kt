@@ -49,8 +49,10 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.util.Locale
+import androidx.drawerlayout.widget.DrawerLayout
+import com.google.android.material.navigation.NavigationView
 
-class PostActivity : AppCompatActivity() {
+class PostActivity : AppCompatActivity(), DrawerHandler {
     private lateinit var commentsRecyclerView: RecyclerView
     lateinit var commentCount: TextView
     private lateinit var likeIcon: ImageView
@@ -69,6 +71,8 @@ class PostActivity : AppCompatActivity() {
     private lateinit var currentUserId: String
     private lateinit var reportPostButton: ImageView
     private lateinit var reportAPI: ReportAPI
+    private lateinit var drawerLayout: DrawerLayout
+    private lateinit var navigationView: NavigationView
     private var userReports: List<ReportResponse> = emptyList()
     private val REQUEST_CODE_EDIT_POST = 100
     private val postDetailLauncher =
@@ -87,6 +91,13 @@ class PostActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_post)
+
+        drawerLayout = findViewById(R.id.drawer_layout)
+        navigationView = findViewById(R.id.nav_view)
+
+        val displayMetrics = resources.displayMetrics
+        navigationView.layoutParams.width = displayMetrics.widthPixels
+        navigationView.requestLayout()
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.post)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -159,7 +170,6 @@ class PostActivity : AppCompatActivity() {
             }
         }
 
-
         userReactions = encryptedPreferencesManager.getUserReactions()
         usernameTextView = findViewById(R.id.username)
 
@@ -199,6 +209,50 @@ class PostActivity : AppCompatActivity() {
 
         fetchUserReports()
 
+        setupDrawer()
+    }
+
+    private fun setupDrawer() {
+        val headerView = navigationView.getHeaderView(0)
+        val avatarImageView = headerView.findViewById<ImageView>(R.id.nav_user_avatar)
+        val closeImageView = headerView.findViewById<ImageView>(R.id.nav_close)
+
+        val user = encryptedPreferencesManager.getUserData()
+        if (user.avatar.isNotEmpty()) {
+            Glide.with(this)
+                .load(user.avatar)
+                .into(avatarImageView)
+        }
+
+        closeImageView.setOnClickListener {
+            drawerLayout.closeDrawers()
+        }
+
+        navigationView.setNavigationItemSelectedListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.nav_my_posts -> {
+                    // Handle My Posts action
+                    true
+                }
+
+                R.id.nav_notifications -> {
+                    val intent = Intent(this, NotificationsActivity::class.java)
+                    startActivity(intent)
+                    true
+                }
+
+                R.id.nav_logout -> {
+                    // Handle Log Out action
+                    true
+                }
+
+                else -> false
+            }
+        }
+    }
+
+    override fun openDrawer() {
+        drawerLayout.openDrawer(androidx.core.view.GravityCompat.START)
     }
 
     private fun displayPost(post: Post) {

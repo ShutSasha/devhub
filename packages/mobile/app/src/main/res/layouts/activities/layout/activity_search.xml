@@ -1,228 +1,250 @@
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/search"
+    android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/shape_background_main">
+    android:fitsSystemWindows="true">
 
-    <FrameLayout
-        android:id="@+id/header_container"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/search"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_height="match_parent"
+        android:background="@drawable/shape_background_main"
+        android:fitsSystemWindows="true">
 
-    <EditText
-        android:id="@+id/search_input"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:layout_weight="1"
-        android:background="@drawable/shape_search_input"
-        android:fontFamily="@font/inter_regular_font"
-        android:hint="Enter text"
-        android:inputType="text"
-        android:padding="12dp"
-        android:textColor="@color/white600"
-        android:textColorHint="@color/white600"
-        android:textSize="16sp"
-        app:layout_constraintEnd_toStartOf="@id/search_button"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/header_container" />
-
-    <Button
-        android:id="@+id/search_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:background="@drawable/shape_primary_button_background"
-        android:gravity="center"
-        android:text="Search"
-        android:textAllCaps="false"
-        android:textColor="@color/white"
-        android:textSize="16sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/header_container" />
-
-    <LinearLayout
-        android:id="@+id/filter_toggle_button_container"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="16dp"
-        android:layout_marginTop="16dp"
-        android:background="@drawable/shape_input_background"
-        android:gravity="center"
-        android:orientation="horizontal"
-        android:paddingVertical="10dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/search_input">
-
-        <ImageView
-            android:id="@+id/filter_icon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="10dp"
-            android:src="@drawable/ic_filter" />
-
-        <TextView
-            android:id="@+id/filter_toggle_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="montserrat_regular"
-            android:text="Filters"
-            android:textAllCaps="false"
-            android:textColor="@color/white"
-            android:textSize="16sp" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/filter_section"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="16dp"
-        android:layout_marginTop="16dp"
-        android:background="@drawable/shape_filters_background"
-        android:orientation="vertical"
-        android:visibility="gone"
-        app:layout_constraintTop_toBottomOf="@id/filter_toggle_button_container">
-
-        =
-
-        <LinearLayout
-            android:id="@+id/tag_input_section"
+        <FrameLayout
+            android:id="@+id/header_container"
             android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <EditText
+            android:id="@+id/search_input"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
-            android:orientation="horizontal">
-
-            <EditText
-                android:id="@+id/tag_search_input"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:background="@drawable/shape_search_input"
-                android:fontFamily="@font/inter_regular_font"
-                android:hint="Enter a tag"
-                android:inputType="text"
-                android:padding="10dp"
-                android:textColor="@color/white600"
-                android:textColorHint="@color/white600"
-                android:textSize="16sp" />
-
-            <Button
-                android:id="@+id/add_tag_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:background="@drawable/shape_primary_button_background"
-                android:text="Add"
-                android:textAllCaps="false"
-                android:textColor="@color/white"
-                android:textSize="16sp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/selected_tags_container"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="16dp"
-            android:orientation="vertical" />
-
-        <LinearLayout
-            android:id="@+id/top_tags_container"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="16dp"
-            android:orientation="vertical" />
-
-        <LinearLayout
-            android:id="@+id/sort_button_container"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="16dp"
-            android:background="@drawable/shape_input_background"
-            android:gravity="center"
-            android:orientation="horizontal"
-            android:paddingVertical="10dp">
-
-            <ImageView
-                android:id="@+id/sort_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="10dp"
-                android:src="@drawable/ic_sort" />
-
-            <TextView
-                android:id="@+id/sort_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="montserrat_regular"
-                android:text="Sort"
-                android:textAllCaps="false"
-                android:textColor="@color/white"
-                android:textSize="16sp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/sort_options_container"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="16dp"
-            android:orientation="vertical"
-            android:visibility="gone">
-
-            <CheckBox
-                android:id="@+id/sort_asc"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:buttonTint="@color/accent"
-                android:fontFamily="@font/inter_regular_font"
-                android:text="From new to old"
-                android:textColor="@color/white"
-                android:textSize="20sp" />
-
-            <CheckBox
-                android:id="@+id/sort_desc"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:buttonTint="@color/accent"
-                android:checked="true"
-                android:fontFamily="@font/inter_regular_font"
-                android:text="From old to new"
-                android:textColor="@color/white"
-                android:textSize="20sp" />
-        </LinearLayout>
+            android:layout_weight="1"
+            android:background="@drawable/shape_search_input"
+            android:fontFamily="@font/inter_regular_font"
+            android:hint="Enter text"
+            android:inputType="text"
+            android:padding="12dp"
+            android:textColor="@color/white600"
+            android:textColorHint="@color/white600"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toStartOf="@id/search_button"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/header_container" />
 
         <Button
-            android:id="@+id/apply_filters_button"
-            android:layout_width="match_parent"
+            android:id="@+id/search_button"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
             android:background="@drawable/shape_primary_button_background"
-            android:fontFamily="@font/montserrat_medium_font"
-            android:text="Apply"
+            android:gravity="center"
+            android:text="Search"
             android:textAllCaps="false"
             android:textColor="@color/white"
-            android:textSize="20sp" />
-    </LinearLayout>
-
-    <ScrollView
-        android:id="@+id/scrollView"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginTop="16dp"
-        app:layout_constraintBottom_toTopOf="@id/footer_container"
-        app:layout_constraintTop_toBottomOf="@id/filter_section">
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/header_container" />
 
         <LinearLayout
-            android:id="@+id/posts_container"
+            android:id="@+id/filter_toggle_button_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical" />
-    </ScrollView>
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/shape_input_background"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingVertical="10dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/search_input">
 
-    <FrameLayout
-        android:id="@+id/footer_container"
+            <ImageView
+                android:id="@+id/filter_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="10dp"
+                android:src="@drawable/ic_filter" />
+
+            <TextView
+                android:id="@+id/filter_toggle_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="montserrat_regular"
+                android:text="Filters"
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                android:textSize="16sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/filter_section"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/shape_filters_background"
+            android:orientation="vertical"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@id/filter_toggle_button_container">
+
+            <LinearLayout
+                android:id="@+id/tag_input_section"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/tag_search_input"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/shape_search_input"
+                    android:fontFamily="@font/inter_regular_font"
+                    android:hint="Enter a tag"
+                    android:inputType="text"
+                    android:padding="10dp"
+                    android:textColor="@color/white600"
+                    android:textColorHint="@color/white600"
+                    android:textSize="16sp" />
+
+                <Button
+                    android:id="@+id/add_tag_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:background="@drawable/shape_primary_button_background"
+                    android:text="Add"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textSize="16sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/selected_tags_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:orientation="vertical" />
+
+            <LinearLayout
+                android:id="@+id/top_tags_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:orientation="vertical" />
+
+            <LinearLayout
+                android:id="@+id/sort_button_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:background="@drawable/shape_input_background"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:paddingVertical="10dp">
+
+                <ImageView
+                    android:id="@+id/sort_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="10dp"
+                    android:src="@drawable/ic_sort" />
+
+                <TextView
+                    android:id="@+id/sort_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="montserrat_regular"
+                    android:text="Sort"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textSize="16sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/sort_options_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <CheckBox
+                    android:id="@+id/sort_asc"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:buttonTint="@color/accent"
+                    android:fontFamily="@font/inter_regular_font"
+                    android:text="From new to old"
+                    android:textColor="@color/white"
+                    android:textSize="20sp" />
+
+                <CheckBox
+                    android:id="@+id/sort_desc"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:buttonTint="@color/accent"
+                    android:checked="true"
+                    android:fontFamily="@font/inter_regular_font"
+                    android:text="From old to new"
+                    android:textColor="@color/white"
+                    android:textSize="20sp" />
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/apply_filters_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:background="@drawable/shape_primary_button_background"
+                android:fontFamily="@font/montserrat_medium_font"
+                android:text="Apply"
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                android:textSize="20sp" />
+        </LinearLayout>
+
+        <ScrollView
+            android:id="@+id/scrollView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginTop="16dp"
+            app:layout_constraintBottom_toTopOf="@id/footer_container"
+            app:layout_constraintTop_toBottomOf="@id/filter_section">
+
+            <LinearLayout
+                android:id="@+id/posts_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+        </ScrollView>
+
+        <FrameLayout
+            android:id="@+id/footer_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <com.google.android.material.navigation.NavigationView
+        android:id="@+id/nav_view"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:layout_marginTop="?attr/actionBarSize"
+        android:background="@drawable/shape_background_main"
+        android:fitsSystemWindows="true"
+        app:headerLayout="@layout/nav_header"
+        app:itemBackground="@drawable/menu_item_background"
+        app:itemIconSize="40dp"
+        app:itemIconTint="@color/text_primary"
+        app:itemTextAppearance="@style/MenuItemStyle"
+        app:menu="@menu/drawer_menu" />
+
+</androidx.drawerlayout.widget.DrawerLayout>

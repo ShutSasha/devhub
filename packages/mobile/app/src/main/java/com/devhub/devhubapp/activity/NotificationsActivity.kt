@@ -1,8 +1,10 @@
 package com.devhub.devhubapp.activity
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
@@ -20,18 +22,30 @@ import com.devhub.devhubapp.fragment.NotificationFragment
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import androidx.drawerlayout.widget.DrawerLayout
+import com.bumptech.glide.Glide
+import com.google.android.material.navigation.NavigationView
 
-class NotificationsActivity : AppCompatActivity() {
+class NotificationsActivity : AppCompatActivity(), DrawerHandler {
 
     private lateinit var unreadContainer: LinearLayout
     private lateinit var readContainer: LinearLayout
     private lateinit var noUnreadTextView: TextView
     private lateinit var noReadTextView: TextView
+    private lateinit var drawerLayout: DrawerLayout
+    private lateinit var navigationView: NavigationView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_notifications)
+
+        drawerLayout = findViewById(R.id.drawer_layout)
+        navigationView = findViewById(R.id.nav_view)
+
+        val displayMetrics = resources.displayMetrics
+        navigationView.layoutParams.width = displayMetrics.widthPixels
+        navigationView.requestLayout()
 
         unreadContainer = findViewById(R.id.unread_notifications)
         readContainer = findViewById(R.id.read_notifications)
@@ -56,6 +70,51 @@ class NotificationsActivity : AppCompatActivity() {
         }
 
         fetchNotifications(userId)
+
+        setupDrawer()
+    }
+
+    private fun setupDrawer() {
+        val headerView = navigationView.getHeaderView(0)
+        val avatarImageView = headerView.findViewById<ImageView>(R.id.nav_user_avatar)
+        val closeImageView = headerView.findViewById<ImageView>(R.id.nav_close)
+
+        val user = EncryptedPreferencesManager(this).getUserData()
+        if (user.avatar.isNotEmpty()) {
+            Glide.with(this)
+                .load(user.avatar)
+                .into(avatarImageView)
+        }
+
+        closeImageView.setOnClickListener {
+            drawerLayout.closeDrawers()
+        }
+
+        navigationView.setNavigationItemSelectedListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.nav_my_posts -> {
+                    // Handle My Posts action
+                    true
+                }
+
+                R.id.nav_notifications -> {
+                    val intent = Intent(this, NotificationsActivity::class.java)
+                    startActivity(intent)
+                    true
+                }
+
+                R.id.nav_logout -> {
+                    // Handle Log Out action
+                    true
+                }
+
+                else -> false
+            }
+        }
+    }
+
+    override fun openDrawer() {
+        drawerLayout.openDrawer(androidx.core.view.GravityCompat.START)
     }
 
     private fun fetchNotifications(userId: String) {

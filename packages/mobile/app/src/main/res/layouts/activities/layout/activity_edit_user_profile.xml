@@ -1,136 +1,157 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/edit_user_profile_container"
+    android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/shape_background_main"
     android:fitsSystemWindows="true">
 
-    <FrameLayout
-        android:id="@+id/header_container"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/edit_user_profile_container"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <LinearLayout
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent"
-        android:orientation="vertical"
-        android:background="@drawable/shape_post_background"
-        android:paddingHorizontal="10dp"
-        android:layout_marginTop="28dp"
-        android:layout_marginHorizontal="16dp"
-        app:layout_constraintTop_toBottomOf="@id/header_container"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-
-        <TextView
-            android:id="@+id/tvUsername"
-            android:layout_height="wrap_content"
-            android:layout_width="match_parent"
-            android:fontFamily="@font/montserrat_semibold_font"
-            android:textSize="24sp"
-            android:textColor="@color/text_primary"
-            android:layout_marginTop="8dp"
-            tools:text= "some_one"/>
-
-        <TextView
-            android:id="@+id/tvName"
-            android:layout_height="wrap_content"
-            android:layout_width="match_parent"
-            android:fontFamily="@font/manrope_regular_font"
-            android:textSize="16sp"
-            android:textColor="@color/text_primary"
-            android:layout_marginTop="20dp"
-            android:text= "@string/name"/>
+        android:layout_height="match_parent"
+        android:background="@drawable/shape_background_main"
+        android:fitsSystemWindows="true">
 
         <FrameLayout
-            android:id="@+id/nameInputContainer"
+            android:id="@+id/header_container"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_width="match_parent"
-            android:layout_marginTop="4dp"/>
-
-        <TextView
-            android:id="@+id/tvDescription"
-            android:layout_height="wrap_content"
-            android:layout_width="match_parent"
-            android:fontFamily="@font/manrope_regular_font"
-            android:textSize="16sp"
-            android:textColor="@color/text_primary"
-            android:layout_marginTop="16dp"
-            android:text= "@string/description"/>
-
-        <FrameLayout
-            android:id="@+id/descriptionInputContainer"
-            android:layout_height="wrap_content"
-            android:layout_width="match_parent"
-            android:layout_marginTop="4dp"/>
-
-        <FrameLayout
-            android:id="@+id/editUserErrorTextView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <LinearLayout
-            android:layout_height="wrap_content"
             android:layout_width="match_parent"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginTop="16dp">
-
-            <ImageView
-                android:id="@+id/ivAvatar"
-                android:layout_height="38dp"
-                android:layout_width="38dp"
-                android:clipToOutline="true"
-                android:scaleType="centerCrop"
-                android:background="@drawable/shape_avatar_border"
-                android:src="@drawable/landscape"
-                android:layout_marginEnd="17dp"/>
-
-            <FrameLayout
-                android:id="@+id/btnOutlined"
-                android:layout_height="wrap_content"
-                android:layout_width="122dp"
-                android:layout_marginEnd="17dp"
-                android:layout_marginHorizontal="10dp"/>
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="28dp"
+            android:background="@drawable/shape_post_background"
+            android:orientation="vertical"
+            android:paddingHorizontal="10dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/header_container">
 
             <TextView
-                android:id="@+id/tvUploadStatus"
-                android:layout_height="wrap_content"
+                android:id="@+id/tvUsername"
                 android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
                 android:fontFamily="@font/montserrat_semibold_font"
-                android:textSize="16sp"
                 android:textColor="@color/text_primary"
-                android:text= "File not chosen"/>
+                android:textSize="24sp" />
+
+            <TextView
+                android:id="@+id/tvName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:fontFamily="@font/manrope_regular_font"
+                android:text="@string/name"
+                android:textColor="@color/text_primary"
+                android:textSize="16sp" />
+
+            <FrameLayout
+                android:id="@+id/nameInputContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp" />
+
+            <TextView
+                android:id="@+id/tvDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:fontFamily="@font/manrope_regular_font"
+                android:text="@string/description"
+                android:textColor="@color/text_primary"
+                android:textSize="16sp" />
+
+            <FrameLayout
+                android:id="@+id/descriptionInputContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp" />
+
+            <FrameLayout
+                android:id="@+id/editUserErrorTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/ivAvatar"
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
+                    android:layout_marginEnd="17dp"
+                    android:background="@drawable/shape_avatar_border"
+                    android:clipToOutline="true"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/landscape" />
+
+                <FrameLayout
+                    android:id="@+id/btnOutlined"
+                    android:layout_width="122dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="10dp"
+                    android:layout_marginEnd="17dp" />
+
+                <TextView
+                    android:id="@+id/tvUploadStatus"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/montserrat_semibold_font"
+                    android:text="File not chosen"
+                    android:textColor="@color/text_primary"
+                    android:textSize="16sp" />
+
+            </LinearLayout>
+
+            <FrameLayout
+                android:id="@+id/updateUserErrorTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <FrameLayout
+                android:id="@+id/btnPrimary"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="10dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="13dp" />
 
         </LinearLayout>
 
         <FrameLayout
-            android:id="@+id/updateUserErrorTextView"
+            android:id="@+id/footer_container"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-        <FrameLayout
-            android:id="@+id/btnPrimary"
             android:layout_height="wrap_content"
-            android:layout_width="match_parent"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="13dp"
-            android:layout_marginHorizontal="10dp"/>
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
 
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <FrameLayout
-        android:id="@+id/footer_container"
+    <com.google.android.material.navigation.NavigationView
+        android:id="@+id/nav_view"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:layout_marginTop="?attr/actionBarSize"
+        android:background="@drawable/shape_background_main"
+        android:fitsSystemWindows="true"
+        app:headerLayout="@layout/nav_header"
+        app:itemBackground="@drawable/menu_item_background"
+        app:itemIconSize="40dp"
+        app:itemIconTint="@color/text_primary"
+        app:itemTextAppearance="@style/MenuItemStyle"
+        app:menu="@menu/drawer_menu" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.drawerlayout.widget.DrawerLayout>
