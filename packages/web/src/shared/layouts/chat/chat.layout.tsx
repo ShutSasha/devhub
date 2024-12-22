@@ -14,13 +14,13 @@ export const Wrapper = styled.div`
 `
 
 const Container = styled.div`
-    max-width: 1440px;
-    width: 100%;
-    margin: 0 auto;
-    padding: 0 10px;
-    display: grid;
-    grid-template-columns: 1fr 2fr;
-    gap: 20px;
+  max-width: 1440px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 10px;
+  display: grid;
+  grid-template-columns: 1fr 3fr;
+  gap: 20px;
 `
 
 interface MainLayoutProps {

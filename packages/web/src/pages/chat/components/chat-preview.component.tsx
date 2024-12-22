@@ -1,7 +1,6 @@
-import React, { FC } from 'react'
+import { FC } from 'react'
 import { StyledAvatar } from '@shared/components/post/post.style'
 import {
-  ChatGrayLine,
   ChatPreviewContainer,
   ChatPreviewDetails,
   ChatPreviewLastMessage,
@@ -18,15 +17,12 @@ interface ChatPreviewProps {
 
 export const ChatPreview: FC<ChatPreviewProps> = ({ username, avatar, lastmessage, isChatActive, onClick }) => {
   return (
-    <>
-      <ChatGrayLine />
-      <ChatPreviewContainer onClick={onClick} $isChatActive={isChatActive}>
-        <StyledAvatar src={avatar} />
-        <ChatPreviewDetails>
-          <ChatPreviewUsername>{username}</ChatPreviewUsername>
-          <ChatPreviewLastMessage>{lastmessage != null ? lastmessage : 'No one message'}</ChatPreviewLastMessage>
-        </ChatPreviewDetails>
-      </ChatPreviewContainer>
-    </>
+    <ChatPreviewContainer onClick={onClick} $isChatActive={isChatActive}>
+      <StyledAvatar src={avatar} />
+      <ChatPreviewDetails>
+        <ChatPreviewUsername>{username}</ChatPreviewUsername>
+        <ChatPreviewLastMessage>{lastmessage != null ? lastmessage : 'No one message'}</ChatPreviewLastMessage>
+      </ChatPreviewDetails>
+    </ChatPreviewContainer>
   )
 }

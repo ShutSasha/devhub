@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { ChatLayout } from '@shared/layouts/chat/chat.layout'
 import { ChatListContainer } from '@pages/chat/chat.style'
-import { SearchInput } from '@shared/components/search-input/search-input.component'
 import { Chat } from '@shared/components/chat/chat.component'
 import { ChatPreview } from '@pages/chat/components/chat-preview.component'
 import { useGetChatsByUserQuery, useGetChatByIdQuery, useGetFirstChatQuery } from '@api/chat.api'
@@ -23,7 +22,7 @@ export const ChatPage = () => {
   const activeChatId = useAppSelector(state => state.chatSlice.activeChatId)
   const isInitialFetch = useRef(true)
 
-  const { data: activeChat, refetch: refetchMainChat } = useGetChatByIdQuery(
+  const { data: activeChat } = useGetChatByIdQuery(
     activeChatId
       ? {
           chatId: activeChatId,
@@ -31,6 +30,12 @@ export const ChatPage = () => {
         }
       : skipToken,
   )
+
+  useEffect(() => {
+    if (!activeChatId && lastChat?.chatId) {
+      dispatch(setActiveChatId(lastChat.chatId))
+    }
+  }, [lastChat])
 
   useEffect(() => {
     refetchPreviews()
@@ -143,7 +148,6 @@ export const ChatPage = () => {
   return (
     <ChatLayout>
       <ChatListContainer>
-        <SearchInput isChatSearch={true} placeholder="Search by chats..." />
         {!isLoading && Array.isArray(userChats) ? (
           userChats.map(userChat => (
             <ChatPreview

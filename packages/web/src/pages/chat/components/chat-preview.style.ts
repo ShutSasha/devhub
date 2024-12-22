@@ -6,7 +6,7 @@ export const ChatPreviewContainer = styled.div<{ $isChatActive: boolean | undefi
   display: flex;
   align-items: center;
   cursor: pointer;
-  padding: 5px;
+  padding: 10px;
   background-color: ${({ $isChatActive }) => ($isChatActive ? 'rgba(247, 151, 29, 0.42)' : 'transparent')};
   border-radius: 2px;
   transition: background-color 0.3s ease;
