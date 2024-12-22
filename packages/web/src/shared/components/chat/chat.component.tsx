@@ -10,10 +10,9 @@ import {
 import { StyledAvatar, StyledUserCredentialsContainer, Username } from '@shared/components/post/post.style'
 import { MessagesContainer } from '@shared/components/chat/message.style'
 import { Message } from '@shared/components/chat/message.component'
-
-import { IMessage, MainChatResponse } from '~types/chat/chat.type'
 import { ROUTES } from '@pages/router/routes.enum'
-import { IndentStyle } from 'typescript'
+
+import { IMessage } from '~types/chat/chat.type'
 
 interface IChatProps {
   messages: IMessage[]
@@ -25,15 +24,7 @@ interface IChatProps {
   sendMessage: (messageInput: string) => void
 }
 
-export const Chat: FC<IChatProps> = ({
-  username,
-  avatarUrl,
-  messages,
-  chatId,
-  userId,
-  userReceiverId,
-  sendMessage,
-}) => {
+export const Chat: FC<IChatProps> = ({ username, avatarUrl, messages, userId, userReceiverId, sendMessage }) => {
   const navigate = useNavigate()
   const [messageInput, setMessageInput] = useState<string>('')
   const messagesEndRef = useRef<HTMLDivElement | null>(null)
@@ -53,7 +44,7 @@ export const Chat: FC<IChatProps> = ({
     }
   }
 
-  const handleRedirectToUserProfile = (id: string | undefin) => {
+  const handleRedirectToUserProfile = (id: string | undefined) => {
     if (id) {
       navigate(ROUTES.USER_PROFILE.replace(':id', id))
     }

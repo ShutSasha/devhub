@@ -1,5 +1,5 @@
 import React, { FC } from 'react'
-import { StyledAvatar, Username } from '@shared/components/post/post.style'
+import { StyledAvatar } from '@shared/components/post/post.style'
 import {
   ChatGrayLine,
   ChatPreviewContainer,
@@ -7,8 +7,6 @@ import {
   ChatPreviewLastMessage,
   ChatPreviewUsername,
 } from '@pages/chat/components/chat-preview.style'
-import { GrayLine } from '@pages/posts/post-view/post-view.style'
-import { IChatPreview } from '~types/chat/chat.type'
 
 interface ChatPreviewProps {
   username: string
@@ -22,7 +20,7 @@ export const ChatPreview: FC<ChatPreviewProps> = ({ username, avatar, lastmessag
   return (
     <>
       <ChatGrayLine />
-      <ChatPreviewContainer onClick={onClick} isChatActive={isChatActive}>
+      <ChatPreviewContainer onClick={onClick} $isChatActive={isChatActive}>
         <StyledAvatar src={avatar} />
         <ChatPreviewDetails>
           <ChatPreviewUsername>{username}</ChatPreviewUsername>

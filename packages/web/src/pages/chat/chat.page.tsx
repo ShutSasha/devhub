@@ -174,7 +174,7 @@ export const ChatPage = () => {
           sendMessage={sendMessage}
           chatId={lastChat.chatId}
           userId={id}
-          userReceiverId={activeChat?.participantDetails.id}
+          userReceiverId={lastChat.participantDetails.id}
           username={lastChat.participantDetails.username || 'Unknown User'}
           avatarUrl={lastChat.participantDetails.avatarUrl || '/default-avatar.png'}
           messages={messages}
