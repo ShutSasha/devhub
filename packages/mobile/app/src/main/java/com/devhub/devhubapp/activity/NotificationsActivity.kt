@@ -28,6 +28,7 @@ import com.google.android.material.navigation.NavigationView
 
 class NotificationsActivity : AppCompatActivity(), DrawerHandler {
 
+    private lateinit var encryptedPreferencesManager: EncryptedPreferencesManager
     private lateinit var unreadContainer: LinearLayout
     private lateinit var readContainer: LinearLayout
     private lateinit var noUnreadTextView: TextView
@@ -104,7 +105,10 @@ class NotificationsActivity : AppCompatActivity(), DrawerHandler {
                 }
 
                 R.id.nav_logout -> {
-                    // Handle Log Out action
+                    encryptedPreferencesManager.deleteUserData()
+                    finish()
+                    val intent = Intent(this, WelcomeActivity::class.java)
+                    startActivity(intent)
                     true
                 }
 

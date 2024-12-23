@@ -221,7 +221,10 @@ class SearchActivity : AppCompatActivity(), DrawerHandler {
                 }
 
                 R.id.nav_logout -> {
-                    // Handle Log Out action
+                    encryptedPreferencesManager.deleteUserData()
+                    finish()
+                    val intent = Intent(this, WelcomeActivity::class.java)
+                    startActivity(intent)
                     true
                 }
 
