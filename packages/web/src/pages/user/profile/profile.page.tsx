@@ -1,5 +1,7 @@
+import { useEffect, useState } from 'react'
 import { toast } from 'react-toastify'
 import { useNavigate, useParams } from 'react-router-dom'
+import { HubConnection, HubConnectionBuilder } from '@microsoft/signalr'
 import { UserProfileLayout } from '@shared/layouts/user/user-profile.layout'
 import {
   useAddFollowingUserFollowingMutation,
@@ -9,8 +11,9 @@ import {
 import postCreatedSVG from '@assets/images/user/post-created-icon.svg'
 import commentWrittenSVG from '@assets/images/user/comment-written-icon.svg'
 import { ROUTES } from '@pages/router/routes.enum'
-import { useAppSelector } from '@app/store/store'
+import { useAppDispatch, useAppSelector } from '@app/store/store'
 import { handleServerException } from '@utils/handleServerException.util'
+import { setActiveChatId } from '@features/chat/chat.slice'
 
 import * as _ from './profile.style'
 
@@ -27,6 +30,22 @@ export const UserProfile = () => {
   } = useGetUserDetailsQuery({ userId: id }, { refetchOnMountOrArgChange: true })
   const [followByUser] = useAddFollowingUserFollowingMutation()
   const [unfollowByUser] = useDeleteUserFollowingMutation()
+  const [connection, setConnection] = useState<HubConnection | null>(null)
+  const dispatch = useAppDispatch()
+
+  useEffect(() => {
+    const newConnection = new HubConnectionBuilder()
+      .withUrl('http://localhost:5231/chat')
+      .withAutomaticReconnect()
+      .build()
+
+    setConnection(newConnection)
+    return () => {
+      if (newConnection) {
+        newConnection.stop()
+      }
+    }
+  }, [])
 
   const handleFollow = async () => {
     try {
@@ -47,6 +66,25 @@ export const UserProfile = () => {
     } catch (e) {
       console.error(e)
       toast.error(handleServerException(e as ErrorException)?.join(', '))
+    }
+  }
+
+  const handleRedirectToChat = async (follower_id: string) => {
+    if (id) {
+      try {
+        await connection?.start()
+
+        if (id && follower_id) await connection?.invoke('JoinChat', id, follower_id)
+
+        connection?.on('JoinedChat', (chatId: string) => {
+          dispatch(setActiveChatId(chatId))
+        })
+
+        await connection?.invoke('JoinChat', id, follower_id)
+        navigate(ROUTES.CHAT.replace(':id', id))
+      } catch (error) {
+        console.error('Error in handleRedirectToChat:', error)
+      }
     }
   }
 
@@ -93,7 +131,7 @@ export const UserProfile = () => {
             ) : (
               <_.FollowBtn onClick={handleFollow}>Follow</_.FollowBtn>
             )}
-            <_.SendMessageBtn>Send message</_.SendMessageBtn>
+            <_.SendMessageBtn onClick={() => handleRedirectToChat(id)}>Send message</_.SendMessageBtn>
           </_.InterectWithUserContainer>
         )}
         {user?._id === userDetails._id && (
