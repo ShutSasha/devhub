@@ -70,18 +70,18 @@ export const UserProfile = () => {
   }
 
   const handleRedirectToChat = async (follower_id: string) => {
-    if (id) {
+    if (user) {
       try {
         await connection?.start()
 
-        if (id && follower_id) await connection?.invoke('JoinChat', id, follower_id)
+        if (user._id && follower_id) await connection?.invoke('JoinChat', user._id, follower_id)
 
         connection?.on('JoinedChat', (chatId: string) => {
           dispatch(setActiveChatId(chatId))
         })
 
-        await connection?.invoke('JoinChat', id, follower_id)
-        navigate(ROUTES.CHAT.replace(':id', id))
+        await connection?.invoke('JoinChat', user._id, follower_id)
+        navigate(ROUTES.CHAT.replace(':id', user._id))
       } catch (error) {
         console.error('Error in handleRedirectToChat:', error)
       }

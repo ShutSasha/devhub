@@ -38,6 +38,7 @@ export const ChatPage = () => {
 
   useEffect(() => {
     refetchPreviews()
+    refetchActiveChat()
   }, [activeChatId])
 
   useEffect(() => {
@@ -96,9 +97,11 @@ export const ChatPage = () => {
             setMessages(prevMessages => [...prevMessages, message])
           })
 
-          await refetchPreviews()
         } catch (error) {
           console.error('Error starting connection or joining chat: ', error)
+        }
+        finally {
+          refetchPreviews()
         }
       }
     }
@@ -114,12 +117,14 @@ export const ChatPage = () => {
     if (connection && activeChatId && messageInput.trim()) {
       try {
         await connection.invoke('SendMessage', activeChatId, id, messageInput)
+        refetchPreviews()
       } catch (error) {
         console.error('Error sending message: ', error)
       }
     } else if (!activeChatId && connection && messageInput.trim() && lastChat) {
       try {
         await connection.invoke('SendMessage', lastChat.chatId, id, messageInput)
+        refetchPreviews()
       } catch (error) {
         console.error('Error sending message: ', error)
       }
