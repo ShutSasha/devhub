@@ -22,7 +22,7 @@ export const ChatPage = () => {
   const activeChatId = useAppSelector(state => state.chatSlice.activeChatId)
   const isInitialFetch = useRef(true)
 
-  const { data: activeChat } = useGetChatByIdQuery(
+  const { data: activeChat,refetch: refetchActiveChat } = useGetChatByIdQuery(
     activeChatId
       ? {
           chatId: activeChatId,
@@ -75,6 +75,7 @@ export const ChatPage = () => {
     }
 
     dispatch(setActiveChatId(chatId))
+    refetchActiveChat();
   }
 
   useEffect(() => {
@@ -87,6 +88,7 @@ export const ChatPage = () => {
           if (id && lastChat.participantDetails.id) {
             await connection.invoke('JoinChat', id, lastChat.participantDetails.id)
           }
+
           connection.on('ReceiveMessage', (message: IMessage) => {
             setMessages(prevMessages => {
               const updatedMessages = [...prevMessages, message]
@@ -97,6 +99,7 @@ export const ChatPage = () => {
         } catch (error) {
           console.error('Error starting connection or joining chat: ', error)
         }
+        
       } else if (connection && activeChat) {
         try {
           await connection.stop()
