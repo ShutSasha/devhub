@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { ChatLayout } from '@shared/layouts/chat/chat.layout'
 import { ChatListContainer } from '@pages/chat/chat.style'
 import { Chat } from '@shared/components/chat/chat.component'
@@ -20,9 +20,8 @@ export const ChatPage = () => {
   const [messages, setMessages] = useState<IMessage[]>([])
   const dispatch = useAppDispatch()
   const activeChatId = useAppSelector(state => state.chatSlice.activeChatId)
-  const isInitialFetch = useRef(true)
 
-  const { data: activeChat,refetch: refetchActiveChat } = useGetChatByIdQuery(
+  const { data: activeChat, refetch: refetchActiveChat } = useGetChatByIdQuery(
     activeChatId
       ? {
           chatId: activeChatId,
@@ -42,22 +41,22 @@ export const ChatPage = () => {
   }, [activeChatId])
 
   useEffect(() => {
-    if (isInitialFetch.current && process.env.NODE_ENV === 'development') {
-      isInitialFetch.current = false
-      return
-    }
+    connection?.stop()
 
     const newConnection = new HubConnectionBuilder()
       .withUrl('http://localhost:5231/chat')
       .withAutomaticReconnect()
       .build()
 
-    setConnection(newConnection)
+    setConnection(prev => {
+      if (prev) {
+        prev.stop()
+      }
+      return newConnection
+    })
 
     return () => {
-      if (newConnection) {
-        newConnection.stop()
-      }
+      newConnection.stop()
     }
   }, [activeChatId])
 
@@ -66,6 +65,8 @@ export const ChatPage = () => {
       setMessages(activeChat.chatMessages || [])
     } else if (lastChat) {
       setMessages(lastChat.chatMessages || [])
+    } else {
+      setMessages([])
     }
   }, [activeChat, lastChat])
 
@@ -75,48 +76,27 @@ export const ChatPage = () => {
     }
 
     dispatch(setActiveChatId(chatId))
-    refetchActiveChat();
+    refetchActiveChat()
   }
 
   useEffect(() => {
     const initiateConnection = async () => {
-      if (connection && !activeChat && lastChat) {
+      if (connection) {
         try {
           await connection.stop()
           await connection.start()
 
-          if (id && lastChat.participantDetails.id) {
-            await connection.invoke('JoinChat', id, lastChat.participantDetails.id)
+          const participantId = activeChat?.participantDetails.id || lastChat?.participantDetails.id
+          if (id && participantId) {
+            await connection.invoke('JoinChat', id, participantId)
           }
 
+          connection.off('ReceiveMessage')
           connection.on('ReceiveMessage', (message: IMessage) => {
-            setMessages(prevMessages => {
-              const updatedMessages = [...prevMessages, message]
-              refetchPreviews()
-              return updatedMessages
-            })
+            setMessages(prevMessages => [...prevMessages, message])
           })
-        } catch (error) {
-          console.error('Error starting connection or joining chat: ', error)
-        }
-        
-      } else if (connection && activeChat) {
-        try {
-          await connection.stop()
-          await connection.start()
 
-          if (id && lastChat?.participantDetails.id) {
-            await connection.invoke('JoinChat', id, activeChat.participantDetails.id)
-          }
-
-          connection.on('ReceiveMessage', (message: IMessage) => {
-            setMessages(prevMessages => {
-              const updatedMessages = [...prevMessages, message]
-
-              refetchPreviews()
-              return updatedMessages
-            })
-          })
+          await refetchPreviews()
         } catch (error) {
           console.error('Error starting connection or joining chat: ', error)
         }
@@ -126,9 +106,7 @@ export const ChatPage = () => {
     initiateConnection()
 
     return () => {
-      if (connection) {
-        connection.off('ReceiveMessage')
-      }
+      connection?.off('ReceiveMessage')
     }
   }, [connection, lastChat, activeChat])
 
