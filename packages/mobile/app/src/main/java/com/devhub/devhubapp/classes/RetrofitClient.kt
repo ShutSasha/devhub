@@ -7,6 +7,8 @@ import android.content.Context
 import com.devhub.devhubapp.api.AuthAPI
 import com.devhub.devhubapp.api.PostAPI
 import com.devhub.devhubapp.api.CommentAPI
+import com.devhub.devhubapp.api.NotificationAPI
+import com.devhub.devhubapp.api.ReportAPI
 import com.devhub.devhubapp.api.UserAPI
 import com.devhub.devhubapp.interceptors.AuthInterceptor
 import com.google.gson.GsonBuilder
@@ -22,6 +24,8 @@ class RetrofitClient private constructor(context: Context) {
     val postAPI: PostAPI
     val commentAPI: CommentAPI
     val userAPI: UserAPI
+    val reportAPI: ReportAPI
+    val notificationAPI: NotificationAPI
 
     init {
         val gson = GsonBuilder()
@@ -51,6 +55,8 @@ class RetrofitClient private constructor(context: Context) {
         postAPI = retrofit.create(PostAPI::class.java)
         commentAPI = retrofit.create(CommentAPI::class.java)
         userAPI = retrofit.create(UserAPI::class.java)
+        reportAPI = retrofit.create(ReportAPI::class.java)
+        notificationAPI = retrofit.create(NotificationAPI::class.java)
     }
 
     fun getRetrofit(): Retrofit {

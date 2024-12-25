@@ -15,4 +15,6 @@ export enum ROUTES {
   USER_FRIENDS_FOLLOWERS = '/user-friends-followers/:id',
   USER_FRIENDS_FOLLOWED_LIST = '/user-friends-followers-list/:id',
   STARRED = '/starred/:id',
+  CHAT = '/user-chats/:id',
+  NOTIFICATION = '/notification/:id',
 }

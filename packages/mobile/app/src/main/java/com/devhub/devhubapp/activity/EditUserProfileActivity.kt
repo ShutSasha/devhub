@@ -9,11 +9,13 @@ import android.text.InputType
 import android.util.Log
 import android.view.View
 import android.webkit.MimeTypeMap
+import android.widget.ImageView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import com.bumptech.glide.Glide
@@ -33,8 +35,8 @@ import com.devhub.devhubapp.fragment.InputFragment
 import com.devhub.devhubapp.fragment.InputTextListener
 import com.devhub.devhubapp.fragment.OutlinedButtonFragment
 import com.devhub.devhubapp.fragment.PrimaryButtonFragment
+import com.google.android.material.navigation.NavigationView
 import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.ResponseBody
@@ -43,10 +45,12 @@ import retrofit2.Callback
 import retrofit2.Response
 import java.io.File
 
-class EditUserProfileActivity : AppCompatActivity() {
+class EditUserProfileActivity : AppCompatActivity(), DrawerHandler {
     private lateinit var encryptedPreferencesManager: EncryptedPreferencesManager
     private lateinit var userAPI: UserAPI
     private lateinit var binding: ActivityEditUserProfileBinding
+    private lateinit var drawerLayout: DrawerLayout
+    private lateinit var navigationView: NavigationView
     private var name: String = ""
     private var description: String = ""
     val editUserError = ErrorFragment()
@@ -61,6 +65,14 @@ class EditUserProfileActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_edit_user_profile)
+
+        drawerLayout = findViewById(R.id.drawer_layout)
+        navigationView = findViewById(R.id.nav_view)
+
+        val displayMetrics = resources.displayMetrics
+        navigationView.layoutParams.width = displayMetrics.widthPixels
+        navigationView.requestLayout()
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.edit_user_profile_container)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
@@ -77,7 +89,6 @@ class EditUserProfileActivity : AppCompatActivity() {
         name = encryptedPreferencesManager.getData("name") ?: ""
         description = intent.getStringExtra("DESCRIPTION") ?: ""
 
-
         val fragmentManager = supportFragmentManager
         if (savedInstanceState == null) {
             fragmentManager.beginTransaction()
@@ -87,24 +98,76 @@ class EditUserProfileActivity : AppCompatActivity() {
         }
 
         setUpFragments(userId)
+
+        setupDrawer()
+    }
+
+    private fun setupDrawer() {
+        val headerView = navigationView.getHeaderView(0)
+        val avatarImageView = headerView.findViewById<ImageView>(R.id.nav_user_avatar)
+        val closeImageView = headerView.findViewById<ImageView>(R.id.nav_close)
+
+        val user = encryptedPreferencesManager.getUserData()
+        if (user.avatar.isNotEmpty()) {
+            Glide.with(this)
+                .load(user.avatar)
+                .into(avatarImageView)
+        }
+
+        closeImageView.setOnClickListener {
+            drawerLayout.closeDrawers()
+        }
+
+        navigationView.setNavigationItemSelectedListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.nav_my_posts -> {
+                    // Handle My Posts action
+                    true
+                }
+
+                R.id.nav_notifications -> {
+                    val intent = Intent(this, NotificationsActivity::class.java)
+                    startActivity(intent)
+                    true
+                }
+
+                R.id.nav_logout -> {
+                    encryptedPreferencesManager.deleteUserData()
+                    finish()
+                    val intent = Intent(this, WelcomeActivity::class.java)
+                    startActivity(intent)
+                    true
+                }
+
+                else -> false
+            }
+        }
+    }
+
+    override fun openDrawer() {
+        drawerLayout.openDrawer(androidx.core.view.GravityCompat.START)
     }
 
     @SuppressLint("CommitTransaction")
     private fun setUpFragments(
         userId: String?
-    ){
+    ) {
         binding.editUserErrorTextView.visibility = View.GONE
         binding.updateUserErrorTextView.visibility = View.GONE
 
         val fragmentManager: FragmentManager = supportFragmentManager
         val fragmentTransaction: FragmentTransaction = fragmentManager.beginTransaction()
 
-        val nameInputFragment = createInputFragment("name", InputType.TYPE_CLASS_TEXT,
-            "", encryptedPreferencesManager.getData("name"))
+        val nameInputFragment = createInputFragment(
+            "name", InputType.TYPE_CLASS_TEXT,
+            "", encryptedPreferencesManager.getData("name")
+        )
         fragmentTransaction.add(R.id.nameInputContainer, nameInputFragment)
 
-        val descriptionInputFragment = createInputFragment("description", InputType.TYPE_CLASS_TEXT,
-            "", description)
+        val descriptionInputFragment = createInputFragment(
+            "description", InputType.TYPE_CLASS_TEXT,
+            "", description
+        )
         fragmentTransaction.add(R.id.descriptionInputContainer, descriptionInputFragment)
 
         fragmentTransaction.add(R.id.editUserErrorTextView, editUserError)
@@ -139,7 +202,12 @@ class EditUserProfileActivity : AppCompatActivity() {
 
     }
 
-    private fun createInputFragment(field: String, inputType: Int, hint: String, text: String?): InputFragment {
+    private fun createInputFragment(
+        field: String,
+        inputType: Int,
+        hint: String,
+        text: String?
+    ): InputFragment {
         val color = ContextCompat.getColor(this, R.color.text_primary)
 
         val inputFragment = InputFragment()
@@ -185,21 +253,21 @@ class EditUserProfileActivity : AppCompatActivity() {
                 updatePhoto(encryptedPreferencesManager.getData("user_id"))
             } else {
                 binding.tvUploadStatus.text = "No file chosen"
-                Log.e("ImagePicker", "No image selected")
             }
-        } else {
-            Log.e("ImagePicker", "Image picker canceled or failed")
         }
     }
 
-    private fun editUserData(userId: String?){
+    private fun editUserData(userId: String?) {
         val user = EditProfileRequest(
             id = userId,
             name = name,
             bio = description
         )
         userAPI.editUserProfile(user).enqueue(object : Callback<EditProfileResponse> {
-            override fun onResponse(call: Call<EditProfileResponse>, response: Response<EditProfileResponse>) {
+            override fun onResponse(
+                call: Call<EditProfileResponse>,
+                response: Response<EditProfileResponse>
+            ) {
                 if (response.isSuccessful) {
                     val data = response.body()
                     Log.i("EditUserProfile", data.toString())
@@ -210,7 +278,8 @@ class EditUserProfileActivity : AppCompatActivity() {
 
                         Log.i("EditUserProfile", user.toString())
 
-                        val intent = Intent(this@EditUserProfileActivity, UserProfileActivity::class.java)
+                        val intent =
+                            Intent(this@EditUserProfileActivity, UserProfileActivity::class.java)
                         intent.putExtra("USER_ID", user._id)
                         startActivity(intent)
                         finish()
@@ -253,7 +322,10 @@ class EditUserProfileActivity : AppCompatActivity() {
         Log.d("UpdatePhoto", "Uploading file with MIME type: $mimeType")
 
         userAPI.updatePhoto(userId, imagePart).enqueue(object : Callback<UpdatePhotoResponse> {
-            override fun onResponse(call: Call<UpdatePhotoResponse>, response: Response<UpdatePhotoResponse>) {
+            override fun onResponse(
+                call: Call<UpdatePhotoResponse>,
+                response: Response<UpdatePhotoResponse>
+            ) {
                 if (response.isSuccessful) {
                     Log.i("UpdatePhoto", "Photo updated successfully")
                     val photoUri = response.body()
@@ -263,7 +335,10 @@ class EditUserProfileActivity : AppCompatActivity() {
                         Log.e("UpdatePhoto", "No data to save")
                     }
                 } else {
-                    Log.e("UpdatePhoto", "Failed to update photo: ${response.code()} ${response.message()}")
+                    Log.e(
+                        "UpdatePhoto",
+                        "Failed to update photo: ${response.code()} ${response.message()}"
+                    )
                 }
             }
 

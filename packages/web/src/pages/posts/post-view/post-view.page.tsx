@@ -15,30 +15,37 @@ import { useCreateCommentMutation } from '@api/comment.api'
 import { handleServerException } from '@utils/handleServerException.util'
 import { toast } from 'react-toastify'
 import { ROUTES } from '@pages/router/routes.enum'
-import { useGetUserReactionsQuery } from '@api/user.api'
+import { useGetUserReactionsQuery, useLazyGetReportsByUserQuery, useReportPostMutation } from '@api/user.api'
 import editPostSVG from '@assets/images/post/edit-post-icon.svg'
 import deletePostSVG from '@assets/images/post/delete-post-ic.svg'
+import reportSVG from '@assets/images/post/report.svg'
 
 import {
   ActionContainer,
   ActionInnerContainer,
+  CategoryButton,
   Comment,
   ContentText,
   Dislike,
   GrayLine,
   Like,
+  Modal,
+  Overlay,
   PostBtn,
   PostCreationData,
   PostImage,
   PostTag,
   PostTagsContainer,
   PostTitle,
+  ReportIcon,
+  Title,
   WriteCommentContainer,
 } from './post-view.style'
 import { Comment as CommentComponent } from './components/comment.component'
 import { InputContainer } from './components/write-comment.component'
 
 import { ErrorException } from '~types/error/error.type'
+import { IReport } from '~types/post/post.type'
 
 export const PostView = () => {
   const { id } = useParams()
@@ -54,6 +61,10 @@ export const PostView = () => {
   const [isLiked, setLiked] = useState<boolean>(false)
   const [isDisliked, setDisliked] = useState<boolean>(false)
   const [isDisableBtn, setDisabledBtn] = useState<boolean>(false)
+  const [isModalVisible, setModalVisible] = useState(false)
+  const [isClosing, setIsClosing] = useState(false)
+  const [reportPost] = useReportPostMutation()
+  const [getReportsByUser] = useLazyGetReportsByUserQuery()
 
   useEffect(() => {
     refetchReactions()
@@ -130,6 +141,35 @@ export const PostView = () => {
     }
   }
 
+  const handleReportPost = async (category: string) => {
+    try {
+      if (!user) return toast.error('Log in for reporting posts', { autoClose: 1300 })
+
+      const reports = await getReportsByUser({ userId: user._id }).unwrap()
+
+      const isReported = reports.some((report: IReport) => report.content === post?._id)
+
+      if (isReported) return toast.error('You have already reported this post', { autoClose: 1300 })
+
+      await reportPost({ sender: user._id, content: post?._id, category }).unwrap()
+
+      toast.info(`Post reported for ${category}`, { autoClose: 1300 })
+      closeModal()
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
+  const openModal = () => {
+    setIsClosing(false)
+    setModalVisible(true)
+  }
+
+  const closeModal = () => {
+    setIsClosing(true)
+    setTimeout(() => setModalVisible(false), 500) // 500ms відповідає тривалості анімації
+  }
+
   if (error) {
     return (
       <PostViewLayout>
@@ -165,7 +205,7 @@ export const PostView = () => {
           />
           <Username style={{ fontSize: '26px', lineHeight: '36px', fontWeight: '500' }}>{post.user.username}</Username>
         </StyledUserCredentialsContainer>
-        <div style={{ alignSelf: 'flex-start' }}>
+        <div style={{ display: 'flex', alignSelf: 'flex-start', gap: '12px' }}>
           {user?._id === post.user._id && (
             <div style={{ display: 'flex', gap: '12px' }}>
               <img
@@ -179,6 +219,19 @@ export const PostView = () => {
                 src={deletePostSVG}
               />
             </div>
+          )}
+          <ReportIcon onClick={openModal} src={reportSVG} />
+          {isModalVisible && (
+            <Overlay className={isClosing ? 'hidden' : 'visible'} onClick={closeModal}>
+              <Modal className={isClosing ? 'hidden' : 'visible'} onClick={e => e.stopPropagation()}>
+                <Title>Report this post by one category</Title>
+                <CategoryButton onClick={() => handleReportPost('Spam')}>Spam</CategoryButton>
+                <CategoryButton onClick={() => handleReportPost('Copyright Infringement')}>
+                  Copyright Infringement
+                </CategoryButton>
+                <CategoryButton onClick={() => handleReportPost('Misinformation')}>Misinformation</CategoryButton>
+              </Modal>
+            </Overlay>
           )}
         </div>
       </StyledUserCredentialsContainerWrapper>

@@ -4,7 +4,6 @@ import { ROUTES } from '@pages/router/routes.enum'
 import { SearchInput } from '@shared/components/search-input/search-input.component'
 import { MainLayout } from '@shared/layouts/main.layout'
 import { useNavigate, useParams } from 'react-router-dom'
-import openChatSvg from '@assets/images/chat/open-chat.svg'
 import { useDeleteUserFollowingMutation, useGetUserFollowingsQuery } from '@api/user.api'
 import { handleServerException } from '@utils/handleServerException.util'
 
@@ -47,7 +46,7 @@ export const FollowedList = () => {
     <MainLayout>
       <div></div>
       <div>
-        <SearchInput placeholder="Search by users..." />
+        <SearchInput isChatSearch={false} placeholder="Search by users..." />
         <_.ChangeList>
           <_.ListText
             $underline={currentUrl.includes(ROUTES.USER_FRIENDS_FOLLOWERS.replace(':id', ''))}
@@ -72,7 +71,6 @@ export const FollowedList = () => {
                   <_.UserName>{following.username}</_.UserName>
                 </_.UserListItemDataContainer>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                  <_.OpenChatIcon src={openChatSvg} alt="open chat" />
                   <_.UnFollowButton onClick={() => handleUnfollow(following._id)}>Unfollow</_.UnFollowButton>
                 </div>
               </_.UserListItem>

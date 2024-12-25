@@ -21,7 +21,14 @@ tasks:
       - |
         cd ./CommentService
         task run
-        
+  
+  run_notification_service:
+    desc: "Run the Go NotificationService"
+    cmds:
+      - |
+        cd ./NotificationService
+        task run
+
   run_user_service:
     desc: "Run the C# UserService"
     cmds:
@@ -35,12 +42,21 @@ tasks:
       - |
         cd ./ApiGetaway
         dotnet run
-
+  
+  run_chat_service:
+    desc: "Run the C# ChatService"
+    cmds:
+      - |
+        cd ./ChatService
+        dotnet run
+      
   run_all:
     desc: "Run both AuthService and PostService"
     deps:
       - run_auth_service
       - run_post_service
+      - run_notification_service
       - run_user_service
       - run_api_getaway
       - run_comment_service
+      - run_chat_service

@@ -13,3 +13,10 @@ export interface IPost {
   comments: IComment[]
   tags: string[]
 }
+
+export interface IReport {
+  _id: string
+  content: string
+  sender: string
+  category: string
+}

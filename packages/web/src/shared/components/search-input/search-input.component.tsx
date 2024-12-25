@@ -3,8 +3,12 @@ import { FONTS } from '@shared/consts/fonts.enum'
 import styled from 'styled-components'
 import search from '@assets/images/search.svg'
 
-const Container = styled.div`
-  flex: 1;
+interface ContainerProps {
+  $isChatSearch: boolean
+}
+
+const Container = styled.div<ContainerProps>`
+  flex: ${({ $isChatSearch }) => ($isChatSearch ? 'none' : '1')};
   position: relative;
   margin-bottom: 16px;
 `
@@ -34,15 +38,16 @@ const SearchIcon = styled.img`
 `
 
 interface SearchInputProps {
+  isChatSearch: boolean
   placeholder?: string
   value?: string
   onChange?: (e: ChangeEvent<HTMLInputElement>) => void
   style?: CSSProperties
 }
 
-export const SearchInput: FC<SearchInputProps> = ({ placeholder, value, onChange }) => {
+export const SearchInput: FC<SearchInputProps> = ({ placeholder, value, onChange, isChatSearch }) => {
   return (
-    <Container>
+    <Container $isChatSearch={isChatSearch}>
       <Input placeholder={placeholder} value={value} onChange={onChange}></Input>
       <SearchIcon src={search} />
     </Container>

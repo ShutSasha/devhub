@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+option csharp_namespace = "ChatService";
+
+
+service UserChatService{
+  rpc AddChatToUser (AddChatToUserRequest) returns (UserResponse);
+  rpc DeleteChatToUserRequest (DeleteChatFromUserRequest) returns (UserResponse);
+}
+
+message AddChatToUserRequest{
+  string userId = 1;
+  string targetUserId = 2;
+  string chatId = 3;
+}
+
+message DeleteChatFromUserRequest{
+  string userId = 1;
+  string targetUserId = 2;
+  string chatId = 3;
+}
+
+message UserResponse{
+  bool success = 1;
+  string message = 2;
+}

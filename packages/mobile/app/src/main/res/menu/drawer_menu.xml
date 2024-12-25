@@ -1,0 +1,18 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/nav_my_posts"
+        android:title="My Posts"
+        android:icon="@drawable/ic_my_posts"
+        app:actionLayout="@layout/menu_item_layout" />
+    <item
+        android:id="@+id/nav_notifications"
+        android:title="Notifications"
+        android:icon="@drawable/ic_notifications"
+        app:actionLayout="@layout/menu_item_layout" />
+    <item
+        android:id="@+id/nav_logout"
+        android:title="Log Out"
+        android:icon="@drawable/ic_logout"
+        app:actionLayout="@layout/menu_item_layout" />
+</menu>

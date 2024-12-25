@@ -15,7 +15,7 @@ export const Container = styled.div`
   margin: 0 auto;
 
   display: grid;
-  grid-template-columns: 300px minmax(300px, 1fr) 300px;
+  grid-template-columns: 300px minmax(300px, 1fr) 340px;
   align-items: center;
 `
 
@@ -130,4 +130,37 @@ export const Logout = styled.button`
 
   object-fit: cover;
   cursor: pointer;
+`
+
+export const NotificationImgContainer = styled.div<{ $count: number }>`
+  position: relative;
+  cursor: pointer;
+  height: 24px;
+  width: 24px;
+
+  &:after {
+    content: '${({ $count }) => ($count === 0 ? '' : $count > 9 ? '9+' : $count)}';
+    position: absolute;
+    display: ${({ $count }) => ($count === 0 ? 'none' : 'flex')};
+    justify-content: center;
+    align-items: center;
+    width: ${({ $count }) => ($count > 9 ? '18px' : '14px')};
+    height: ${({ $count }) => ($count > 9 ? '18px' : '14px')};
+    background-color: #ff9900;
+    border-radius: 50%;
+    top: -5px;
+    right: -2px;
+    z-index: 500;
+    font-size: 12px;
+    color: #fff;
+    font-weight: bold;
+    padding: 0 4px;
+    box-sizing: border-box;
+  }
+`
+
+export const NotificationImg = styled.img`
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
 `

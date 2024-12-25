@@ -22,6 +22,7 @@ import com.devhub.devhubapp.activity.UserProfileActivity
 import com.devhub.devhubapp.classes.EncryptedPreferencesManager
 import com.devhub.devhubapp.classes.RetrofitClient
 import com.devhub.devhubapp.dataClasses.Post
+import com.devhub.devhubapp.dataClasses.SavedPostDetailsResponse
 import com.devhub.devhubapp.dataClasses.SavedPostRequest
 import com.devhub.devhubapp.dataClasses.UserIdRequest
 import com.devhub.devhubapp.dataClasses.UserReactions
@@ -154,8 +155,8 @@ class PostFragment : Fragment() {
         val request = SavedPostRequest(userId, postId)
 
         RetrofitClient.getInstance(requireContext()).userAPI.toggleSavePost(request)
-            .enqueue(object : Callback<Post> {
-                override fun onResponse(call: Call<Post>, response: Response<Post>) {
+            .enqueue(object : Callback<SavedPostDetailsResponse> {
+                override fun onResponse(call: Call<SavedPostDetailsResponse>, response: Response<SavedPostDetailsResponse>) {
                     if (response.isSuccessful) {
                         response.body()?.let { updatedPost ->
                             post.saved = updatedPost.saved
@@ -178,7 +179,7 @@ class PostFragment : Fragment() {
                     }
                 }
 
-                override fun onFailure(call: Call<Post>, t: Throwable) {
+                override fun onFailure(call: Call<SavedPostDetailsResponse>, t: Throwable) {
                     Log.e("PostFragment", "Error toggling save post: ${t.message}", t)
                 }
             })

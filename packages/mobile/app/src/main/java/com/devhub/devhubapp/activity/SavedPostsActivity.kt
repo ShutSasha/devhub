@@ -12,6 +12,8 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.drawerlayout.widget.DrawerLayout
+import com.bumptech.glide.Glide
 import com.devhub.devhubapp.R
 import com.devhub.devhubapp.classes.EncryptedPreferencesManager
 import com.devhub.devhubapp.classes.RetrofitClient
@@ -22,11 +24,12 @@ import com.devhub.devhubapp.dataClasses.UserReactions
 import com.devhub.devhubapp.fragment.FooterFragment
 import com.devhub.devhubapp.fragment.HeaderFragment
 import com.devhub.devhubapp.fragment.PostFragment
+import com.google.android.material.navigation.NavigationView
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class SavedPostsActivity : AppCompatActivity() {
+class SavedPostsActivity : AppCompatActivity(), DrawerHandler {
     @SuppressLint("CommitTransaction")
     private var currentPage = 1
     private var isLoading = false
@@ -36,11 +39,20 @@ class SavedPostsActivity : AppCompatActivity() {
     private val REQUEST_CODE_CREATE_POST = 101
     private lateinit var emptyStateImage: ImageView
     private lateinit var scrollView: ScrollView
+    private lateinit var drawerLayout: DrawerLayout
+    private lateinit var navigationView: NavigationView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_saved_posts)
+
+        drawerLayout = findViewById(R.id.drawer_layout)
+        navigationView = findViewById(R.id.nav_view)
+
+        val displayMetrics = resources.displayMetrics
+        navigationView.layoutParams.width = displayMetrics.widthPixels
+        navigationView.requestLayout()
 
         emptyStateImage = findViewById(R.id.empty_state_image)
         scrollView = findViewById(R.id.scrollView)
@@ -83,6 +95,54 @@ class SavedPostsActivity : AppCompatActivity() {
         }
 
         fetchUserReactions(user._id)
+
+        setupDrawer()
+    }
+
+    private fun setupDrawer() {
+        val headerView = navigationView.getHeaderView(0)
+        val avatarImageView = headerView.findViewById<ImageView>(R.id.nav_user_avatar)
+        val closeImageView = headerView.findViewById<ImageView>(R.id.nav_close)
+
+        val user = encryptedPreferencesManager.getUserData()
+        if (user.avatar.isNotEmpty()) {
+            Glide.with(this)
+                .load(user.avatar)
+                .into(avatarImageView)
+        }
+
+        closeImageView.setOnClickListener {
+            drawerLayout.closeDrawers()
+        }
+
+        navigationView.setNavigationItemSelectedListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.nav_my_posts -> {
+                    // Handle My Posts action
+                    true
+                }
+
+                R.id.nav_notifications -> {
+                    val intent = Intent(this, NotificationsActivity::class.java)
+                    startActivity(intent)
+                    true
+                }
+
+                R.id.nav_logout -> {
+                    encryptedPreferencesManager.deleteUserData()
+                    finish()
+                    val intent = Intent(this, WelcomeActivity::class.java)
+                    startActivity(intent)
+                    true
+                }
+
+                else -> false
+            }
+        }
+    }
+
+    override fun openDrawer() {
+        drawerLayout.openDrawer(androidx.core.view.GravityCompat.START)
     }
 
     private fun loadSavedPosts(userId: String) {

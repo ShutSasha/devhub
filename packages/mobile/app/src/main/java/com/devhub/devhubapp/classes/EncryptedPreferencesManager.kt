@@ -47,6 +47,27 @@ class EncryptedPreferencesManager(context: Context) {
         saveData("roles", userData.userRole?.joinToString(",") ?: "")
     }
 
+    fun deleteUserData() {
+        val editor = sharedPreferences.edit()
+        editor.remove("user_id")
+        editor.remove("name")
+        editor.remove("bio")
+        editor.remove("username")
+        editor.remove("email")
+        editor.remove("avatar")
+        editor.remove("createdAt")
+        editor.remove("devPoints")
+        editor.remove("activationCode")
+        editor.remove("isActivated")
+        editor.remove("roles")
+        editor.remove("access_token")
+        editor.remove("refresh_token")
+        editor.remove("likedPosts")
+        editor.remove("dislikedPosts")
+        editor.remove("saved_posts")
+        editor.apply()
+    }
+
     fun getUserData(): User {
 
         val createdAtLong = sharedPreferences.getLong("createdAt", 0L)
@@ -99,7 +120,6 @@ class EncryptedPreferencesManager(context: Context) {
             dislikedPosts = dislikedPosts
         )
     }
-
 
     fun saveData(key: String, value: Any) {
         val editor = sharedPreferences.edit()
